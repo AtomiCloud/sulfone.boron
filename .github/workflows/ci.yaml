@@ -38,11 +38,11 @@ jobs:
       matrix:
         configs:
           - image-name: sulfone-boron-arm
-            dockerfile: ./infra/Dockerfile
+            dockerfile: Dockerfile
             context: .
             platform: linux/arm
           - image-name: sulfone-boron-amd
-            dockerfile: ./infra/Dockerfile
+            dockerfile: Dockerfile
             context: .
             platform: linux/amd64
     env:
