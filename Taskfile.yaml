@@ -1,0 +1,23 @@
+version: "3"
+
+vars:
+  PLATFORM: sulfone
+  SERVICE: boron
+  USER: kirinnee/
+
+includes:
+  docker: tasks/Taskfile.docker.yaml
+
+tasks:
+  setup:
+    desc: "Setup the repository"
+    cmds:
+      - go mod tidy
+  build:
+    desc: "Build the binary"
+    cmds:
+      - go build -o bin/{{.PLATFORM}}-{{.SERVICE}} .
+  run:
+    desc: "Run the application"
+    cmds:
+      - go run . {{.CLI_ARGS}}

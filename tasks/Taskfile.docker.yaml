@@ -1,0 +1,16 @@
+version: "3"
+
+tasks:
+  build:
+    desc: "Build docker images"
+    cmds:
+      - docker build . -t {{.USER}}{{.PLATFORM}}-{{.SERVICE}}:{{.CLI_ARGS |default "latest"}}
+  run:
+    desc: "Run docker images"
+    cmds:
+      - docker run --rm -v /var/run/docker.sock:/var/run/docker.sock {{.USER}}{{.PLATFORM}}-{{.SERVICE}}:{{.CLI_ARGS |default "latest"}} setup
+      - docker run --rm -it -p 9000:9000 --network cyanprint -v /var/run/docker.sock:/var/run/docker.sock {{.USER}}{{.PLATFORM}}-{{.SERVICE}}:{{.CLI_ARGS |default "latest"}}
+  push:
+    desc: "Push docker images"
+    cmds:
+      - docker push {{.USER}}{{.PLATFORM}}-{{.SERVICE}}:{{.CLI_ARGS |default "latest"}}
