@@ -3,7 +3,7 @@ module github.com/AtomiCloud/sulfone.boron
 go 1.20
 
 require (
-	github.com/docker/docker v24.0.6+incompatible
+	github.com/docker/docker v24.0.7+incompatible
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.4.0
 	github.com/urfave/cli/v2 v2.25.7
