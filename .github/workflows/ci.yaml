@@ -17,9 +17,6 @@ env:
   DOCKER_CACHE_REGION: "APAC"
 
   # Helm
-  HELM_DOMAIN: ghcr.io
-  HELM_USER: ${{ github.actor }}
-  HELM_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   precommit:
@@ -102,9 +99,9 @@ jobs:
 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          DOMAIN: ${{ env.HELM_DOMAIN }}
+          DOMAIN: ${{ env.DOCKER_DOMAIN }}
 
-          DOCKER_PASSWORD: ${{ env.HELM_PASSWORD }}
-          DOCKER_USER: ${{ env.HELM_USER }}
+          DOCKER_PASSWORD: ${{ env.DOCKER_PASSWORD }}
+          DOCKER_USER: ${{ env.DOCKER_USER }}
 
         run: nix develop .#releaser -c scripts/ci/release.sh
