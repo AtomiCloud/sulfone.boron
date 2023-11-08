@@ -114,7 +114,7 @@ func (de TemplateExecutor) listContainersVolumesImages() (
 
 	go func() {
 		fmt.Println("🔍 Looking for images...")
-		images, err := d.GetImages()
+		images, err := d.ListImages()
 		if err != nil {
 			fmt.Println("🚨 Error looking for images", err)
 			errChan <- []error{err}

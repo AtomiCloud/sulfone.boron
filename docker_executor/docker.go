@@ -22,7 +22,7 @@ type DockerClient struct {
 
 const networkName = "cyanprint"
 
-func (d *DockerClient) GetImages() ([]DockerImageReference, error) {
+func (d *DockerClient) ListImages() ([]DockerImageReference, error) {
 
 	f := filters.NewArgs()
 	f.Add("label", "cyanprint.dev=true")
@@ -95,6 +95,35 @@ func (d *DockerClient) PullImages(images []DockerImageReference) []error {
 	// close channels
 	close(errChan)
 	return allErr
+}
+
+func (d *DockerClient) GetCoordinatorImage() (DockerImageReference, error) {
+	f := filters.NewArgs()
+	f.Add("label", "cyanprint.name=sulfone-boron")
+	images, err := d.Docker.ImageList(d.Context, types.ImageListOptions{
+		All:     true,
+		Filters: f,
+	})
+	if err != nil {
+		return DockerImageReference{}, err
+	}
+	var latest types.ImageSummary
+
+	for _, image := range images {
+		if latest.Created < image.Created {
+			latest = image
+		}
+
+	}
+
+	for _, digest := range latest.RepoDigests {
+		s, e := DockerImageToStruct(digest)
+		if e != nil {
+			return DockerImageReference{}, e
+		}
+		return s, nil
+	}
+	return DockerImageReference{}, fmt.Errorf("no coordinator image found")
 }
 
 func (d *DockerClient) ListContainer() ([]DockerContainerReference, []DockerContainerReference, error) {

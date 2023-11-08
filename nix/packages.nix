@@ -1,4 +1,4 @@
-{ pkgs, atomi, atomi_classic, pkgs-2305, pkgs-nov-07-23 }:
+{ pkgs, atomi, atomi_classic, pkgs-2305, pkgs-sep-04-23, pkgs-nov-07-23 }:
 let
   all = {
     atomipkgs_classic = (
@@ -24,6 +24,15 @@ let
           k3d;
       }
     );
+    sep-04-23 = (
+      with pkgs-sep-04-23;
+      {
+        inherit
+
+          go
+          golangci-lint;
+      }
+    );
     nov-07-23 = (
       with pkgs-nov-07-23;
       {
@@ -33,13 +42,11 @@ let
           sd
           bash
           git
-          go
 
           # lint
           treefmt
           gitlint
           shellcheck
-          golangci-lint
 
           #infra
           kubectl
@@ -55,4 +62,5 @@ with all;
 atomipkgs //
 atomipkgs_classic //
 nix-2305 //
+sep-04-23 //
 nov-07-23

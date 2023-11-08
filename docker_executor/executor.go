@@ -2,7 +2,6 @@ package docker_executor
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"net/http"
 	"time"
 )
@@ -13,9 +12,7 @@ type Executor struct {
 }
 
 type MergerReq struct {
-	MergerId  string `json:"merger_id"`
-	Reference string `json:"merger_reference"`
-	Sha       string `json:"merger_sha"`
+	MergerId string `json:"merger_id"`
 }
 
 func (e Executor) missingPluginsImages(images []DockerImageReference) []DockerImageReference {
@@ -60,15 +57,12 @@ func (e Executor) missingProcessorImages(images []DockerImageReference) []Docker
 	return missing
 }
 
-func (e Executor) session() string {
-	return StripDash(uuid.New().String())[:10]
-}
-
 func (e Executor) startMerger(session string, temVolRef, workVolRef DockerVolumeReference, mr MergerReq) error {
 
-	i := DockerImageReference{
-		Reference: mr.Reference,
-		Sha:       mr.Sha,
+	i, er := e.Docker.GetCoordinatorImage()
+	if er != nil {
+		fmt.Println("🚨 Error getting coordinator image", er)
+		return er
 	}
 
 	c := DockerContainerReference{
@@ -390,7 +384,7 @@ func (e Executor) Start(session string, readVolRef, writeVolRef DockerVolumeRefe
 func (e Executor) Warm(session string) (string, DockerVolumeReference, []error) {
 	fmt.Println("🔑 Starting a new session:", session)
 	fmt.Println("🔍 Looking for images...")
-	images, err := e.Docker.GetImages()
+	images, err := e.Docker.ListImages()
 	if err != nil {
 		fmt.Println("🚨 Error looking for images", err)
 		return session, DockerVolumeReference{}, []error{err}
