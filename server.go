@@ -380,8 +380,24 @@ func server() {
 		endpoint := "http://" + docker_executor.DockerContainerToString(d) + ":5550/api/template/init"
 		fmt.Println("🌐 Upstream Endpoint:", endpoint)
 		fmt.Println("🆕 Start forwarding request...")
-		// Forward the request body directly without reading it first
-		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), c.Request.Body)
+
+		reqBody, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			// Handle error
+			c.JSON(http.StatusBadGateway, ProblemDetails{
+				Title:   "Read request failed",
+				Status:  400,
+				Detail:  "Failed read the initial request body",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+				TraceId: nil,
+				Data:    []string{err.Error()},
+			})
+			return
+		}
+
+		fmt.Println("📦 Request Body:", string(reqBody))
+
+		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
 		if err != nil {
 			// Handle error
 			c.JSON(http.StatusBadGateway, ProblemDetails{
@@ -415,10 +431,12 @@ func server() {
 		}
 		fmt.Println("Status Code from upstream:", resp.StatusCode)
 		c.Data(resp.StatusCode, "Content-Type", body)
+
 	})
 	r.POST("/proxy/template/:cyanId/api/template/validate", func(c *gin.Context) {
 
 		cyanId := c.Param("cyanId")
+		fmt.Println("📇 Cyan ID:", cyanId)
 
 		d := docker_executor.DockerContainerReference{
 			CyanId:    cyanId,
@@ -426,9 +444,27 @@ func server() {
 			SessionId: "",
 		}
 		endpoint := "http://" + docker_executor.DockerContainerToString(d) + ":5550/api/template/validate"
+		fmt.Println("🌐 Upstream Endpoint:", endpoint)
+		fmt.Println("🆕 Start forwarding request...")
+
+		reqBody, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			// Handle error
+			c.JSON(http.StatusBadGateway, ProblemDetails{
+				Title:   "Read request failed",
+				Status:  400,
+				Detail:  "Failed read the initial request body",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+				TraceId: nil,
+				Data:    []string{err.Error()},
+			})
+			return
+		}
+
+		fmt.Println("📦 Request Body:", string(reqBody))
 
 		// Forward the request body directly without reading it first
-		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), c.Request.Body)
+		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
 		if err != nil {
 			// Handle error
 			c.JSON(http.StatusBadGateway, ProblemDetails{
@@ -465,6 +501,7 @@ func server() {
 	r.POST("/proxy/extension/:cyanId/api/extension/init", func(c *gin.Context) {
 
 		cyanId := c.Param("cyanId")
+		fmt.Println("📇 Cyan ID:", cyanId)
 
 		d := docker_executor.DockerContainerReference{
 			CyanId:    cyanId,
@@ -472,9 +509,26 @@ func server() {
 			SessionId: "",
 		}
 		endpoint := "http://" + docker_executor.DockerContainerToString(d) + ":5550/api/extension/init"
+		fmt.Println("🌐 Upstream Endpoint:", endpoint)
+		fmt.Println("🆕 Start forwarding request...")
 
+		reqBody, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			// Handle error
+			c.JSON(http.StatusBadGateway, ProblemDetails{
+				Title:   "Read request failed",
+				Status:  400,
+				Detail:  "Failed read the initial request body",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+				TraceId: nil,
+				Data:    []string{err.Error()},
+			})
+			return
+		}
+
+		fmt.Println("📦 Request Body:", string(reqBody))
 		// Forward the request body directly without reading it first
-		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), c.Request.Body)
+		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
 		if err != nil {
 			// Handle error
 			c.JSON(http.StatusBadGateway, ProblemDetails{
@@ -511,6 +565,7 @@ func server() {
 	r.POST("/proxy/extension/:cyanId/api/extension/validate", func(c *gin.Context) {
 
 		cyanId := c.Param("cyanId")
+		fmt.Println("📇 Cyan ID:", cyanId)
 
 		d := docker_executor.DockerContainerReference{
 			CyanId:    cyanId,
@@ -518,9 +573,26 @@ func server() {
 			SessionId: "",
 		}
 		endpoint := "http://" + docker_executor.DockerContainerToString(d) + ":5550/api/extension/validate"
+		fmt.Println("🌐 Upstream Endpoint:", endpoint)
+		fmt.Println("🆕 Start forwarding request...")
 
+		reqBody, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			// Handle error
+			c.JSON(http.StatusBadGateway, ProblemDetails{
+				Title:   "Read request failed",
+				Status:  400,
+				Detail:  "Failed read the initial request body",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+				TraceId: nil,
+				Data:    []string{err.Error()},
+			})
+			return
+		}
+
+		fmt.Println("📦 Request Body:", string(reqBody))
 		// Forward the request body directly without reading it first
-		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), c.Request.Body)
+		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
 		if err != nil {
 			// Handle error
 			c.JSON(http.StatusBadGateway, ProblemDetails{
