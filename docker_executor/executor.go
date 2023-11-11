@@ -20,11 +20,11 @@ func (e Executor) missingPluginsImages(images []DockerImageReference) []DockerIm
 	for _, plugin := range e.Template.Plugins {
 		c := DockerImageReference{
 			Reference: plugin.DockerReference,
-			Sha:       plugin.DockerSHA,
+			Tag:       plugin.DockerTag,
 		}
 		found := false
 		for _, i := range images {
-			if i.Reference == plugin.DockerReference && i.Sha == plugin.DockerSHA {
+			if i.Reference == plugin.DockerReference && i.Tag == plugin.DockerTag {
 				found = true
 				break
 			}
@@ -41,11 +41,11 @@ func (e Executor) missingProcessorImages(images []DockerImageReference) []Docker
 	for _, processor := range e.Template.Processors {
 		c := DockerImageReference{
 			Reference: processor.DockerReference,
-			Sha:       processor.DockerSHA,
+			Tag:       processor.DockerTag,
 		}
 		found := false
 		for _, i := range images {
-			if i.Reference == processor.DockerReference && i.Sha == processor.DockerSHA {
+			if i.Reference == processor.DockerReference && i.Tag == processor.DockerTag {
 				found = true
 				break
 			}
@@ -100,7 +100,7 @@ func (e Executor) startProcessors(session string, temVolRef, workVolRef DockerVo
 		semaphore <- 0
 		i := DockerImageReference{
 			Reference: processor.DockerReference,
-			Sha:       processor.DockerSHA,
+			Tag:       processor.DockerTag,
 		}
 		c := DockerContainerReference{
 			CyanId:    processor.ID,
@@ -159,7 +159,7 @@ func (e Executor) startPlugins(session string, temVolRef, workVolRef DockerVolum
 		semaphore <- 0
 		i := DockerImageReference{
 			Reference: plugin.DockerReference,
-			Sha:       plugin.DockerSHA,
+			Tag:       plugin.DockerTag,
 		}
 		c := DockerContainerReference{
 			CyanId:    plugin.ID,

@@ -46,10 +46,10 @@ func (de TemplateExecutor) missingTemplateVolumeImage(images []DockerImageRefere
 	template := de.Template
 	i := DockerImageReference{
 		Reference: template.BlobDockerReference,
-		Sha:       template.BlobDockerSHA,
+		Tag:       template.BlobDockerTag,
 	}
 	for _, image := range images {
-		if image.Reference == i.Reference && image.Sha == i.Sha {
+		if image.Reference == i.Reference && image.Tag == i.Tag {
 			return false, i
 		}
 	}
@@ -60,10 +60,10 @@ func (de TemplateExecutor) missingTemplateImages(images []DockerImageReference) 
 	template := de.Template
 	i := DockerImageReference{
 		Reference: template.TemplateDockerReference,
-		Sha:       template.TemplateDockerSHA,
+		Tag:       template.TemplateDockerTag,
 	}
 	for _, image := range images {
-		if image.Reference == i.Reference && image.Sha == i.Sha {
+		if image.Reference == i.Reference && image.Tag == i.Tag {
 			return false, i
 		}
 	}
@@ -145,7 +145,7 @@ func (de TemplateExecutor) listContainersVolumesImages() (
 func (de TemplateExecutor) startContainer(conRef DockerContainerReference) error {
 	imageRef := DockerImageReference{
 		Reference: de.Template.TemplateDockerReference,
-		Sha:       de.Template.TemplateDockerSHA,
+		Tag:       de.Template.TemplateDockerTag,
 	}
 	err := de.Docker.CreateContainer(conRef, imageRef)
 	if err != nil {
@@ -168,7 +168,7 @@ func (de TemplateExecutor) startVolume(volRef DockerVolumeReference) error {
 	}
 	unzipImage := DockerImageReference{
 		Reference: de.Template.BlobDockerReference,
-		Sha:       de.Template.BlobDockerSHA,
+		Tag:       de.Template.BlobDockerTag,
 	}
 	unzipContainer := DockerContainerReference{
 		CyanId:    de.Template.ID,

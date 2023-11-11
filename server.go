@@ -24,7 +24,7 @@ func stringifyErrors(e []error) []string {
 	return errs
 }
 
-func server() {
+func server(registryEndpoint string) {
 	r := gin.Default()
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, docker_executor.StandardResponse{Status: "OK"})
@@ -85,7 +85,7 @@ func server() {
 		merger := docker_executor.Merger{
 			ParallelismLimit: cpu,
 			RegistryClient: docker_executor.RegistryClient{
-				Endpoint: "https://api.zinc.sulfone.raichu.cluster.atomi.cloud",
+				Endpoint: registryEndpoint,
 			},
 			Template:  req.Template,
 			SessionId: sessionId,
@@ -642,7 +642,7 @@ func server() {
 		m := docker_executor.Merger{
 			ParallelismLimit: cpu,
 			RegistryClient: docker_executor.RegistryClient{
-				Endpoint: "https://api.zinc.sulfone.raichu.cluster.atomi.cloud",
+				Endpoint: registryEndpoint,
 			},
 			Template:  req.Template,
 			SessionId: sessionId,

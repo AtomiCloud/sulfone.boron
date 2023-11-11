@@ -4,6 +4,7 @@ vars:
   PLATFORM: sulfone
   SERVICE: boron
   USER: kirinnee/
+  REGISTRY_HOST: http://host.docker.internal:9001
 
 includes:
   docker: tasks/Taskfile.docker.yaml

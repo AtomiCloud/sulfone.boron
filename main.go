@@ -18,8 +18,16 @@ func main() {
 		Commands: []*cli.Command{
 			{
 				Name: "start",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:    "registry",
+						Aliases: []string{"r"},
+						Value:   "https://api.zinc.sulfone.raichu.cluster.atomi.cloud",
+					},
+				},
 				Action: func(context *cli.Context) error {
-					server()
+					registry := context.String("registry")
+					server(registry)
 					return nil
 				},
 			},

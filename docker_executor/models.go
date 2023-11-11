@@ -13,7 +13,7 @@ type PluginRes struct {
 	CreatedAt       string `json:"createdAt"`
 	Description     string `json:"description"`
 	DockerReference string `json:"dockerReference"`
-	DockerSHA       string `json:"dockerSha"`
+	DockerTag       string `json:"dockerTag"`
 }
 
 type ProcessorRes struct {
@@ -22,7 +22,7 @@ type ProcessorRes struct {
 	CreatedAt       string `json:"createdAt"`
 	Description     string `json:"description"`
 	DockerReference string `json:"dockerReference"`
-	DockerSHA       string `json:"dockerSha"`
+	DockerTag       string `json:"dockerTag"`
 }
 
 type TemplateVersionPrincipalRes struct {
@@ -31,9 +31,9 @@ type TemplateVersionPrincipalRes struct {
 	CreatedAt               string `json:"createdAt"`
 	Description             string `json:"description"`
 	BlobDockerReference     string `json:"blobDockerReference"`
-	BlobDockerSHA           string `json:"blobDockerSha"`
+	BlobDockerTag           string `json:"blobDockerTag"`
 	TemplateDockerReference string `json:"templateDockerReference"`
-	TemplateDockerSHA       string `json:"templateDockerSha"`
+	TemplateDockerTag       string `json:"templateDockerTag"`
 }
 
 type TemplatePrincipalRes struct {

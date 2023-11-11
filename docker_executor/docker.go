@@ -36,8 +36,8 @@ func (d *DockerClient) ListImages() ([]DockerImageReference, error) {
 	var imageNames []DockerImageReference
 
 	for _, image := range images {
-		for _, digest := range image.RepoDigests {
-			s, err := DockerImageToStruct(digest)
+		for _, tags := range image.RepoTags {
+			s, err := DockerImageToStruct(tags)
 			if err != nil {
 				return nil, err
 			}
@@ -116,8 +116,8 @@ func (d *DockerClient) GetCoordinatorImage() (DockerImageReference, error) {
 
 	}
 
-	for _, digest := range latest.RepoDigests {
-		s, e := DockerImageToStruct(digest)
+	for _, tag := range latest.RepoTags {
+		s, e := DockerImageToStruct(tag)
 		if e != nil {
 			return DockerImageReference{}, e
 		}

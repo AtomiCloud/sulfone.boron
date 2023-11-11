@@ -105,7 +105,7 @@ type RegistryPluginVersionPrincipalRes struct {
 	CreatedAt       string `json:"created_at"`
 	Description     string `json:"description"`
 	DockerReference string `json:"dockerReference"`
-	DockerSha       string `json:"dockerSha"`
+	DockerTag       string `json:"dockerTag"`
 }
 
 type RegistryPluginRes struct {
@@ -131,7 +131,7 @@ type RegistryProcessorVersionPrincipalRes struct {
 	CreatedAt       string `json:"created_at"`
 	Description     string `json:"description"`
 	DockerReference string `json:"dockerReference"`
-	DockerSha       string `json:"dockerSha"`
+	DockerTag       string `json:"dockerTag"`
 }
 
 type RegistryProcessorRes struct {

@@ -9,7 +9,7 @@ tasks:
     desc: "Run docker images"
     cmds:
       - docker run --rm -v /var/run/docker.sock:/var/run/docker.sock {{.USER}}{{.PLATFORM}}-{{.SERVICE}}:{{.CLI_ARGS |default "latest"}} setup
-      - docker run --rm -it -p 9000:9000 --network cyanprint -v /var/run/docker.sock:/var/run/docker.sock {{.USER}}{{.PLATFORM}}-{{.SERVICE}}:{{.CLI_ARGS |default "latest"}}
+      - docker run --rm -it -p 9000:9000 --network cyanprint -v /var/run/docker.sock:/var/run/docker.sock {{.USER}}{{.PLATFORM}}-{{.SERVICE}}:{{.CLI_ARGS |default "latest"}} start -r {{.REGISTRY_HOST}}
   push:
     desc: "Push docker images"
     cmds:

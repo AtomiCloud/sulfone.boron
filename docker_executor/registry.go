@@ -14,6 +14,7 @@ type RegistryClient struct {
 func (rc RegistryClient) getProcessorVersion(username string, name string, version string) (RegistryProcessorVersionRes, error) {
 	url := rc.Endpoint + "/api/v1/Processor/slug/" + username + "/" + name + "/versions/" + version
 
+	fmt.Println("🔍 Getting version of processor:", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("🚨 Error occurred making a request to %s: %v\n", url, err)
@@ -31,7 +32,7 @@ func (rc RegistryClient) getProcessorVersion(username string, name string, versi
 
 	if resp.StatusCode != http.StatusOK {
 		fmt.Printf("🚨 Unexpected status code: %d. Body: %s\n", resp.StatusCode, body)
-		return RegistryProcessorVersionRes{}, err
+		return RegistryProcessorVersionRes{}, fmt.Errorf("unexpected status code: %d. Body: %s\n", resp.StatusCode, body)
 	}
 
 	var res RegistryProcessorVersionRes
@@ -46,6 +47,7 @@ func (rc RegistryClient) getProcessorVersion(username string, name string, versi
 func (rc RegistryClient) getProcessorVersionLatest(username string, name string) (RegistryProcessorVersionRes, error) {
 	url := rc.Endpoint + "/api/v1/Processor/slug/" + username + "/" + name + "/versions/latest"
 
+	fmt.Println("🔍 Getting latest version of processor:", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("🚨 Error occurred making a request to %s: %v\n", url, err)
@@ -63,7 +65,7 @@ func (rc RegistryClient) getProcessorVersionLatest(username string, name string)
 
 	if resp.StatusCode != http.StatusOK {
 		fmt.Printf("🚨 Unexpected status code: %d. Body: %s\n", resp.StatusCode, body)
-		return RegistryProcessorVersionRes{}, err
+		return RegistryProcessorVersionRes{}, fmt.Errorf("unexpected status code: %d. Body: %s\n", resp.StatusCode, body)
 	}
 
 	var res RegistryProcessorVersionRes
@@ -78,6 +80,7 @@ func (rc RegistryClient) getProcessorVersionLatest(username string, name string)
 func (rc RegistryClient) getPluginVersion(username string, name string, version string) (RegistryPluginVersionRes, error) {
 	url := rc.Endpoint + "/api/v1/Plugin/slug/" + username + "/" + name + "/versions/" + version
 
+	fmt.Println("🔍 Getting version of plugin:", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("🚨 Error occurred making a request to %s: %v\n", url, err)
@@ -95,7 +98,7 @@ func (rc RegistryClient) getPluginVersion(username string, name string, version 
 
 	if resp.StatusCode != http.StatusOK {
 		fmt.Printf("🚨 Unexpected status code: %d. Body: %s\n", resp.StatusCode, body)
-		return RegistryPluginVersionRes{}, err
+		return RegistryPluginVersionRes{}, fmt.Errorf("unexpected status code: %d. Body: %s\n", resp.StatusCode, body)
 	}
 
 	var res RegistryPluginVersionRes
@@ -110,6 +113,7 @@ func (rc RegistryClient) getPluginVersion(username string, name string, version 
 func (rc RegistryClient) getPluginVersionLatest(username string, name string) (RegistryPluginVersionRes, error) {
 	url := rc.Endpoint + "/api/v1/Plugin/slug/" + username + "/" + name + "/versions/latest"
 
+	fmt.Println("🔍 Getting latest version of plugin:", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("🚨 Error occurred making a request to %s: %v\n", url, err)
@@ -127,7 +131,7 @@ func (rc RegistryClient) getPluginVersionLatest(username string, name string) (R
 
 	if resp.StatusCode != http.StatusOK {
 		fmt.Printf("🚨 Unexpected status code: %d. Body: %s\n", resp.StatusCode, body)
-		return RegistryPluginVersionRes{}, err
+		return RegistryPluginVersionRes{}, fmt.Errorf("unexpected status code: %d. Body: %s\n", resp.StatusCode, body)
 	}
 
 	var res RegistryPluginVersionRes

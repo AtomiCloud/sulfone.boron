@@ -20,27 +20,22 @@ func InsertDash(uuid string) string {
 
 type DockerImageReference struct {
 	Reference string
-	Sha       string
+	Tag       string
 }
 
 func DockerImageToString(image DockerImageReference) string {
-	return fmt.Sprintf("%s@sha256:%s", image.Reference, image.Sha)
+	return fmt.Sprintf("%s:%s", image.Reference, image.Tag)
 }
 
 func DockerImageToStruct(imageString string) (DockerImageReference, error) {
-	parts := strings.Split(imageString, "@")
+	parts := strings.Split(imageString, ":")
 	if len(parts) != 2 {
 		fmt.Println("Invalid image string format")
 		return DockerImageReference{}, errors.New("invalid image string format")
 	}
-	reference := parts[0]
-	shaWithPrefix := parts[1]
-
-	sha := strings.TrimPrefix(shaWithPrefix, "sha256:")
-
 	return DockerImageReference{
-		Reference: reference,
-		Sha:       sha,
+		Reference: parts[0],
+		Tag:       parts[1],
 	}, nil
 }
 
@@ -73,7 +68,7 @@ func DockerContainerNameToStruct(name string) (DockerContainerReference, error) 
 			SessionId: sessionId,
 		}, nil
 	}
-	return DockerContainerReference{}, errors.New("invalid container name")
+	return DockerContainerReference{}, errors.New("invalid container name: " + name)
 }
 
 type DockerVolumeReference struct {
