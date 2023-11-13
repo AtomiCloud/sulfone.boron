@@ -1,6 +1,7 @@
 package docker_executor
 
 type CyanGlobReq struct {
+	Root    *string  `json:"root"`
 	Glob    string   `json:"glob"`
 	Exclude []string `json:"exclude"`
 	Type    string   `json:"type"`
