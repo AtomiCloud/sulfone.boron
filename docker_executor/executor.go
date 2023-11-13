@@ -3,6 +3,7 @@ package docker_executor
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -24,7 +25,7 @@ func (e Executor) missingPluginsImages(images []DockerImageReference) []DockerIm
 		}
 		found := false
 		for _, i := range images {
-			if i.Reference == plugin.DockerReference && i.Tag == plugin.DockerTag {
+			if strings.HasSuffix(plugin.DockerReference, i.Reference) && i.Tag == plugin.DockerTag {
 				found = true
 				break
 			}
@@ -45,7 +46,7 @@ func (e Executor) missingProcessorImages(images []DockerImageReference) []Docker
 		}
 		found := false
 		for _, i := range images {
-			if i.Reference == processor.DockerReference && i.Tag == processor.DockerTag {
+			if strings.HasSuffix(processor.DockerReference, i.Reference) && i.Tag == processor.DockerTag {
 				found = true
 				break
 			}

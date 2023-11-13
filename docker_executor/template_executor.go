@@ -3,6 +3,7 @@ package docker_executor
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -49,7 +50,7 @@ func (de TemplateExecutor) missingTemplateVolumeImage(images []DockerImageRefere
 		Tag:       template.BlobDockerTag,
 	}
 	for _, image := range images {
-		if image.Reference == i.Reference && image.Tag == i.Tag {
+		if strings.HasSuffix(i.Reference, image.Reference) && image.Tag == i.Tag {
 			return false, i
 		}
 	}
@@ -63,7 +64,7 @@ func (de TemplateExecutor) missingTemplateImages(images []DockerImageReference) 
 		Tag:       template.TemplateDockerTag,
 	}
 	for _, image := range images {
-		if image.Reference == i.Reference && image.Tag == i.Tag {
+		if strings.HasSuffix(i.Reference, image.Reference) && image.Tag == i.Tag {
 			return false, i
 		}
 	}
