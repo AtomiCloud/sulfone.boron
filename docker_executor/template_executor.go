@@ -180,12 +180,18 @@ func (de TemplateExecutor) startVolume(volRef DockerVolumeReference) error {
 	fmt.Println("🚧 Unzipping volume ", volRef.CyanId)
 	err = d.CreateContainerWithVolume(unzipContainer, volRef, unzipImage)
 	if err != nil {
+		fmt.Println("🚨 Failed to start unzip container", volRef.CyanId)
+		return err
+	} else {
+		fmt.Println("⚙️ Still unzipping...", volRef.CyanId)
+	}
+	err = d.WaitContainer(unzipContainer)
+	if err != nil {
 		fmt.Println("🚨 Failed to unzip volume", volRef.CyanId)
 		return err
 	} else {
 		fmt.Println("✅ Volume unzipped", volRef.CyanId)
 	}
-
 	fmt.Println("🧹 Removing unzip container", volRef.CyanId)
 	err = d.RemoveContainer(unzipContainer)
 	if err != nil {

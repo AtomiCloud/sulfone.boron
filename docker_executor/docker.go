@@ -22,6 +22,23 @@ type DockerClient struct {
 
 const networkName = "cyanprint"
 
+func (d *DockerClient) WaitContainer(ref DockerContainerReference) error {
+
+	name := DockerContainerToString(ref)
+
+	statusCh, errCh := d.Docker.ContainerWait(d.Context, name, container.WaitConditionNotRunning)
+	select {
+	case e := <-errCh:
+		if e != nil {
+			return e
+		}
+	case <-statusCh:
+	}
+
+	return nil
+
+}
+
 func (d *DockerClient) ListImages() ([]DockerImageReference, error) {
 
 	f := filters.NewArgs()
