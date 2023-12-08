@@ -11,7 +11,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/sulfone-boron
 
-FROM alpine:3.18
+FROM alpine:3.19
 WORKDIR /app
 LABEL cyanprint.name="sulfone-boron"
 COPY --from=builder /app/sulfone-boron /app/sulfone-boron
