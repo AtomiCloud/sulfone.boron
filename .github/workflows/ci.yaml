@@ -87,6 +87,7 @@ jobs:
       - uses: AtomiCloud/actions.cache-npm@v1.0.1
       - uses: AtomiCloud/actions.cache-go@v1.0.1
 
+      - uses: rlespinasse/github-slug-action@v3.x
       - name: Release
         env:
           GITHUB_SHA: ${{ github.sha }}
