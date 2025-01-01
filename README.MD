@@ -14,22 +14,16 @@ To use Sulfone Boron, ensure you have Docker installed and running on your syste
 
 ## Quick Start
 
-#### Linux/OSX AMD
+#### Linux/OSX
 ```bash
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron-amd:latest setup
-docker run --rm -it -p 9000:9000 --network cyanprint -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron-amd:latest
-```
-
-#### Linux/OSX ARM
-```bash
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron-arm:latest setup
-docker run --rm -it -p 9000:9000 --network cyanprint -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron-arm:latest
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron:latest setup
+docker run --rm -it -p 9000:9000 --network cyanprint -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron:latest
 ```
 
 #### Windows
 ```bash
-docker run --rm -v //var/run/docker.sock:/var/run/docker.sock.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron-arm:latest setup
-docker run --rm -it -p 9000:9000 --network cyanprint -v //var/run/docker.sock:/var/run/docker.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron-arm:latest
+docker run --rm -v //var/run/docker.sock:/var/run/docker.sock.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron:latest setup
+docker run --rm -it -p 9000:9000 --network cyanprint -v //var/run/docker.sock:/var/run/docker.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron:latest
 ```
 
 ## Contributing
