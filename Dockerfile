@@ -1,4 +1,4 @@
-FROM golang:1.23-alpine3.18 as builder
+FROM golang:1.23.3-alpine3.20 as builder
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/sulfone-boron
 
-FROM alpine:3.18
+FROM alpine:3.20
 WORKDIR /app
 LABEL cyanprint.name="sulfone-boron"
 COPY --from=builder /app/sulfone-boron /app/sulfone-boron
