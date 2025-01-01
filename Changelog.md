@@ -1,3 +1,10 @@
+## [1.1.0](https://github.com/AtomiCloud/sulfone.boron/compare/v1.0.0...v1.1.0) (2025-01-01)
+
+
+### ✨ Features ✨
+
+* all necessary scripts for deployment ([ea48e06](https://github.com/AtomiCloud/sulfone.boron/commit/ea48e06a4e38c90794b65c229bfbcf2d1897891c))
+
 ## 1.0.0 (2025-01-01)
 
 
