@@ -14,14 +14,14 @@ with packages;
   ];
 
   infra = [
-    helm
-    kubectl
     docker
   ];
 
   main = [
+    gcc
     go
     infisical
+    opentofu
   ];
 
   lint = [
@@ -39,9 +39,7 @@ with packages;
   ];
 
   releaser = [
-    nodejs
     sg
-    npm
   ];
 
 }

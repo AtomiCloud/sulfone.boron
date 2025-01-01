@@ -1,0 +1,25 @@
+version: '3'
+
+vars:
+  TF: tofu
+tasks:
+  init:
+    desc: Initialize OpenTofu folder
+    cmds:
+      - '{{.TF}} init {{.CLI_ARGS}}'
+  plan:
+    desc: Plan for Infisical deployment
+    cmds:
+      - '{{.TF}} plan {{.CLI_ARGS}}'
+  apply:
+    desc: Apply for Infisical deployment
+    cmds:
+      - '{{.TF}} apply {{.CLI_ARGS}}'
+  destroy:
+    desc: Destroy Infisical deployment
+    cmds:
+      - '{{.TF}} destroy {{.CLI_ARGS}}'
+  output:
+    desc: Output Infisical deployment
+    cmds:
+      - '{{.TF}} output {{.CLI_ARGS}}'

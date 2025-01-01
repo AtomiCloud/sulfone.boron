@@ -1,0 +1,53 @@
+- name: Install Docker
+  hosts: all
+  become: true
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+    - name: Upgrade all packages
+      apt:
+        upgrade: safe
+    - name: Install dependencies for Docker
+      apt:
+        name: '{{ item }}'
+        state: present
+        update_cache: yes
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg
+        - lsb-release
+    - name: Add Docker GPG key
+      apt_key:
+        url: 'https://download.docker.com/linux/ubuntu/gpg'
+        state: present
+    - name: Add Docker APT repository
+      apt_repository:
+        repo: 'deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable'
+        state: present
+    - name: Install Docker CE
+      apt:
+        name: 'docker-ce'
+        state: present
+        update_cache: yes
+    - name: Configure Docker logging options
+      copy:
+        dest: /etc/docker/daemon.json
+        content: |
+          {
+              "log-driver": "json-file",
+              "log-opts": {
+                  "max-size": "200m",
+                  "max-file": "5"
+              }
+          }
+      notify:
+        - Restart Docker
+  handlers:
+    - name: Restart Docker
+      service:
+        name: docker
+        state: restarted

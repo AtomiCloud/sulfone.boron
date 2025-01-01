@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 
 vars:
   PLATFORM: sulfone
@@ -8,17 +8,33 @@ vars:
 
 includes:
   docker: tasks/Taskfile.docker.yaml
+  general:
+    taskfile: tasks/Taskfile.tf.yaml
+    dir: tofu/live/general
+  ruby:
+    taskfile: tasks/Taskfile.tf.yaml
+    dir: tofu/live/ruby
+  opal:
+    taskfile: tasks/Taskfile.tf.yaml
+    dir: tofu/live/opal
+  mica:
+    taskfile: tasks/Taskfile.tf.yaml
+    dir: tofu/live/mica
+  talc:
+    taskfile: tasks/Taskfile.tf.yaml
+    dir: tofu/live/talc
 
 tasks:
   setup:
-    desc: "Setup the repository"
+    desc: 'Setup the repository'
     cmds:
       - go mod tidy
+      - ./scripts/local/secrets.sh
   build:
-    desc: "Build the binary"
+    desc: 'Build the binary'
     cmds:
       - go build -o bin/{{.PLATFORM}}-{{.SERVICE}} .
   run:
-    desc: "Run the application"
+    desc: 'Run the application'
     cmds:
       - go run . {{.CLI_ARGS}}

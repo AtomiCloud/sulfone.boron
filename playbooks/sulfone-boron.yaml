@@ -1,0 +1,21 @@
+- name: Copy and deploy Docker Compose file
+  hosts: all
+  become: true
+  become_user: kirin
+  tasks:
+    - name: Ensure data directory exists
+      ansible.builtin.file:
+        path: /data
+        state: directory
+        mode: '0755'
+    - name: Copy artifact folder
+      copy:
+        src: ../artifact
+        dest: '~/'
+    - name: Execute Docker Setup
+      command: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron:latest setup
+
+    - name: Start Docker Compose
+      command: docker compose up -d
+      args:
+        chdir: '~/artifact'

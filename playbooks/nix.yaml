@@ -1,0 +1,21 @@
+- name: Install Nix
+  hosts: all
+  become: true
+  tasks:
+    - name: Check if Nix is installed
+      command: bash --login -c "nix --version"
+      register: nix_check
+      ignore_errors: true
+
+    - name: Download Nix installer
+      shell: curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix -o install-nix.sh
+      register: download_result
+      when: nix_check.rc != 0
+
+    - name: Make installer executable
+      shell: chmod +x install-nix.sh
+      when: nix_check.rc != 0
+
+    - name: Install Nix
+      shell: ./install-nix.sh install --no-confirm
+      when: nix_check.rc != 0

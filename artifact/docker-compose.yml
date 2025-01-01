@@ -1,0 +1,11 @@
+services:
+  boron:
+    image: ghcr.io/atomicloud/sulfone.boron/sulfone-boron:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - cyanprint
+    ports:
+      - 9000:9000
+    tty: true

@@ -1,6 +1,6 @@
 module github.com/AtomiCloud/sulfone.boron
 
-go 1.20
+go 1.23
 
 require (
 	github.com/docker/docker v24.0.6+incompatible

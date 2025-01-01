@@ -16,9 +16,18 @@ pre-commit-lib.run {
 
     a-infisical = {
       enable = true;
-      name = "Secrets Scanning";
-      description = "Scan for possible secrets";
-      entry = "${packages.infisical}/bin/infisical scan . --verbose";
+      name = "Secrets Scanning (Past Commits)";
+      description = "Scan for possible secrets in past commits";
+      entry = "${packages.infisical}/bin/infisical scan . -v";
+      language = "system";
+      pass_filenames = false;
+    };
+
+    a-infisical-staged = {
+      enable = true;
+      name = "Secrets Scanning (Staged)";
+      description = "Scan for possible secrets in staged files";
+      entry = "${packages.infisical}/bin/infisical scan git-changes --staged -v";
       language = "system";
       pass_filenames = false;
     };
@@ -27,7 +36,7 @@ pre-commit-lib.run {
       enable = true;
       name = "Golang CI Lint";
       description = "Lint Golang code";
-      entry = "${packages.golangci-lint}/bin/golangci-lint run .";
+      entry = "${packages.golangci-lint}/bin/golangci-lint run --timeout 10m0s .";
       language = "system";
       files = ".*go$";
       pass_filenames = false;
