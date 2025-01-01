@@ -13,6 +13,7 @@ let
       with pkgs-2411;
       {
         inherit
+          ansible
           infisical
           hadolint
           k3d

@@ -22,6 +22,7 @@ with packages;
     go
     infisical
     opentofu
+    ansible
   ];
 
   lint = [

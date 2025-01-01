@@ -30,6 +30,14 @@ tasks:
     cmds:
       - go mod tidy
       - ./scripts/local/secrets.sh
+  provision-and-deploy:
+    desc: 'Provision and deploy the cluster'
+    cmds:
+      - ./scripts/cd/provision-and-deploy.sh
+  exec:
+    desc: 'SSH into the executor'
+    cmds:
+      - ./scripts/local/exec.sh
   build:
     desc: 'Build the binary'
     cmds:

@@ -24,9 +24,13 @@ echo "📝 Writing IP address to general/ip.tfvars..."
 echo "ip_address = \"$address\"" >./tofu/live/general/ip.tfvars
 echo "✅ IP address written to general/ip.tfvars successfully"
 
-echo "🏗️ Provisioning Infrastructure..."
-tofu -chdir=tofu/live/general apply
-echo "✅ Infrastructure provisioned successfully"
+echo "🆕 Initializing Generic Infrastructure..."
+tofu -chdir=tofu/live/general init
+echo "✅ Generic Infrastructure initialized successfully"
+
+echo "🏗️ Provisioning Generic Infrastructure..."
+tofu -chdir=tofu/live/general apply -var-file="ip.tfvars"
+echo "✅ Generic Infrastructure provisioned successfully"
 
 echo "🚀 Deploying..."
 ./scripts/cd/deploy.sh "$cluster"

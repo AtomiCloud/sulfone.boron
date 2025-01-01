@@ -9,3 +9,7 @@ services:
     ports:
       - 9000:9000
     tty: true
+
+networks:
+  cyanprint:
+    external: true
