@@ -63,10 +63,6 @@ echo "  ✅ Commit Cache: ${CACHE_COMMIT}"
 echo "  ✅ Branch Cache: ${CACHE_BRANCH}"
 echo "  ✅ Latest Cache: ${CACHE_LATEST}"
 
-# build image
-export AWS_ACCESS_KEY_ID="${S3_KEY_ID}"
-export AWS_SECRET_ACCESS_KEY="${S3_KEY_SECRET}"
-
 echo "🔨 Building Dockerfile..."
 args=""
 if [ "$BRANCH" = "$LATEST_BRANCH" ]; then
