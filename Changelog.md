@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/AtomiCloud/sulfone.boron/compare/v1.1.1...v1.1.2) (2025-01-07)
+
+
+### 🐛 Bug Fixes 🐛
+
+* update image during ansible deployment ([7ca9534](https://github.com/AtomiCloud/sulfone.boron/commit/7ca953447dc1085da4b78cf3611c9eabe14f7c29))
+
 ## [1.1.1](https://github.com/AtomiCloud/sulfone.boron/compare/v1.1.0...v1.1.1) (2025-01-07)
 
 
