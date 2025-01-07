@@ -10,6 +10,9 @@
     - name: Execute Docker Setup
       command: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron:latest setup
 
+    - name: Update Docker Image
+      command: docker pull ghcr.io/atomicloud/sulfone.boron/sulfone-boron:latest
+
     - name: Start Docker Compose
       command: docker compose up -d
       args:
