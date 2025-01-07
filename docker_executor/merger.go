@@ -114,7 +114,7 @@ func (m Merger) execProcessors(processors []CyanProcessorReq) ([]string, []error
 				return
 			}
 			fmt.Println("🔭 Checking Processor references...")
-			pp, err := m.RegistryClient.convertProcessor(p)
+			pp, err := m.RegistryClient.convertProcessor(p, m.Template.Processors)
 			if err != nil {
 				fmt.Printf("Error converting processor %s: %v", p.Name, err)
 				errChan <- err
@@ -185,7 +185,7 @@ func (m Merger) execPlugins(mergePath string, plugins []CyanPluginReq) []error {
 	for _, plugin := range plugins {
 		go func(c CyanPluginReq) {
 			fmt.Println("🔭 Checking Plugin references...")
-			p, err := m.RegistryClient.convertPlugin(c)
+			p, err := m.RegistryClient.convertPlugin(c, m.Template.Plugins)
 			if err != nil {
 				fmt.Printf("🚨 Error converting plugin %s: %v\n", c.Name, err)
 				errChan <- err
