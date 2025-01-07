@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/AtomiCloud/sulfone.boron/compare/v1.1.0...v1.1.1) (2025-01-07)
+
+
+### 🐛 Bug Fixes 🐛
+
+* auto detect template reference instead of latest ([30d1c10](https://github.com/AtomiCloud/sulfone.boron/commit/30d1c10953642a32240741621ae75e2421f08295))
+
 ## [1.1.0](https://github.com/AtomiCloud/sulfone.boron/compare/v1.0.0...v1.1.0) (2025-01-01)
 
 
