@@ -10,9 +10,7 @@ pre-commit-lib.run {
       excludes = [ ".*scaffold/templates/.*" ".*infra/.*" "pnpm-lock.yaml" "Changelog.md" "CommitConventions.md" ".*schema.json" ];
     };
     # linters From https://github.com/cachix/pre-commit-hooks.nix
-    shellcheck = {
-      enable = false;
-    };
+    shellcheck.enable = false;
 
     a-infisical = {
       enable = true;
@@ -75,7 +73,7 @@ pre-commit-lib.run {
     a-enforce-exec = {
       enable = true;
       name = "Enforce Shell Script executable";
-      entry = "${packages.coreutils}/bin/chmod +x";
+      entry = "${packages.atomiutils}/bin/chmod +x";
       files = ".*sh$";
       language = "system";
       pass_filenames = true;
@@ -84,18 +82,12 @@ pre-commit-lib.run {
     a-hadolint = {
       enable = true;
       name = "Docker Linter";
-      entry = "${packages.hadolint}/bin/hadolint";
+      entry = "${packages.infralint}/bin/hadolint";
       files = ".*Dockerfile$";
       language = "system";
       pass_filenames = true;
     };
-
-
   };
 
-  settings = {
-    treefmt = {
-      package = formatter;
-    };
-  };
+  settings.treefmt.package = formatter;
 }

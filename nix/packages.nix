@@ -1,30 +1,36 @@
-{ pkgs, atomi, pkgs-2411 }:
+{ pkgs, atomi, pkgs-2411, pkgs-2405 }:
 let
   all = {
     atomipkgs = (
       with atomi;
       {
         inherit
+          atomiutils
+          infrautils
+          infralint
           sg
           pls;
+      }
+    );
+    nix-unstable = (
+      with pkgs;
+      { }
+    );
+    nix-2405 = (
+      with pkgs-2405;
+      {
+        inherit
+          ansible;
       }
     );
     nix-2411 = (
       with pkgs-2411;
       {
         inherit
-          ansible
           infisical
-          hadolint
-          k3d
-          coreutils
-          findutils
-          sd
-          bash
           git
 
           gcc
-          opentofu
 
           # lint
           treefmt
@@ -32,11 +38,7 @@ let
           shellcheck
 
           go
-          golangci-lint
-
-          #infra
-          kubectl
-          docker;
+          golangci-lint;
       }
     );
 
@@ -44,4 +46,6 @@ let
 in
 with all;
 atomipkgs //
-nix-2411
+nix-2411 //
+nix-2405 //
+nix-unstable

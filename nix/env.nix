@@ -2,10 +2,7 @@
 with packages;
 {
   system = [
-    coreutils
-    sd
-    bash
-    findutils
+    atomiutils
   ];
 
   dev = [
@@ -14,25 +11,24 @@ with packages;
   ];
 
   infra = [
-    docker
   ];
 
   main = [
     gcc
     go
     infisical
-    opentofu
+    infrautils
     ansible
   ];
 
   lint = [
     # core
     treefmt
-    hadolint
     gitlint
     shellcheck
     sg
     golangci-lint
+    infralint
   ];
 
   ci = [

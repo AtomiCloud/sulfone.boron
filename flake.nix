@@ -8,7 +8,8 @@
     # registry
     nixpkgs.url = "nixpkgs/nixos-unstable";
     nixpkgs-2411.url = "nixpkgs/nixos-24.11";
-    atomipkgs.url = "github:kirinnee/test-nix-repo/v28.0.0";
+    nixpkgs-2405.url = "nixpkgs/nixos-24.05";
+    atomipkgs.url = "github:AtomiCloud/nix-registry/v2";
   };
   outputs =
     { self
@@ -22,13 +23,14 @@
     , atomipkgs
     , nixpkgs
     , nixpkgs-2411
-
+    , nixpkgs-2405
     } @inputs:
     flake-utils.lib.eachDefaultSystem
       (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
         pkgs-2411 = nixpkgs-2411.legacyPackages.${system};
+        pkgs-2405 = nixpkgs-2405.legacyPackages.${system};
         atomi = atomipkgs.packages.${system};
         pre-commit-lib = pre-commit-hooks.lib.${system};
       in
@@ -41,7 +43,7 @@
             inherit treefmt-nix pkgs;
           };
           packages = import ./nix/packages.nix {
-            inherit pkgs atomi pkgs-2411;
+            inherit pkgs atomi pkgs-2411 pkgs-2405;
           };
           env = import ./nix/env.nix {
             inherit pkgs packages;
