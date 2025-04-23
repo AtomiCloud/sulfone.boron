@@ -1,3 +1,10 @@
+## [1.2.0](https://github.com/AtomiCloud/sulfone.boron/compare/v1.1.2...v1.2.0) (2025-04-23)
+
+
+### ✨ Features ✨
+
+* upgrade infra configuration ([c677999](https://github.com/AtomiCloud/sulfone.boron/commit/c677999b113ff316411f9cba0295c6773aa6f161))
+
 ## [1.1.2](https://github.com/AtomiCloud/sulfone.boron/compare/v1.1.1...v1.1.2) (2025-01-07)
 
 
