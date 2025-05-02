@@ -131,7 +131,7 @@ locals {
         zinc = {
           name        = "CyanPrint Registry"
           slug        = "zinc"
-          description = "CyanPrint Registry for templates, processors and extensions"
+          description = "CyanPrint Registry for templates and processors"
         }
 
         argon = {
