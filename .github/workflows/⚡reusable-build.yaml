@@ -43,7 +43,7 @@ jobs:
 
       # Action
       - name: Build and Push Docker
-        run: ./scripts/ci/ci-docker.sh ${{ inputs.version }}
+        run: ./scripts/ci/docker.sh ${{ inputs.version }}
         env:
           LATEST_BRANCH: main
 
