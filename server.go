@@ -6,14 +6,15 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"github.com/AtomiCloud/sulfone.boron/docker_executor"
-	"github.com/docker/docker/client"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	rt "runtime"
+
+	"github.com/AtomiCloud/sulfone.boron/docker_executor"
+	"github.com/docker/docker/client"
+	"github.com/gin-gonic/gin"
 )
 
 func stringifyErrors(e []error) []string {
@@ -485,138 +486,10 @@ func server(registryEndpoint string) {
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			// Handle error
-			// Handle error
 			c.JSON(http.StatusBadGateway, ProblemDetails{
 				Title:   "Upstream failed",
 				Status:  502,
 				Detail:  "Failed to read respond from upstream template",
-				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502",
-				TraceId: nil,
-				Data:    []string{err.Error()},
-			})
-			return
-		}
-		c.Data(resp.StatusCode, "Content-Type", body)
-	})
-	r.POST("/proxy/extension/:cyanId/api/extension/init", func(c *gin.Context) {
-
-		cyanId := c.Param("cyanId")
-		fmt.Println("📇 Cyan ID:", cyanId)
-
-		d := docker_executor.DockerContainerReference{
-			CyanId:    cyanId,
-			CyanType:  "extension",
-			SessionId: "",
-		}
-		endpoint := "http://" + docker_executor.DockerContainerToString(d) + ":5550/api/extension/init"
-		fmt.Println("🌐 Upstream Endpoint:", endpoint)
-		fmt.Println("🆕 Start forwarding request...")
-
-		reqBody, err := io.ReadAll(c.Request.Body)
-		if err != nil {
-			// Handle error
-			c.JSON(http.StatusBadGateway, ProblemDetails{
-				Title:   "Read request failed",
-				Status:  400,
-				Detail:  "Failed read the initial request body",
-				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
-				TraceId: nil,
-				Data:    []string{err.Error()},
-			})
-			return
-		}
-
-		fmt.Println("📦 Request Body:", string(reqBody))
-		// Forward the request body directly without reading it first
-		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
-		if err != nil {
-			// Handle error
-			c.JSON(http.StatusBadGateway, ProblemDetails{
-				Title:   "Upstream failed",
-				Status:  502,
-				Detail:  "Failed to forward request to upstream extension",
-				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502",
-				TraceId: nil,
-				Data:    []string{err.Error()},
-			})
-			return
-		}
-		defer func(Body io.ReadCloser) {
-			_ = Body.Close()
-		}(resp.Body)
-
-		// Read the response from the new endpoint
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			// Handle error
-			// Handle error
-			c.JSON(http.StatusBadGateway, ProblemDetails{
-				Title:   "Upstream failed",
-				Status:  502,
-				Detail:  "Failed to read respond from upstream extension",
-				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502",
-				TraceId: nil,
-				Data:    []string{err.Error()},
-			})
-			return
-		}
-		c.Data(resp.StatusCode, "Content-Type", body)
-	})
-	r.POST("/proxy/extension/:cyanId/api/extension/validate", func(c *gin.Context) {
-
-		cyanId := c.Param("cyanId")
-		fmt.Println("📇 Cyan ID:", cyanId)
-
-		d := docker_executor.DockerContainerReference{
-			CyanId:    cyanId,
-			CyanType:  "extension",
-			SessionId: "",
-		}
-		endpoint := "http://" + docker_executor.DockerContainerToString(d) + ":5550/api/extension/validate"
-		fmt.Println("🌐 Upstream Endpoint:", endpoint)
-		fmt.Println("🆕 Start forwarding request...")
-
-		reqBody, err := io.ReadAll(c.Request.Body)
-		if err != nil {
-			// Handle error
-			c.JSON(http.StatusBadGateway, ProblemDetails{
-				Title:   "Read request failed",
-				Status:  400,
-				Detail:  "Failed read the initial request body",
-				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
-				TraceId: nil,
-				Data:    []string{err.Error()},
-			})
-			return
-		}
-
-		fmt.Println("📦 Request Body:", string(reqBody))
-		// Forward the request body directly without reading it first
-		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
-		if err != nil {
-			// Handle error
-			c.JSON(http.StatusBadGateway, ProblemDetails{
-				Title:   "Upstream failed",
-				Status:  502,
-				Detail:  "Failed to forward request to upstream extension",
-				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502",
-				TraceId: nil,
-				Data:    []string{err.Error()},
-			})
-			return
-		}
-		defer func(Body io.ReadCloser) {
-			_ = Body.Close()
-		}(resp.Body)
-
-		// Read the response from the new endpoint
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			// Handle error
-			c.JSON(http.StatusBadGateway, ProblemDetails{
-				Title:   "Upstream failed",
-				Status:  502,
-				Detail:  "Failed to read respond from upstream extension",
 				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502",
 				TraceId: nil,
 				Data:    []string{err.Error()},

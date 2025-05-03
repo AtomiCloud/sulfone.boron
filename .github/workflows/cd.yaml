@@ -1,0 +1,17 @@
+name: CD
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+jobs:
+  publish:
+    name: Publish
+    uses: ./.github/workflows/⚡reusable-build.yaml
+    secrets: inherit
+    with:
+      atomi_platform: sulfone
+      atomi_service: boron
+
+      image_name: sulfone-boron
+      version: ${{ github.ref_name }}

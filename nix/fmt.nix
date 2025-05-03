@@ -9,6 +9,7 @@ let
       prettier.enable = true;
       shfmt.enable = true;
       gofmt.enable = true;
+      actionlint.enable = true;
     };
   };
 in

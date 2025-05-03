@@ -1,105 +1,23 @@
-name: CI-CD
+name: CI
 
 on:
   push:
 
-env:
-  # Docker
-  DOCKER_DOMAIN: ghcr.io
-  DOCKER_USER: ${{ github.actor }}
-  DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-  DOCKER_LATEST_BRANCH: main
-
 jobs:
   precommit:
-    name: Pre-commit Check
-    runs-on:
-      - nscloud-ubuntu-22.04-amd64-4x8-with-cache
-      - nscloud-cache-size-50gb
-      - nscloud-cache-tag-sulfone-boron-nix-store-cache
-      - nscloud-git-mirror-1gb
-    steps:
-      # Setup
-      - uses: AtomiCloud/actions.setup-nix@v1.2.1
-      - uses: AtomiCloud/actions.cache-go@v1.0.1
+    name: Pre-Commit
+    uses: ./.github/workflows/⚡reusable-precommit.yaml
+    secrets: inherit
+    with:
+      atomi_platform: sulfone
+      atomi_service: boron
 
-      # pre commit
-      - name: Run pre-commit
-        run: nix develop .#ci -c ./scripts/ci/pre-commit.sh
   build:
-    name: Build Docker
-    permissions:
-      contents: read
-      id-token: write
-      packages: write
-    runs-on:
-      - ubuntu-22.04
-    strategy:
-      matrix:
-        configs:
-          - image-name: sulfone-boron
-            dockerfile: Dockerfile
-            context: .
-            platform: linux/arm64,linux/amd64
-    env:
-      STRAT_DOCKER_IMAGE: ${{ matrix.configs.image-name }}
-      STRAT_DOCKERFILE: ${{ matrix.configs.dockerfile }}
-      STRAT_DOCKER_CONTEXT: ${{ matrix.configs.context }}
-      STRAT_DOCKER_PLATFORM: ${{ matrix.configs.platform }}
-    steps:
-      # Setup
-      - uses: AtomiCloud/actions.setup-docker@v1.2.0
+    name: Build
+    uses: ./.github/workflows/⚡reusable-build.yaml
+    secrets: inherit
+    with:
+      atomi_platform: sulfone
+      atomi_service: boron
 
-      # action
-      - uses: rlespinasse/github-slug-action@v3.x
-      - name: Build and Push Docker
-        run: ./scripts/ci/ci-docker.sh
-        env:
-          CI_DOCKER_IMAGE: ${{ env.STRAT_DOCKER_IMAGE }}
-          CI_DOCKER_CONTEXT: ${{ env.STRAT_DOCKER_CONTEXT }}
-          CI_DOCKERFILE: ${{ env.STRAT_DOCKERFILE }}
-          CI_DOCKER_PLATFORM: ${{ env.STRAT_DOCKER_PLATFORM }}
-
-          DOMAIN: ${{ env.DOCKER_DOMAIN }}
-
-          GITHUB_REPO_REF: ${{ github.repository }}
-          GITHUB_SHA: ${{ github.sha }}
-          GITHUB_BRANCH: ${{ env.GITHUB_REF_SLUG }}
-
-          DOCKER_PASSWORD: ${{ env.DOCKER_PASSWORD }}
-          DOCKER_USER: ${{ env.DOCKER_USER }}
-
-          LATEST_BRANCH: ${{ env.DOCKER_LATEST_BRANCH}}
-  release:
-    name: Semantic Release
-    needs:
-      - precommit
-      - build
-    if: github.ref == 'refs/heads/main'
-    runs-on:
-      - nscloud-ubuntu-22.04-amd64-4x8-with-cache
-      - nscloud-cache-size-50gb
-      - nscloud-cache-tag-sulfone-boron-releaser-nix-store-cache
-      - nscloud-git-mirror-1gb
-    steps:
-      # Setup
-      - uses: AtomiCloud/actions.setup-nix@v1.2.1
-      - uses: AtomiCloud/actions.cache-npm@v1.0.1
-      - uses: AtomiCloud/actions.cache-go@v1.0.1
-
-      - uses: rlespinasse/github-slug-action@v3.x
-      - name: Release
-        env:
-          GITHUB_SHA: ${{ github.sha }}
-          GITHUB_BRANCH: ${{ env.GITHUB_REF_SLUG_URL }}
-          GITHUB_REPO_REF: ${{ github.repository }}
-          CI_DOCKER_IMAGES: 'sulfone-boron'
-
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-          DOMAIN: ${{ env.DOCKER_DOMAIN }}
-
-          DOCKER_PASSWORD: ${{ env.DOCKER_PASSWORD }}
-          DOCKER_USER: ${{ env.DOCKER_USER }}
-
-        run: nix develop .#releaser -c scripts/ci/release.sh
+      image_name: sulfone-boron
