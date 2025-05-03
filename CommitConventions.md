@@ -74,9 +74,10 @@ A new feature
 | example         | feat: new withdraw api for rapid                                                  |
 | example applied | when this commit is applied, it will _add_ `null`, **new withdraw api for rapid** |
 
-| Scope   | Description            | Bump    |
-| ------- | ---------------------- | ------- |
-| default | Release a new features | `minor` |
+| Scope      | Description               | Bump    |
+| ---------- | ------------------------- | ------- |
+| default    | Release a new features    | `minor` |
+| `breaking` | Release a breaking change | `major` |
 
 ## fix
 

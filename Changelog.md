@@ -1,3 +1,18 @@
+## [2.0.0](https://github.com/AtomiCloud/sulfone.boron/compare/v1.2.0...v2.0.0) (2025-05-03)
+
+
+### ✨ Features ✨
+
+* add gatekeeper CI ([040d0da](https://github.com/AtomiCloud/sulfone.boron/commit/040d0da04c3da5fd5050333584af6e53d27c11fc))
+* **breaking:** remove extensions ([a03194c](https://github.com/AtomiCloud/sulfone.boron/commit/a03194c8bdc87713d04965c3742eef4e2ec36739))
+* upgrade infra to latest ([f6e71d8](https://github.com/AtomiCloud/sulfone.boron/commit/f6e71d84d20058203978c99f1fef92300ea7986c))
+
+
+### 🐛 Bug Fixes 🐛
+
+* incorrect docker setup version ([2dc50f4](https://github.com/AtomiCloud/sulfone.boron/commit/2dc50f4d3a30008cb8206cd8831f7bb47431e41f))
+* incorrect path to docker build ([094a48c](https://github.com/AtomiCloud/sulfone.boron/commit/094a48ca9374f5efd0a2a9ef498ae0f776556128))
+
 ## [1.2.0](https://github.com/AtomiCloud/sulfone.boron/compare/v1.1.2...v1.2.0) (2025-04-23)
 
 
