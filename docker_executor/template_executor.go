@@ -46,8 +46,8 @@ func (de TemplateExecutor) missingTemplateVolume(volumes []DockerVolumeReference
 func (de TemplateExecutor) missingTemplateVolumeImage(images []DockerImageReference) (bool, DockerImageReference) {
 	template := de.Template
 	i := DockerImageReference{
-		Reference: template.BlobDockerReference,
-		Tag:       template.BlobDockerTag,
+		Reference: template.Properties.BlobDockerReference,
+		Tag:       template.Properties.BlobDockerTag,
 	}
 	for _, image := range images {
 		if strings.HasSuffix(i.Reference, image.Reference) && image.Tag == i.Tag {
@@ -60,8 +60,8 @@ func (de TemplateExecutor) missingTemplateVolumeImage(images []DockerImageRefere
 func (de TemplateExecutor) missingTemplateImages(images []DockerImageReference) (bool, DockerImageReference) {
 	template := de.Template
 	i := DockerImageReference{
-		Reference: template.TemplateDockerReference,
-		Tag:       template.TemplateDockerTag,
+		Reference: template.Properties.TemplateDockerReference,
+		Tag:       template.Properties.TemplateDockerTag,
 	}
 	for _, image := range images {
 		if strings.HasSuffix(i.Reference, image.Reference) && image.Tag == i.Tag {
@@ -145,8 +145,8 @@ func (de TemplateExecutor) listContainersVolumesImages() (
 
 func (de TemplateExecutor) startContainer(conRef DockerContainerReference) error {
 	imageRef := DockerImageReference{
-		Reference: de.Template.TemplateDockerReference,
-		Tag:       de.Template.TemplateDockerTag,
+		Reference: de.Template.Properties.TemplateDockerReference,
+		Tag:       de.Template.Properties.TemplateDockerTag,
 	}
 	err := de.Docker.CreateContainer(conRef, imageRef)
 	if err != nil {
@@ -168,8 +168,8 @@ func (de TemplateExecutor) startVolume(volRef DockerVolumeReference) error {
 		fmt.Println("✅ Volume created", volRef.CyanId)
 	}
 	unzipImage := DockerImageReference{
-		Reference: de.Template.BlobDockerReference,
-		Tag:       de.Template.BlobDockerTag,
+		Reference: de.Template.Properties.BlobDockerReference,
+		Tag:       de.Template.Properties.BlobDockerTag,
 	}
 	unzipContainer := DockerContainerReference{
 		CyanId:    de.Template.ID,
