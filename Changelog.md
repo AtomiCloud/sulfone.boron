@@ -1,3 +1,10 @@
+## [2.1.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.0.0...v2.1.0) (2025-05-10)
+
+
+### ✨ Features ✨
+
+* upgrade models to include template ref & empty template ([60abd10](https://github.com/AtomiCloud/sulfone.boron/commit/60abd10bb0bd98e0d145a48aa681b08231eeb15f))
+
 ## [2.0.0](https://github.com/AtomiCloud/sulfone.boron/compare/v1.2.0...v2.0.0) (2025-05-03)
 
 
