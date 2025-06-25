@@ -1,4 +1,4 @@
-{ pkgs, atomi, pkgs-2411, pkgs-2405 }:
+{ pkgs, atomi, pkgs-2505, pkgs-2405, pkgs-unstable }:
 let
   all = {
     atomipkgs = (
@@ -13,7 +13,7 @@ let
       }
     );
     nix-unstable = (
-      with pkgs;
+      with pkgs-unstable;
       { }
     );
     nix-2405 = (
@@ -23,8 +23,8 @@ let
           ansible;
       }
     );
-    nix-2411 = (
-      with pkgs-2411;
+    nix-2505 = (
+      with pkgs-2505;
       {
         inherit
           infisical
@@ -46,6 +46,6 @@ let
 in
 with all;
 atomipkgs //
-nix-2411 //
+nix-2505 //
 nix-2405 //
 nix-unstable
