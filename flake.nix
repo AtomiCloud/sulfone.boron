@@ -6,8 +6,8 @@
     pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
 
     # registry
-    nixpkgs.url = "nixpkgs/nixos-unstable";
-    nixpkgs-2411.url = "nixpkgs/nixos-24.11";
+    nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
+    nixpkgs-2505.url = "nixpkgs/nixos-25.05";
     nixpkgs-2405.url = "nixpkgs/nixos-24.05";
     atomipkgs.url = "github:AtomiCloud/nix-registry/v2";
   };
@@ -21,19 +21,20 @@
 
       # registries
     , atomipkgs
-    , nixpkgs
-    , nixpkgs-2411
+    , nixpkgs-unstable
+    , nixpkgs-2505
     , nixpkgs-2405
     } @inputs:
     flake-utils.lib.eachDefaultSystem
       (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
-        pkgs-2411 = nixpkgs-2411.legacyPackages.${system};
+        pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
+        pkgs-2505 = nixpkgs-2505.legacyPackages.${system};
         pkgs-2405 = nixpkgs-2405.legacyPackages.${system};
         atomi = atomipkgs.packages.${system};
         pre-commit-lib = pre-commit-hooks.lib.${system};
       in
+      let pkgs = pkgs-2505; in
       let
         out = rec {
           pre-commit = import ./nix/pre-commit.nix {
@@ -43,7 +44,7 @@
             inherit treefmt-nix pkgs;
           };
           packages = import ./nix/packages.nix {
-            inherit pkgs atomi pkgs-2411 pkgs-2405;
+            inherit pkgs atomi pkgs-2505 pkgs-2405 pkgs-unstable;
           };
           env = import ./nix/env.nix {
             inherit pkgs packages;
