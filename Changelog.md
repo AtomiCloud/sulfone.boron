@@ -1,3 +1,11 @@
+## [2.1.1](https://github.com/AtomiCloud/sulfone.boron/compare/v2.1.0...v2.1.1) (2025-06-29)
+
+
+### 🐛 Bug Fixes 🐛
+
+* **default:** incorrect reference ID for older templates ([620b607](https://github.com/AtomiCloud/sulfone.boron/commit/620b607945eef1250f2ac7a8336a88923e42da9e))
+* upgraded tofu ([9113c47](https://github.com/AtomiCloud/sulfone.boron/commit/9113c473e2ded2b47a74f1150c6bd606bce636d8))
+
 ## [2.1.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.0.0...v2.1.0) (2025-05-10)
 
 
