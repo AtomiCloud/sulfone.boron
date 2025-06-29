@@ -1,6 +1,6 @@
 variable "tofu_backend" {
   type = string
-  sensitive = true
+  # sensitive = true
 }
 
 # secrets
