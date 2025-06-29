@@ -225,7 +225,7 @@ func (rc RegistryClient) convertPlugin(cp CyanPluginReq, plugins []PluginRes) (C
 				if p.ID == r.Principal.Id {
 					fmt.Printf("✅ Plugin %s (from Cyan Response)'s verions %s matches %s", n, v, p.ID)
 					return CyanPlugin{
-						Id:        res.Principal.Id,
+						Id:        r.Principal.Id,
 						Reference: n,
 						Username:  username,
 						Name:      name,
