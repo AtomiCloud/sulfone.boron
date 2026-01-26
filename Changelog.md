@@ -1,3 +1,18 @@
+## [2.2.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.1.1...v2.2.0) (2026-01-26)
+
+
+### ✨ Features ✨
+
+* allow key selection during deploy ([7915442](https://github.com/AtomiCloud/sulfone.boron/commit/79154421ab32dee830001fe4fc8c7c5f6bdb7bcb))
+
+
+### 🐛 Bug Fixes 🐛
+
+* **ci:** update all Docker API types for v27 ([f152d76](https://github.com/AtomiCloud/sulfone.boron/commit/f152d761fe4789425d93f97076e1269e0950eeb5))
+* **ci:** update Docker API calls for v27 and fix shell script ([ff937c8](https://github.com/AtomiCloud/sulfone.boron/commit/ff937c85472ac76d4c522878347578d92f9342f0))
+* **ci:** update Dockerfile to use Go 1.24 ([8fbbd88](https://github.com/AtomiCloud/sulfone.boron/commit/8fbbd886c200ce95da765e0ca2185886f96fda76))
+* **default:** upgrade to use newest docker client ([ce169eb](https://github.com/AtomiCloud/sulfone.boron/commit/ce169eb1fb4d3a13f7eb2b318392c0307786aba1))
+
 ## [2.1.1](https://github.com/AtomiCloud/sulfone.boron/compare/v2.1.0...v2.1.1) (2025-06-29)
 
 
