@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/AtomiCloud/sulfone.boron/docker_executor"
-	"github.com/docker/docker/api/types"
+	imageTypes "github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/urfave/cli/v2"
 	"log"
@@ -28,7 +28,7 @@ func main() {
 					defer func(dCli *client.Client) {
 						_ = dCli.Close()
 					}(dCli)
-					images, err := dCli.ImageList(ctx, types.ImageListOptions{})
+					images, err := dCli.ImageList(ctx, imageTypes.ListOptions{})
 					if err != nil {
 						panic(err)
 					}
