@@ -18,3 +18,5 @@ pkg/
 **.tfstate
 **.tfstate.**
 **/secrets.tfvars
+
+dev-loop/

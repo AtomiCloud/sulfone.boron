@@ -34,6 +34,10 @@ tasks:
     desc: 'Provision and deploy the cluster'
     cmds:
       - ./scripts/cd/provision-and-deploy.sh
+  deploy:
+    desc: 'Deploy the cluster'
+    cmds:
+      - ./scripts/cd/deploy.sh {{.CLI_ARGS}}
   exec:
     desc: 'SSH into the executor'
     cmds:

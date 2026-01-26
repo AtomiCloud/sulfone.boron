@@ -6,6 +6,7 @@ import (
 	"github.com/docker/docker/api/types"
 	container "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+	imageTypes "github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
@@ -43,7 +44,7 @@ func (d *DockerClient) ListImages() ([]DockerImageReference, error) {
 
 	f := filters.NewArgs()
 	f.Add("label", "cyanprint.dev=true")
-	images, err := d.Docker.ImageList(d.Context, types.ImageListOptions{
+	images, err := d.Docker.ImageList(d.Context, imageTypes.ListOptions{
 		All:     true,
 		Filters: f,
 	})
@@ -75,7 +76,7 @@ func (d *DockerClient) PullImages(images []DockerImageReference) []error {
 		go func(image DockerImageReference) {
 			ref := DockerImageToString(image)
 			fmt.Println("📥 Pulling image:", ref)
-			reader, err := d.Docker.ImagePull(d.Context, ref, types.ImagePullOptions{
+			reader, err := d.Docker.ImagePull(d.Context, ref, imageTypes.PullOptions{
 				All: true,
 			})
 			if err != nil {
@@ -117,14 +118,14 @@ func (d *DockerClient) PullImages(images []DockerImageReference) []error {
 func (d *DockerClient) GetCoordinatorImage() (DockerImageReference, error) {
 	f := filters.NewArgs()
 	f.Add("label", "cyanprint.name=sulfone-boron")
-	images, err := d.Docker.ImageList(d.Context, types.ImageListOptions{
+	images, err := d.Docker.ImageList(d.Context, imageTypes.ListOptions{
 		All:     true,
 		Filters: f,
 	})
 	if err != nil {
 		return DockerImageReference{}, err
 	}
-	var latest types.ImageSummary
+	var latest imageTypes.Summary
 
 	for _, image := range images {
 		if latest.Created < image.Created {
@@ -147,7 +148,7 @@ func (d *DockerClient) ListContainer() ([]DockerContainerReference, []DockerCont
 
 	f := filters.NewArgs()
 	f.Add("label", "cyanprint.dev=true")
-	containers, err := d.Docker.ContainerList(d.Context, types.ContainerListOptions{
+	containers, err := d.Docker.ContainerList(d.Context, container.ListOptions{
 		All:     true,
 		Filters: f,
 	})
@@ -188,7 +189,7 @@ func (d *DockerClient) CreateContainer(cc DockerContainerReference, image Docker
 	if err != nil {
 		return err
 	}
-	err = d.Docker.ContainerStart(d.Context, c.ID, types.ContainerStartOptions{})
+	err = d.Docker.ContainerStart(d.Context, c.ID, container.StartOptions{})
 	if err != nil {
 		return err
 	}
@@ -220,7 +221,7 @@ func (d *DockerClient) CreateContainerWithVolume(cc DockerContainerReference, v 
 	if err != nil {
 		return err
 	}
-	err = d.Docker.ContainerStart(d.Context, c.ID, types.ContainerStartOptions{})
+	err = d.Docker.ContainerStart(d.Context, c.ID, container.StartOptions{})
 	if err != nil {
 		return err
 	}
@@ -229,7 +230,7 @@ func (d *DockerClient) CreateContainerWithVolume(cc DockerContainerReference, v 
 
 func (d *DockerClient) RemoveContainer(cc DockerContainerReference) error {
 	name := DockerContainerToString(cc)
-	err := d.Docker.ContainerRemove(d.Context, name, types.ContainerRemoveOptions{
+	err := d.Docker.ContainerRemove(d.Context, name, container.RemoveOptions{
 		Force:         true,
 		RemoveVolumes: false,
 	})
@@ -357,7 +358,7 @@ func (d *DockerClient) CreateContainerWithReadWriteVolume(cc DockerContainerRefe
 	if err != nil {
 		return err
 	}
-	err = d.Docker.ContainerStart(d.Context, c.ID, types.ContainerStartOptions{})
+	err = d.Docker.ContainerStart(d.Context, c.ID, container.StartOptions{})
 	if err != nil {
 		return err
 	}

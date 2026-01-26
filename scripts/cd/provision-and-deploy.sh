@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
+cluster="$1"
+key="$2"
+
 set -euo pipefail
 
 # deploy compute here
-echo "❓Which cluster do you want to provision to?"
-cluster="$(printf "mica\ntalc\nopal\nruby\ntopaz\namber\n" | fzf)"
+[ -z "$cluster" ] && cluster="$(printf "mica\ntalc\nopal\nruby\ntopaz\namber\n" | fzf)"
 echo "🚀 Provisioning to $cluster..."
 
 echo "🆕 Initializing $cluster..."
@@ -33,5 +35,5 @@ tofu -chdir=tofu/live/general apply -var-file="ip.tfvars"
 echo "✅ Generic Infrastructure provisioned successfully"
 
 echo "🚀 Deploying..."
-./scripts/cd/deploy.sh "$cluster"
+./scripts/cd/deploy.sh "$cluster" "$key"
 echo "✅ Deployment successful"
