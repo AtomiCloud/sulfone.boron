@@ -188,7 +188,7 @@ func (d *DockerClient) CreateContainer(cc DockerContainerReference, image Docker
 	if err != nil {
 		return err
 	}
-	err = d.Docker.ContainerStart(d.Context, c.ID, types.ContainerStartOptions{})
+	err = d.Docker.ContainerStart(d.Context, c.ID, container.StartOptions{})
 	if err != nil {
 		return err
 	}
@@ -220,7 +220,7 @@ func (d *DockerClient) CreateContainerWithVolume(cc DockerContainerReference, v 
 	if err != nil {
 		return err
 	}
-	err = d.Docker.ContainerStart(d.Context, c.ID, types.ContainerStartOptions{})
+	err = d.Docker.ContainerStart(d.Context, c.ID, container.StartOptions{})
 	if err != nil {
 		return err
 	}
@@ -229,7 +229,7 @@ func (d *DockerClient) CreateContainerWithVolume(cc DockerContainerReference, v 
 
 func (d *DockerClient) RemoveContainer(cc DockerContainerReference) error {
 	name := DockerContainerToString(cc)
-	err := d.Docker.ContainerRemove(d.Context, name, types.ContainerRemoveOptions{
+	err := d.Docker.ContainerRemove(d.Context, name, container.RemoveOptions{
 		Force:         true,
 		RemoveVolumes: false,
 	})
@@ -357,7 +357,7 @@ func (d *DockerClient) CreateContainerWithReadWriteVolume(cc DockerContainerRefe
 	if err != nil {
 		return err
 	}
-	err = d.Docker.ContainerStart(d.Context, c.ID, types.ContainerStartOptions{})
+	err = d.Docker.ContainerStart(d.Context, c.ID, container.StartOptions{})
 	if err != nil {
 		return err
 	}
