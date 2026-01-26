@@ -3,10 +3,10 @@ package docker_executor
 import (
 	"context"
 	"fmt"
-	imageTypes "github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types"
 	container "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+	imageTypes "github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
