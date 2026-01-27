@@ -3,11 +3,11 @@ package docker_executor
 import (
 	"context"
 	"fmt"
-	"github.com/docker/docker/api/types"
 	container "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	imageTypes "github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
+	networkTypes "github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"io"
@@ -366,7 +366,7 @@ func (d *DockerClient) CreateContainerWithReadWriteVolume(cc DockerContainerRefe
 }
 
 func (d *DockerClient) CyanPrintNetworkExist() (bool, error) {
-	networks, err := d.Docker.NetworkList(d.Context, types.NetworkListOptions{})
+	networks, err := d.Docker.NetworkList(d.Context, networkTypes.ListOptions{})
 	if err != nil {
 		return false, err
 	}
@@ -379,7 +379,7 @@ func (d *DockerClient) CyanPrintNetworkExist() (bool, error) {
 }
 
 func (d *DockerClient) CreateNetwork() error {
-	_, err := d.Docker.NetworkCreate(d.Context, networkName, types.NetworkCreate{
+	_, err := d.Docker.NetworkCreate(d.Context, networkName, networkTypes.CreateOptions{
 		Driver: "bridge",
 	})
 	if err != nil {
