@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/AtomiCloud/sulfone.boron/compare/v2.2.0...v2.2.1) (2026-01-27)
+
+
+### 🐛 Bug Fixes 🐛
+
+* upgrade Docker client to v28 and fix network API types ([ce2e2cb](https://github.com/AtomiCloud/sulfone.boron/commit/ce2e2cb3e271962792d5ba57579e369f63881339))
+
 ## [2.2.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.1.1...v2.2.0) (2026-01-26)
 
 
