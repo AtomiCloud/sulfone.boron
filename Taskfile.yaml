@@ -33,7 +33,7 @@ tasks:
   provision-and-deploy:
     desc: 'Provision and deploy the cluster'
     cmds:
-      - ./scripts/cd/provision-and-deploy.sh
+      - ./scripts/cd/provision-and-deploy.sh {{.CLI_ARGS}}
   deploy:
     desc: 'Deploy the cluster'
     cmds:
