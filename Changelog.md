@@ -1,3 +1,11 @@
+## [2.3.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.2.1...v2.3.0) (2026-01-27)
+
+
+### ✨ Features ✨
+
+* add version number configuration for boron deployment ([f996d05](https://github.com/AtomiCloud/sulfone.boron/commit/f996d0589bd2b5ccf0724e201f00e058451ba766))
+* add version number configuration for boron deployment ([#22](https://github.com/AtomiCloud/sulfone.boron/issues/22)) ([005da45](https://github.com/AtomiCloud/sulfone.boron/commit/005da456531a0625a5af20a253b4a78732693faa))
+
 ## [2.2.1](https://github.com/AtomiCloud/sulfone.boron/compare/v2.2.0...v2.2.1) (2026-01-27)
 
 
