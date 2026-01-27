@@ -2,18 +2,25 @@
   hosts: all
   become: true
   become_user: kirin
+  vars:
+    boron_version: "{{ boron_version | default('latest') }}"
+  environment:
+    BORON_VERSION: '{{ boron_version }}'
   tasks:
     - name: Copy artifact folder
       copy:
         src: ../artifact
         dest: '~/'
+
     - name: Execute Docker Setup
-      command: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron:latest setup
+      command: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/atomicloud/sulfone.boron/sulfone-boron:{{ boron_version }} setup
 
     - name: Update Docker Image
-      command: docker pull ghcr.io/atomicloud/sulfone.boron/sulfone-boron:latest
+      command: docker pull ghcr.io/atomicloud/sulfone.boron/sulfone-boron:{{ boron_version }}
 
     - name: Start Docker Compose
       command: docker compose up -d
+      environment:
+        BORON_VERSION: '{{ boron_version }}'
       args:
         chdir: '~/artifact'

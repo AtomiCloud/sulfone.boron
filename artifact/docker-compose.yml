@@ -1,6 +1,6 @@
 services:
   boron:
-    image: ghcr.io/atomicloud/sulfone.boron/sulfone-boron:latest
+    image: ghcr.io/atomicloud/sulfone.boron/sulfone-boron:${BORON_VERSION:-latest}
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
