@@ -5,6 +5,7 @@
 **Why**: Prevents resource leaks and ensures clean state between executions.
 
 **Key Files**:
+
 - `docker_executor/executor.go:297` → `Clean()`
 - `docker_executor/docker.go:243` → `RemoveAllContainers()`
 - `docker_executor/docker.go:290` → `RemoveAllVolumes()`
@@ -19,6 +20,7 @@ The cleanup system provides controlled resource removal:
 4. **Return errors** - Collect and return all removal errors
 
 Cleanup is triggered by:
+
 - `DELETE /executor/:sessionId` - Manual cleanup API call
 - Can be integrated with workflow automation
 
@@ -69,22 +71,22 @@ sequenceDiagram
     E-->>S: 14. Return errors (empty if success)
 ```
 
-| # | Step | What | Key File |
-|---|------|------|----------|
-| 1 | Clean request | Server calls executor cleanup | `server.go:34` |
-| 2 | List resources | Query for cyanprint containers and volumes | `executor.go:221` |
-| 3 | Query | Docker filters by label `cyanprint.dev=true` | `docker.go:147`, `docker.go:411` |
-| 4 | Return | All cyanprint resources | `docker.go:174`, `docker.go:429` |
-| 5 | References | Struct representations of containers/volumes | `executor.go:250` |
-| 6 | Filter | Match by `SessionId == sessionId` | `executor.go:306` |
-| 7 | Remove containers | Delete matching containers in parallel | `docker.go:243` |
-| 8 | Remove volumes | Delete matching volumes in parallel | `docker.go:290` |
-| 9 | Remove | Docker API call per container | `docker.go:233` |
-| 10 | Remove | Docker API call per container | `docker.go:233` |
-| 11 | Remove | Docker API call per volume | `docker.go:283` |
-| 12 | Results | Success or error per resource | `docker.go:240`, `docker.go:287` |
-| 13 | Collect | All errors aggregated | `docker.go:265`, `docker.go:311` |
-| 14 | Return | Empty if success, errors if any failures | `executor.go:325` |
+| #   | Step              | What                                         | Key File                         |
+| --- | ----------------- | -------------------------------------------- | -------------------------------- |
+| 1   | Clean request     | Server calls executor cleanup                | `server.go:34`                   |
+| 2   | List resources    | Query for cyanprint containers and volumes   | `executor.go:221`                |
+| 3   | Query             | Docker filters by label `cyanprint.dev=true` | `docker.go:147`, `docker.go:411` |
+| 4   | Return            | All cyanprint resources                      | `docker.go:174`, `docker.go:429` |
+| 5   | References        | Struct representations of containers/volumes | `executor.go:250`                |
+| 6   | Filter            | Match by `SessionId == sessionId`            | `executor.go:306`                |
+| 7   | Remove containers | Delete matching containers in parallel       | `docker.go:243`                  |
+| 8   | Remove volumes    | Delete matching volumes in parallel          | `docker.go:290`                  |
+| 9   | Remove            | Docker API call per container                | `docker.go:233`                  |
+| 10  | Remove            | Docker API call per container                | `docker.go:233`                  |
+| 11  | Remove            | Docker API call per volume                   | `docker.go:283`                  |
+| 12  | Results           | Success or error per resource                | `docker.go:240`, `docker.go:287` |
+| 13  | Collect           | All errors aggregated                        | `docker.go:265`, `docker.go:311` |
+| 14  | Return            | Empty if success, errors if any failures     | `executor.go:325`                |
 
 ## Filtering by Session
 
@@ -142,21 +144,21 @@ Volumes are named `cyan-<uuid>` or `cyan-<uuid>-<session>`:
 
 ## Edge Cases
 
-| Case | Behavior |
-|------|----------|
-| No matching resources | Returns empty error list (success) |
-| Some removals fail | Returns errors for failed items, successful removals persist |
-| Container in use | Force flag enabled, removes anyway |
-| Volume in use | Force flag enabled, removes anyway |
-| Session ID empty | Would match all resources (should not happen) |
+| Case                  | Behavior                                                     |
+| --------------------- | ------------------------------------------------------------ |
+| No matching resources | Returns empty error list (success)                           |
+| Some removals fail    | Returns errors for failed items, successful removals persist |
+| Container in use      | Force flag enabled, removes anyway                           |
+| Volume in use         | Force flag enabled, removes anyway                           |
+| Session ID empty      | Would match all resources (should not happen)                |
 
 ## Error Handling
 
-| Error | Cause | Handling |
-|-------|-------|----------|
+| Error               | Cause                            | Handling                               |
+| ------------------- | -------------------------------- | -------------------------------------- |
 | Container not found | Already removed or never existed | Logged, continues with other resources |
-| Volume in use | Mounted to running container | Force removes anyway |
-| Network error | Docker daemon unreachable | Returns error to caller |
+| Volume in use       | Mounted to running container     | Force removes anyway                   |
+| Network error       | Docker daemon unreachable        | Returns error to caller                |
 
 ## Related
 

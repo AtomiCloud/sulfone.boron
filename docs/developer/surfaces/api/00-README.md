@@ -12,18 +12,18 @@ http://localhost:9000
 
 ## All Endpoints
 
-| Method | Path | Description | Key File |
-|--------|------|-------------|----------|
-| GET | `/` | Health check | `server.go:30` |
-| POST | `/executor` | Start a new execution session | `server.go:183` |
-| POST | `/executor/:sessionId` | Execute merge and get results | `server.go:68` |
-| DELETE | `/executor/:sessionId` | Clean up session resources | `server.go:34` |
-| POST | `/executor/:sessionId/warm` | Warm session with images and volumes | `server.go:248` |
-| POST | `/template/warm` | Warm template (pre-pull images, create volume) | `server.go:312` |
-| POST | `/proxy/template/:cyanId/api/template/init` | Proxy to template init endpoint | `server.go:371` |
-| POST | `/proxy/template/:cyanId/api/template/validate` | Proxy to template validate endpoint | `server.go:437` |
-| POST | `/merge/:sessionId` | Internal merge endpoint | `server.go:503` |
-| POST | `/zip` | Create tar.gz from directory | `server.go:531` |
+| Method | Path                                            | Description                                    | Key File        |
+| ------ | ----------------------------------------------- | ---------------------------------------------- | --------------- |
+| GET    | `/`                                             | Health check                                   | `server.go:30`  |
+| POST   | `/executor`                                     | Start a new execution session                  | `server.go:183` |
+| POST   | `/executor/:sessionId`                          | Execute merge and get results                  | `server.go:68`  |
+| DELETE | `/executor/:sessionId`                          | Clean up session resources                     | `server.go:34`  |
+| POST   | `/executor/:sessionId/warm`                     | Warm session with images and volumes           | `server.go:248` |
+| POST   | `/template/warm`                                | Warm template (pre-pull images, create volume) | `server.go:312` |
+| POST   | `/proxy/template/:cyanId/api/template/init`     | Proxy to template init endpoint                | `server.go:371` |
+| POST   | `/proxy/template/:cyanId/api/template/validate` | Proxy to template validate endpoint            | `server.go:437` |
+| POST   | `/merge/:sessionId`                             | Internal merge endpoint                        | `server.go:503` |
+| POST   | `/zip`                                          | Create tar.gz from directory                   | `server.go:531` |
 
 ## Common Response Formats
 

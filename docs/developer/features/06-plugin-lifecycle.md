@@ -5,6 +5,7 @@
 **Why**: Ensures plugins see a consistent, complete state and enables ordered transformations (e.g., formatter then linter).
 
 **Key Files**:
+
 - `docker_executor/merger.go:179` → `execPlugins()`
 - `docker_executor/merger.go:216` → Sequential plugin loop
 
@@ -61,19 +62,19 @@ sequenceDiagram
     M-->>M: 11. All plugins complete
 ```
 
-| # | Step | What | Key File |
-|---|------|------|----------|
-| 1 | Resolve | Query Zinc for plugin versions | `merger.go:188` |
-| 2 | Converted | Plugins with IDs, versions, configs | `registry.go:227` |
-| 3 | Call plugin 1 | HTTP POST to plugin container | `merger.go:223` |
-| 4 | Modify | Plugin reads/writes merged directory | Internal to plugin |
-| 5 | Updated | Files changed by plugin 1 | Internal to plugin |
-| 6 | Complete | Plugin 1 returns success | `merger.go:233` |
-| 7 | Call plugin 2 | HTTP POST to plugin container | `merger.go:223` |
-| 8 | Modify | Plugin 2 sees plugin 1 changes | Internal to plugin |
-| 9 | Updated | Files changed by plugin 2 | Internal to plugin |
-| 10 | Complete | Plugin 2 returns success | `merger.go:233` |
-| 11 | Return | All plugins complete, return nil | `merger.go:235` |
+| #   | Step          | What                                 | Key File           |
+| --- | ------------- | ------------------------------------ | ------------------ |
+| 1   | Resolve       | Query Zinc for plugin versions       | `merger.go:188`    |
+| 2   | Converted     | Plugins with IDs, versions, configs  | `registry.go:227`  |
+| 3   | Call plugin 1 | HTTP POST to plugin container        | `merger.go:223`    |
+| 4   | Modify        | Plugin reads/writes merged directory | Internal to plugin |
+| 5   | Updated       | Files changed by plugin 1            | Internal to plugin |
+| 6   | Complete      | Plugin 1 returns success             | `merger.go:233`    |
+| 7   | Call plugin 2 | HTTP POST to plugin container        | `merger.go:223`    |
+| 8   | Modify        | Plugin 2 sees plugin 1 changes       | Internal to plugin |
+| 9   | Updated       | Files changed by plugin 2            | Internal to plugin |
+| 10  | Complete      | Plugin 2 returns success             | `merger.go:233`    |
+| 11  | Return        | All plugins complete, return nil     | `merger.go:235`    |
 
 ## Plugin Request Format
 
@@ -87,6 +88,7 @@ sequenceDiagram
 ```
 
 Each plugin:
+
 1. Reads files from the shared directory
 2. Modifies them in-place
 3. Returns when complete
@@ -120,12 +122,12 @@ err = e.statusCheck(ep, 60)
 
 ## Edge Cases
 
-| Case | Behavior |
-|------|----------|
-| Plugin fails | Stops immediately, returns error, partial changes persist |
-| No plugins | Skips plugin stage, returns merged output |
-| Plugin modifies same file | Later plugin sees earlier plugin's changes |
-| Plugin creates new files | Later plugin can see and modify them |
+| Case                      | Behavior                                                  |
+| ------------------------- | --------------------------------------------------------- |
+| Plugin fails              | Stops immediately, returns error, partial changes persist |
+| No plugins                | Skips plugin stage, returns merged output                 |
+| Plugin modifies same file | Later plugin sees earlier plugin's changes                |
+| Plugin creates new files  | Later plugin can see and modify them                      |
 
 ## Related
 

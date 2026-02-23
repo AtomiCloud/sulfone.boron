@@ -1,6 +1,7 @@
 # File Merging Algorithm
 
 **Used by**:
+
 - [Merger System Feature](../features/03-merger-system.md)
 - Merger container during merge operation
 
@@ -12,13 +13,13 @@ This enables the 3-stage pipeline where parallel processor outputs are consolida
 
 ## Input/Output
 
-| Input | Type | Description |
-|-------|------|-------------|
-| `fromDirs` | `[]string` | Processor output directories to merge |
-| `toDir` | `string` | Destination directory for merged output |
+| Input      | Type       | Description                             |
+| ---------- | ---------- | --------------------------------------- |
+| `fromDirs` | `[]string` | Processor output directories to merge   |
+| `toDir`    | `string`   | Destination directory for merged output |
 
-| Output | Type | Description |
-|--------|------|-------------|
+| Output  | Type    | Description                                |
+| ------- | ------- | ------------------------------------------ |
 | `error` | `error` | Error if directory walk or file copy fails |
 
 ## Steps
@@ -48,19 +49,19 @@ sequenceDiagram
     Note over M: 10. Return (all dirs merged)
 ```
 
-| # | Step | What | Why | Key File |
-|---|------|------|-----|----------|
-| 1 | Loop | Iterate through each source directory | Process all processor outputs | `merger.go:264` |
-| 2 | Walk | Call `filepath.Walk` on source directory | Traverse all files and subdirectories | `merger.go:266` |
-| 3a | Mkdir | Create directory in destination (if directory entry) | Preserve directory structure | `merger.go:282` |
-| 3b | Open | Open source file for reading | Prepare to copy file contents | `merger.go:24` |
-| 4 | Create | Create destination file | Prepare to receive copied contents | `merger.go:33` |
-| 5 | Copy | Use `io.Copy` to transfer contents | Efficiently copy file data | `merger.go:42` |
-| 6 | Chmod | Copy source file permissions to destination | Preserve file mode bits | `merger.go:52` |
-| 7 | Close | Close source file | Free file descriptor | `merger.go:29` |
-| 8 | Close | Close destination file | Flush and free file descriptor | `merger.go:38` |
-| 9 | Continue | Proceed to next source directory | Merge all processor outputs | `merger.go:265` |
-| 10 | Return | Return nil error (or first error encountered) | Signal completion | `merger.go:292` |
+| #   | Step     | What                                                 | Why                                   | Key File        |
+| --- | -------- | ---------------------------------------------------- | ------------------------------------- | --------------- |
+| 1   | Loop     | Iterate through each source directory                | Process all processor outputs         | `merger.go:264` |
+| 2   | Walk     | Call `filepath.Walk` on source directory             | Traverse all files and subdirectories | `merger.go:266` |
+| 3a  | Mkdir    | Create directory in destination (if directory entry) | Preserve directory structure          | `merger.go:282` |
+| 3b  | Open     | Open source file for reading                         | Prepare to copy file contents         | `merger.go:24`  |
+| 4   | Create   | Create destination file                              | Prepare to receive copied contents    | `merger.go:33`  |
+| 5   | Copy     | Use `io.Copy` to transfer contents                   | Efficiently copy file data            | `merger.go:42`  |
+| 6   | Chmod    | Copy source file permissions to destination          | Preserve file mode bits               | `merger.go:52`  |
+| 7   | Close    | Close source file                                    | Free file descriptor                  | `merger.go:29`  |
+| 8   | Close    | Close destination file                               | Flush and free file descriptor        | `merger.go:38`  |
+| 9   | Continue | Proceed to next source directory                     | Merge all processor outputs           | `merger.go:265` |
+| 10  | Return   | Return nil error (or first error encountered)        | Signal completion                     | `merger.go:292` |
 
 ## Detailed Walkthrough
 
@@ -83,6 +84,7 @@ for _, dir := range fromDirs {
 **Key File**: `merger.go:280` → directory handling
 
 When a directory entry is encountered:
+
 1. Calculate relative path from source root
 2. Create corresponding path in destination
 3. Copy directory permissions
@@ -98,6 +100,7 @@ if info.IsDir() {
 **Key File**: `merger.go:22` → `copyFile()`
 
 When a file entry is encountered:
+
 1. Open source file
 2. Create destination file
 3. Copy contents with `io.Copy`
@@ -127,28 +130,29 @@ The merger container runs Boron itself and exposes the `MergeFiles` function via
 **Key File**: `merger.go:296` → `Merge()`
 
 The file merge is stage 2 of the 3-stage pipeline:
+
 1. **Stage 1**: Processors output to unique directories
 2. **Stage 2**: File merge consolidates outputs
 3. **Stage 3**: Plugins process merged directory
 
 ## Edge Cases
 
-| Case | Input | Behavior | Key File |
-|------|-------|----------|----------|
-| Empty source list | `fromDirs = []` | Returns immediately with no error | `merger.go:265` |
-| Empty directory | `fromDirs = ["empty/"]` | Creates no files in destination | `merger.go:266` |
-| Overwrite conflict | Two dirs have same file | Later source overwrites earlier | `merger.go:284` |
-| Nested directories | Deep source directory tree | Preserves full directory structure | `merger.go:272` |
-| Symlinks | Source contains symlinks | Copies symlink target, not symlink itself | `merger.go:24` |
+| Case               | Input                      | Behavior                                  | Key File        |
+| ------------------ | -------------------------- | ----------------------------------------- | --------------- |
+| Empty source list  | `fromDirs = []`            | Returns immediately with no error         | `merger.go:265` |
+| Empty directory    | `fromDirs = ["empty/"]`    | Creates no files in destination           | `merger.go:266` |
+| Overwrite conflict | Two dirs have same file    | Later source overwrites earlier           | `merger.go:284` |
+| Nested directories | Deep source directory tree | Preserves full directory structure        | `merger.go:272` |
+| Symlinks           | Source contains symlinks   | Copies symlink target, not symlink itself | `merger.go:24`  |
 
 ## Error Handling
 
-| Error | Cause | Handling |
-|-------|-------|----------|
-| Source not found | Directory in `fromDirs` doesn't exist | Returns error from `filepath.Walk` |
-| Permission denied | Cannot read source or write destination | Returns error from file operations |
-| Disk full | Cannot write to destination | Returns error from file creation |
-| Walk callback error | Any error during processing | Returns immediately, stopping merge |
+| Error               | Cause                                   | Handling                            |
+| ------------------- | --------------------------------------- | ----------------------------------- |
+| Source not found    | Directory in `fromDirs` doesn't exist   | Returns error from `filepath.Walk`  |
+| Permission denied   | Cannot read source or write destination | Returns error from file operations  |
+| Disk full           | Cannot write to destination             | Returns error from file creation    |
+| Walk callback error | Any error during processing             | Returns immediately, stopping merge |
 
 ## Complexity
 

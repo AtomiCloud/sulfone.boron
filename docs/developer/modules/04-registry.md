@@ -5,6 +5,7 @@
 **Why**: Translates user-friendly references (e.g., `username/processor`) into concrete version IDs and Docker image references.
 
 **Key Files**:
+
 - `docker_executor/registry.go:11` → `RegistryClient` struct
 - `docker_executor/registry.go:147` → `convertProcessor()`
 - `docker_executor/registry.go:205` → `convertPlugin()`
@@ -12,6 +13,7 @@
 ## Responsibilities
 
 What this module is responsible for:
+
 - Query Zinc registry for version metadata
 - Parse Cyan references (username/name:version)
 - Resolve version references to concrete IDs
@@ -31,8 +33,8 @@ registry.go
 └── convertPlugin()              # Resolve plugin reference
 ```
 
-| File | Purpose |
-|------|---------|
+| File          | Purpose                   |
+| ------------- | ------------------------- |
 | `registry.go` | Zinc registry HTTP client |
 
 ## Dependencies
@@ -43,10 +45,10 @@ flowchart LR
     C[Merger] --> A
 ```
 
-| Dependency | Why |
-|------------|-----|
-| Zinc API | Source of version metadata |
-| Merger | Uses registry for version resolution |
+| Dependency | Why                                  |
+| ---------- | ------------------------------------ |
+| Zinc API   | Source of version metadata           |
+| Merger     | Uses registry for version resolution |
 
 ## Key Interfaces
 
@@ -82,12 +84,12 @@ func (rc RegistryClient) convertPlugin(cp CyanPluginReq, plugins []PluginRes) (C
 
 ## API Endpoints Used
 
-| Resource | Endpoint | Purpose |
-|----------|----------|---------|
+| Resource          | Endpoint                                               | Purpose              |
+| ----------------- | ------------------------------------------------------ | -------------------- |
 | Processor version | `/api/v1/Processor/slug/:user/:name/versions/:version` | Get specific version |
-| Processor latest | `/api/v1/Processor/slug/:user/:name/versions/latest` | Get latest version |
-| Plugin version | `/api/v1/Plugin/slug/:user/:name/versions/:version` | Get specific version |
-| Plugin latest | `/api/v1/Plugin/slug/:user/:name/versions/latest` | Get latest version |
+| Processor latest  | `/api/v1/Processor/slug/:user/:name/versions/latest`   | Get latest version   |
+| Plugin version    | `/api/v1/Plugin/slug/:user/:name/versions/:version`    | Get specific version |
+| Plugin latest     | `/api/v1/Plugin/slug/:user/:name/versions/latest`      | Get latest version   |
 
 ## Related
 

@@ -5,6 +5,7 @@
 **Why**: Orchestrates parallel processor execution, output consolidation, and sequential plugin application.
 
 **Key Files**:
+
 - `docker_executor/merger.go:15` → `Merger` struct
 - `docker_executor/merger.go:102` → `execProcessors()`
 - `docker_executor/merger.go:179` → `execPlugins()`
@@ -12,6 +13,7 @@
 ## Responsibilities
 
 What this module is responsible for:
+
 - Execute processors in parallel via HTTP
 - Merge processor outputs into single directory
 - Execute plugins sequentially on merged output
@@ -31,8 +33,8 @@ merger.go
 └── PostJSON[Req, Res]()    # Generic HTTP POST helper
 ```
 
-| File | Purpose |
-|------|---------|
+| File        | Purpose                                       |
+| ----------- | --------------------------------------------- |
 | `merger.go` | 3-stage pipeline coordination and HTTP client |
 
 ## Dependencies
@@ -44,10 +46,10 @@ flowchart LR
     D[Docker Executor] --> A
 ```
 
-| Dependency | Why |
-|------------|-----|
-| Registry Client | Resolve processor/plugin versions |
-| Server | Calls merger for build execution |
+| Dependency      | Why                                 |
+| --------------- | ----------------------------------- |
+| Registry Client | Resolve processor/plugin versions   |
+| Server          | Calls merger for build execution    |
 | Docker Executor | Container references for HTTP calls |
 
 ## Key Interfaces

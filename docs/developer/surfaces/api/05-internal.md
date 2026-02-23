@@ -10,9 +10,9 @@ Merge output directories from multiple processor containers into a single direct
 
 ### Parameters
 
-| Name | In | Type | Required | Description |
-|------|-----|------|----------|-------------|
-| `sessionId` | path | `string` | Yes | Session identifier |
+| Name        | In   | Type     | Required | Description        |
+| ----------- | ---- | -------- | -------- | ------------------ |
+| `sessionId` | path | `string` | Yes      | Session identifier |
 
 ### Request Body
 
@@ -24,11 +24,11 @@ Merge output directories from multiple processor containers into a single direct
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `from_dirs` | `[]string` | Yes | Processor output directories |
-| `to_dir` | `string` | Yes | Merge destination directory |
-| `template` | `TemplateVersionRes` | Yes | Template definition |
+| Field       | Type                 | Required | Description                  |
+| ----------- | -------------------- | -------- | ---------------------------- |
+| `from_dirs` | `[]string`           | Yes      | Processor output directories |
+| `to_dir`    | `string`             | Yes      | Merge destination directory  |
+| `template`  | `TemplateVersionRes` | Yes      | Template definition          |
 
 ### Response 200 OK
 
@@ -60,15 +60,16 @@ Create a tar.gz archive from a directory and stream it to the client. Called aft
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `target_dir` | `string` | Yes | Directory to zip |
+| Field        | Type     | Required | Description      |
+| ------------ | -------- | -------- | ---------------- |
+| `target_dir` | `string` | Yes      | Directory to zip |
 
 ### Response 200 OK
 
 Returns `application/octet-stream` with tar.gz archive.
 
 Headers:
+
 - `Content-Disposition: attachment; filename=cyan-output.tar.gz`
 - `Content-Type: application/octet-stream`
 

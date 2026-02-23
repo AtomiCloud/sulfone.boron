@@ -15,23 +15,23 @@ flowchart TD
     D --> DM[Domain Models]
 ```
 
-| Module | Role |
-|--------|------|
-| **Server** | HTTP API layer, routes requests to appropriate modules |
-| **Docker Executor** | Container lifecycle management (start, health check, clean) |
-| **Merger** | 3-stage pipeline coordination |
-| **Registry Client** | Version resolution from Zinc |
-| **Template Executor** | Template warming (pre-pull, volume creation) |
-| **Domain Models** | Container/volume/image naming conventions |
+| Module                | Role                                                        |
+| --------------------- | ----------------------------------------------------------- |
+| **Server**            | HTTP API layer, routes requests to appropriate modules      |
+| **Docker Executor**   | Container lifecycle management (start, health check, clean) |
+| **Merger**            | 3-stage pipeline coordination                               |
+| **Registry Client**   | Version resolution from Zinc                                |
+| **Template Executor** | Template warming (pre-pull, volume creation)                |
+| **Domain Models**     | Container/volume/image naming conventions                   |
 
 ## All Modules
 
-| Module | What | Why | Key Files |
-|---------|------|-----|-----------|
-| [Server](./01-server.md) | Gin HTTP API handlers | Provide REST interface for build orchestration | `server.go:28` |
+| Module                                     | What                                     | Why                                               | Key Files                        |
+| ------------------------------------------ | ---------------------------------------- | ------------------------------------------------- | -------------------------------- |
+| [Server](./01-server.md)                   | Gin HTTP API handlers                    | Provide REST interface for build orchestration    | `server.go:28`                   |
 | [Docker Executor](./02-docker-executor.md) | Template execution, container management | Orchestrate container lifecycle and health checks | `executor.go:10`, `docker.go:18` |
-| [Merger](./03-merger.md) | File consolidation from processors | Combine parallel outputs into single directory | `merger.go:15` |
-| [Registry](./04-registry.md) | Image registry operations | Resolve processor/plugin versions from Zinc | `registry.go:11` |
+| [Merger](./03-merger.md)                   | File consolidation from processors       | Combine parallel outputs into single directory    | `merger.go:15`                   |
+| [Registry](./04-registry.md)               | Image registry operations                | Resolve processor/plugin versions from Zinc       | `registry.go:11`                 |
 
 ## Groups
 

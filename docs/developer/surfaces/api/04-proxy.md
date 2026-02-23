@@ -10,9 +10,9 @@ Proxy to template container's init endpoint.
 
 ### Parameters
 
-| Name | In | Type | Required | Description |
-|------|-----|------|----------|-------------|
-| `cyanId` | path | `string` | Yes | Template container ID (UUID, dashes optional) |
+| Name     | In   | Type     | Required | Description                                   |
+| -------- | ---- | -------- | -------- | --------------------------------------------- |
+| `cyanId` | path | `string` | Yes      | Template container ID (UUID, dashes optional) |
 
 ### Request Body
 
@@ -43,9 +43,9 @@ Proxy to template container's validate endpoint.
 
 ### Parameters
 
-| Name | In | Type | Required | Description |
-|------|-----|------|----------|-------------|
-| `cyanId` | path | `string` | Yes | Template container ID (UUID, dashes optional) |
+| Name     | In   | Type     | Required | Description                                   |
+| -------- | ---- | -------- | -------- | --------------------------------------------- |
+| `cyanId` | path | `string` | Yes      | Template container ID (UUID, dashes optional) |
 
 ### Request Body
 
@@ -73,6 +73,7 @@ Returns the template container's response with original status code and headers.
 **Key File**: `domain_model.go:48` → `DockerContainerToString()`
 
 Template containers are addressed via the `cyanprint` network:
+
 - Container name: `cyan-template-<stripped-uuid>`
 - HTTP endpoint: `http://cyan-template-<stripped-uuid>:5550`
 

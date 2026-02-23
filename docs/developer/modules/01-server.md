@@ -5,6 +5,7 @@
 **Why**: Exposes Boron's functionality over HTTP for integration with clients and other services.
 
 **Key Files**:
+
 - `server.go:28` → `server()` function
 - `server.go:30` → Root health check
 - `server.go:183` → POST /executor (start)
@@ -35,11 +36,11 @@ server.go
 └── main()                # CLI entry point
 ```
 
-| File | Purpose |
-|------|---------|
-| `server.go` | Gin server with all HTTP handlers |
-| `main.go` | CLI setup and server startup |
-| `model.go` | Server-specific request/response types |
+| File        | Purpose                                |
+| ----------- | -------------------------------------- |
+| `server.go` | Gin server with all HTTP handlers      |
+| `main.go`   | CLI setup and server startup           |
+| `model.go`  | Server-specific request/response types |
 
 ## Dependencies
 
@@ -54,12 +55,12 @@ flowchart LR
     C --> A
 ```
 
-| Dependency | Why |
-|------------|-----|
+| Dependency      | Why                            |
+| --------------- | ------------------------------ |
 | Docker Executor | Container lifecycle operations |
-| Merger | 3-stage pipeline coordination |
-| Gin | HTTP routing and middleware |
-| Docker Client | Direct Docker API calls |
+| Merger          | 3-stage pipeline coordination  |
+| Gin             | HTTP routing and middleware    |
+| Docker Client   | Direct Docker API calls        |
 
 ## Key Interfaces
 
@@ -67,17 +68,17 @@ flowchart LR
 
 **Key File**: `server.go:28` → `server()`
 
-| Method | Path | Purpose | Key Function |
-|--------|------|---------|--------------|
-| GET | `/` | Health check | Health check response |
-| POST | `/executor` | Start execution | `server.go:183` |
-| POST | `/executor/:sessionId` | Merge and zip | `server.go:68` |
-| DELETE | `/executor/:sessionId` | Cleanup session | `server.go:34` |
-| POST | `/executor/:sessionId/warm` | Warm session | `server.go:248` |
-| POST | `/template/warm` | Warm template | `server.go:312` |
-| POST | `/proxy/template/:cyanId/*` | Template proxy | `server.go:371` |
-| POST | `/merge/:sessionId` | Merger container | `server.go:503` |
-| POST | `/zip` | Zip directory | `server.go:531` |
+| Method | Path                        | Purpose          | Key Function          |
+| ------ | --------------------------- | ---------------- | --------------------- |
+| GET    | `/`                         | Health check     | Health check response |
+| POST   | `/executor`                 | Start execution  | `server.go:183`       |
+| POST   | `/executor/:sessionId`      | Merge and zip    | `server.go:68`        |
+| DELETE | `/executor/:sessionId`      | Cleanup session  | `server.go:34`        |
+| POST   | `/executor/:sessionId/warm` | Warm session     | `server.go:248`       |
+| POST   | `/template/warm`            | Warm template    | `server.go:312`       |
+| POST   | `/proxy/template/:cyanId/*` | Template proxy   | `server.go:371`       |
+| POST   | `/merge/:sessionId`         | Merger container | `server.go:503`       |
+| POST   | `/zip`                      | Zip directory    | `server.go:531`       |
 
 ### Request Types
 

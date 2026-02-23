@@ -23,6 +23,7 @@ curl http://localhost:9000/
 ```
 
 Response:
+
 ```json
-{"status":"OK"}
+{ "status": "OK" }
 ```

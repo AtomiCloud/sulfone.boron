@@ -5,6 +5,7 @@
 **Why**: Enables HTTP-based communication between containers (health checks, API calls) without complex DNS or port mapping.
 
 **Key Files**:
+
 - `docker_executor/docker.go:391` → `EnforceNetwork()`
 - `docker_executor/docker.go:368` → `CyanPrintNetworkExist()`
 - `docker_executor/docker.go:381` → `CreateNetwork()`
@@ -68,20 +69,20 @@ sequenceDiagram
     C->>C: 12. HTTP http://cyan-processor-uuid:5551/
 ```
 
-| # | Step | What | Key File |
-|---|------|------|----------|
-| 1 | Enforce | Check/create network before containers | `server.go:214` |
-| 2 | List | Query existing networks | `docker.go:369` |
-| 3 | Found | Network exists, skip creation | `docker.go:374` |
-| 4 | Existing | Return success, use existing | `docker.go:394` |
-| 5 | Not found | Network doesn't exist | `docker.go:399` |
-| 6 | Create | Create bridge network | `docker.go:382` |
-| 7 | Created | New network ready | `docker.go:388` |
-| 8 | Ready | Network available for containers | `docker.go:406` |
-| 9 | Create container | Attach to cyanprint network | `docker.go:357` |
-| 10 | Attach | Container joins network | `docker.go:187` |
-| 11 | Joined | Container can communicate | `docker.go:361` |
-| 12 | Communicate | HTTP between containers by name | `merger.go:144` |
+| #   | Step             | What                                   | Key File        |
+| --- | ---------------- | -------------------------------------- | --------------- |
+| 1   | Enforce          | Check/create network before containers | `server.go:214` |
+| 2   | List             | Query existing networks                | `docker.go:369` |
+| 3   | Found            | Network exists, skip creation          | `docker.go:374` |
+| 4   | Existing         | Return success, use existing           | `docker.go:394` |
+| 5   | Not found        | Network doesn't exist                  | `docker.go:399` |
+| 6   | Create           | Create bridge network                  | `docker.go:382` |
+| 7   | Created          | New network ready                      | `docker.go:388` |
+| 8   | Ready            | Network available for containers       | `docker.go:406` |
+| 9   | Create container | Attach to cyanprint network            | `docker.go:357` |
+| 10  | Attach           | Container joins network                | `docker.go:187` |
+| 11  | Joined           | Container can communicate              | `docker.go:361` |
+| 12  | Communicate      | HTTP between containers by name        | `merger.go:144` |
 
 ## Network Configuration
 
@@ -94,6 +95,7 @@ _, err := d.Docker.NetworkCreate(ctx, "cyanprint", types.CreateOptions{
 ```
 
 **Properties**:
+
 - Name: `cyanprint`
 - Driver: `bridge` (default Docker bridge)
 - Scope: Local (single host)
@@ -118,12 +120,12 @@ c, err := d.Docker.ContainerCreate(ctx, &container.Config{
 
 Containers address each other by **container name**:
 
-| From | To | URL |
-|------|-----|-----|
-| Coordinator | Processor | `http://cyan-processor-uuid-session:5551/` |
-| Coordinator | Plugin | `http://cyan-plugin-uuid-session:5552/` |
-| Coordinator | Merger | `http://cyan-merger-uuid-session:9000/` |
-| Merger | Processor | `http://cyan-processor-uuid-session:5551/api/process` |
+| From        | To        | URL                                                   |
+| ----------- | --------- | ----------------------------------------------------- |
+| Coordinator | Processor | `http://cyan-processor-uuid-session:5551/`            |
+| Coordinator | Plugin    | `http://cyan-plugin-uuid-session:5552/`               |
+| Coordinator | Merger    | `http://cyan-merger-uuid-session:9000/`               |
+| Merger      | Processor | `http://cyan-processor-uuid-session:5551/api/process` |
 
 **Key File**: `domain_model.go:48` → `DockerContainerToString()`
 
@@ -138,6 +140,7 @@ Docker bridge network provides **automatic DNS**:
 ## Network Persistence
 
 The `cyanprint` network:
+
 - **Persists** after Boron exits
 - **Shared** across all Boron instances on same host
 - **Not removed** by cleanup (only containers/volumes are removed)
@@ -150,12 +153,12 @@ docker network rm cyanprint
 
 ## Edge Cases
 
-| Case | Behavior |
-|------|----------|
-| Network already exists | Uses existing, no error |
-| Network name conflict (non-cyanprint) | Unlikely, cyanprint is specific |
-| Network deleted during execution | Existing containers continue, new containers fail |
- | Multiple Boron instances | Share same network, containers can communicate |
+| Case                                  | Behavior                                          |
+| ------------------------------------- | ------------------------------------------------- |
+| Network already exists                | Uses existing, no error                           |
+| Network name conflict (non-cyanprint) | Unlikely, cyanprint is specific                   |
+| Network deleted during execution      | Existing containers continue, new containers fail |
+| Multiple Boron instances              | Share same network, containers can communicate    |
 
 ## Related
 

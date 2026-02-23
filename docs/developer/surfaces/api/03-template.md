@@ -26,9 +26,9 @@ Warm a template by pulling images and creating the template volume.
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `template` | `TemplateVersionRes` | Yes | Template definition with processors and plugins |
+| Field      | Type                 | Required | Description                                     |
+| ---------- | -------------------- | -------- | ----------------------------------------------- |
+| `template` | `TemplateVersionRes` | Yes      | Template definition with processors and plugins |
 
 ### Response 200 OK
 

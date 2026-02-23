@@ -5,6 +5,7 @@
 **Why**: Provides the core orchestration logic for running processors, plugins, and merger containers.
 
 **Key Files**:
+
 - `docker_executor/executor.go:10` → `Executor` struct
 - `docker_executor/docker.go:18` → `DockerClient` struct
 - `docker_executor/template_executor.go:10` → `TemplateExecutor` struct
@@ -12,6 +13,7 @@
 ## Responsibilities
 
 What this module is responsible for:
+
 - Container creation and lifecycle management
 - Volume creation and mounting
 - Image listing and pulling
@@ -29,12 +31,12 @@ docker_executor/
 └── domain_model.go       # Naming conventions
 ```
 
-| File | Purpose |
-|------|---------|
-| `executor.go` | Main executor for session lifecycle |
-| `docker.go` | Docker client wrapper with parallel operations |
-| `template_executor.go` | Template warming and initialization |
-| `domain_model.go` | Container/volume/image naming and parsing |
+| File                   | Purpose                                        |
+| ---------------------- | ---------------------------------------------- |
+| `executor.go`          | Main executor for session lifecycle            |
+| `docker.go`            | Docker client wrapper with parallel operations |
+| `template_executor.go` | Template warming and initialization            |
+| `domain_model.go`      | Container/volume/image naming and parsing      |
 
 ## Dependencies
 
@@ -46,12 +48,12 @@ flowchart LR
     E[Merger] --> A
 ```
 
-| Dependency | Why |
-|------------|-----|
-| Docker Client SDK | Container and volume management |
-| Registry Client | Image reference resolution |
-| Server | Calls executor for container operations |
-| Merger | Uses executor for container creation |
+| Dependency        | Why                                     |
+| ----------------- | --------------------------------------- |
+| Docker Client SDK | Container and volume management         |
+| Registry Client   | Image reference resolution              |
+| Server            | Calls executor for container operations |
+| Merger            | Uses executor for container creation    |
 
 ## Key Components
 
@@ -67,6 +69,7 @@ type Executor struct {
 ```
 
 **Methods**:
+
 - `Start()` - Start processors, plugins, merger
 - `Warm()` - Pull images, create session volume
 - `Clean()` - Remove session containers and volumes
@@ -85,6 +88,7 @@ type DockerClient struct {
 ```
 
 **Methods**:
+
 - `CreateContainerWithReadWriteVolume()` - Create with dual mounts
 - `ListContainer()`, `ListVolumes()`, `ListImages()` - Resource listing
 - `PullImages()` - Parallel image pulling
@@ -103,6 +107,7 @@ type TemplateExecutor struct {
 ```
 
 **Methods**:
+
 - `WarmTemplate()` - Pull template images, create volume and container
 - `statusCheck()` - Health check for template container
 

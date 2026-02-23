@@ -16,14 +16,14 @@ Boron manages the complete execution lifecycle of Cyanprint templates:
 
 ## Quick Navigation
 
-| Section | Description | Start Here |
-|---------|-------------|------------|
-| [Getting Started](./01-getting-started.md) | Installation, setup, and first run | New users |
-| [Architecture](./02-architecture.md) | High-level system design and components | Understanding the big picture |
-| [Features](./features/) | What Boron does and how it works | Learning specific capabilities |
-| [Modules](./modules/) | Code organization and structure | Navigating the codebase |
-| [Surfaces](./surfaces/) | HTTP API endpoints and contracts | Integrating with Boron |
-| [Algorithms](./algorithms/) | Implementation details for complex logic | Deep dive into internals |
+| Section                                    | Description                              | Start Here                     |
+| ------------------------------------------ | ---------------------------------------- | ------------------------------ |
+| [Getting Started](./01-getting-started.md) | Installation, setup, and first run       | New users                      |
+| [Architecture](./02-architecture.md)       | High-level system design and components  | Understanding the big picture  |
+| [Features](./features/)                    | What Boron does and how it works         | Learning specific capabilities |
+| [Modules](./modules/)                      | Code organization and structure          | Navigating the codebase        |
+| [Surfaces](./surfaces/)                    | HTTP API endpoints and contracts         | Integrating with Boron         |
+| [Algorithms](./algorithms/)                | Implementation details for complex logic | Deep dive into internals       |
 
 ## System Context
 
@@ -38,22 +38,22 @@ flowchart LR
     B -->|Merged Output| C
 ```
 
-| Component | Role |
-|-----------|------|
+| Component         | Role                                                            |
+| ----------------- | --------------------------------------------------------------- |
 | **Zinc Registry** | Stores templates, processors, and plugins with version metadata |
-| **Boron** | Orchestrates execution, manages containers, merges outputs |
-| **Docker** | Runs isolated containers for each processor and plugin |
-| **Client** | Initiates builds and receives zipped results |
+| **Boron**         | Orchestrates execution, manages containers, merges outputs      |
+| **Docker**        | Runs isolated containers for each processor and plugin          |
+| **Client**        | Initiates builds and receives zipped results                    |
 
 ## Key Concepts
 
-| Concept | Description | Link |
-|---------|-------------|------|
-| **Session** | Isolated execution context with dedicated containers/volumes | [Session Management](./features/01-session-management.md) |
-| **Template** | Code generation template with processors and plugins | [Warming System](./features/07-warming-system.md) |
-| **Processor** | Container that transforms input files to output files | [Processor Isolation](./features/04-processor-isolation.md) |
-| **Plugin** | Container that post-processes merged output | [Plugin Lifecycle](./features/06-plugin-lifecycle.md) |
-| **Merger** | Container that consolidates processor outputs | [Merger System](./features/03-merger-system.md) |
+| Concept       | Description                                                  | Link                                                        |
+| ------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
+| **Session**   | Isolated execution context with dedicated containers/volumes | [Session Management](./features/01-session-management.md)   |
+| **Template**  | Code generation template with processors and plugins         | [Warming System](./features/07-warming-system.md)           |
+| **Processor** | Container that transforms input files to output files        | [Processor Isolation](./features/04-processor-isolation.md) |
+| **Plugin**    | Container that post-processes merged output                  | [Plugin Lifecycle](./features/06-plugin-lifecycle.md)       |
+| **Merger**    | Container that consolidates processor outputs                | [Merger System](./features/03-merger-system.md)             |
 
 ## Architecture Overview
 
@@ -82,11 +82,11 @@ flowchart LR
     PL2 --> O[Final Output]
 ```
 
-| Stage | What Happens | Parallel? |
-|-------|--------------|-----------|
-| 1 | Processors read from template volume, write to work areas | Yes (semaphore-limited) |
-| 2 | Merger consolidates all processor outputs | Single container |
-| 3 | Plugins process merged output sequentially | No (sequential) |
+| Stage | What Happens                                              | Parallel?               |
+| ----- | --------------------------------------------------------- | ----------------------- |
+| 1     | Processors read from template volume, write to work areas | Yes (semaphore-limited) |
+| 2     | Merger consolidates all processor outputs                 | Single container        |
+| 3     | Plugins process merged output sequentially                | No (sequential)         |
 
 ## Getting Started
 
@@ -97,9 +97,9 @@ flowchart LR
 
 ## Technology Stack
 
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| HTTP Server | Gin | REST API for build initiation |
-| Container Runtime | Docker | Isolated execution environments |
-| Orchestration | Go goroutines + channels | Parallel execution control |
-| Networking | Docker bridge network | Inter-container communication |
+| Component         | Technology               | Purpose                         |
+| ----------------- | ------------------------ | ------------------------------- |
+| HTTP Server       | Gin                      | REST API for build initiation   |
+| Container Runtime | Docker                   | Isolated execution environments |
+| Orchestration     | Go goroutines + channels | Parallel execution control      |
+| Networking        | Docker bridge network    | Inter-container communication   |

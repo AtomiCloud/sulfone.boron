@@ -26,12 +26,12 @@ Start a new execution session. Creates and starts processor, plugin, and merger 
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `session_id` | `string` | Yes | Unique identifier for this execution |
-| `template` | `TemplateVersionRes` | Yes | Template definition with processors and plugins |
-| `write_vol_reference` | `DockerVolumeReference` | Yes | Session volume reference |
-| `merger_id` | `string` | Yes | Merger container ID |
+| Field                 | Type                    | Required | Description                                     |
+| --------------------- | ----------------------- | -------- | ----------------------------------------------- |
+| `session_id`          | `string`                | Yes      | Unique identifier for this execution            |
+| `template`            | `TemplateVersionRes`    | Yes      | Template definition with processors and plugins |
+| `write_vol_reference` | `DockerVolumeReference` | Yes      | Session volume reference                        |
+| `merger_id`           | `string`                | Yes      | Merger container ID                             |
 
 ### Response 200 OK
 
@@ -73,10 +73,10 @@ Execute the merge pipeline and stream zipped output.
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `template` | `TemplateVersionRes` | Yes | Template definition |
-| `merger_id` | `string` | Yes | Merger container ID |
+| Field       | Type                 | Required | Description         |
+| ----------- | -------------------- | -------- | ------------------- |
+| `template`  | `TemplateVersionRes` | Yes      | Template definition |
+| `merger_id` | `string`             | Yes      | Merger container ID |
 
 ### Response 200 OK
 
@@ -151,9 +151,9 @@ Warm a session by pulling images and creating the session volume.
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `template` | `TemplateVersionRes` | Yes | Template definition |
+| Field      | Type                 | Required | Description         |
+| ---------- | -------------------- | -------- | ------------------- |
+| `template` | `TemplateVersionRes` | Yes      | Template definition |
 
 ### Response 200 OK
 

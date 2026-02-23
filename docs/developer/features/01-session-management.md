@@ -5,6 +5,7 @@
 **Why**: Prevents resource conflicts between concurrent executions and enables cleanup of specific runs.
 
 **Key Files**:
+
 - `docker_executor/domain_model.go:42` → `DockerContainerReference`
 - `docker_executor/domain_model.go:74` → `DockerVolumeReference`
 - `docker_executor/executor.go:297` → `Clean()`
@@ -60,21 +61,21 @@ sequenceDiagram
     E-->>S: 13. Cleanup complete
 ```
 
-| # | Step | What | Key File |
-|---|------|------|----------|
-| 1 | Request | Client provides or receives session ID | `server.go:68` |
-| 2 | Warm | Create session volume | `executor.go:385` |
-| 3 | Create volume | Docker creates `cyan-<uuid>-<session>` | `docker.go:432` |
-| 4 | Created | Volume ready for mounts | `docker.go:441` |
-| 5 | Start containers | Create processor/plugin/merger containers | `executor.go:328` |
-| 6 | Started | All containers running with session suffix | `docker.go:357` |
-| 7 | Cleanup | Client requests cleanup | `server.go:34` |
-| 8 | Clean | List and filter resources by session | `executor.go:297` |
-| 9 | List | Query Docker for cyanprint resources | `docker.go:147`, `docker.go:411` |
-| 10 | Filter | Return only resources matching session ID | `executor.go:306` |
-| 11 | Remove | Delete containers and volumes | `docker.go:243`, `docker.go:290` |
-| 12 | Removed | All session resources deleted | `docker.go:281`, `docker.go:325` |
-| 13 | Complete | Return OK to client | `executor.go:325` |
+| #   | Step             | What                                       | Key File                         |
+| --- | ---------------- | ------------------------------------------ | -------------------------------- |
+| 1   | Request          | Client provides or receives session ID     | `server.go:68`                   |
+| 2   | Warm             | Create session volume                      | `executor.go:385`                |
+| 3   | Create volume    | Docker creates `cyan-<uuid>-<session>`     | `docker.go:432`                  |
+| 4   | Created          | Volume ready for mounts                    | `docker.go:441`                  |
+| 5   | Start containers | Create processor/plugin/merger containers  | `executor.go:328`                |
+| 6   | Started          | All containers running with session suffix | `docker.go:357`                  |
+| 7   | Cleanup          | Client requests cleanup                    | `server.go:34`                   |
+| 8   | Clean            | List and filter resources by session       | `executor.go:297`                |
+| 9   | List             | Query Docker for cyanprint resources       | `docker.go:147`, `docker.go:411` |
+| 10  | Filter           | Return only resources matching session ID  | `executor.go:306`                |
+| 11  | Remove           | Delete containers and volumes              | `docker.go:243`, `docker.go:290` |
+| 12  | Removed          | All session resources deleted              | `docker.go:281`, `docker.go:325` |
+| 13  | Complete         | Return OK to client                        | `executor.go:325`                |
 
 ## Container Naming
 
@@ -82,12 +83,12 @@ sequenceDiagram
 
 Containers are named `cyan-<type>-<uuid>-<session>`:
 
-| Type | Example | Purpose |
-|------|---------|---------|
-| `template` | `cyan-template-abc123-` | Template container (no session) |
-| `processor` | `cyan-processor-def456-session789` | Processor container |
-| `plugin` | `cyan-plugin-ghi012-session789` | Plugin container |
-| `merger` | `cyan-merger-jkl345-session789` | Merger container |
+| Type        | Example                            | Purpose                         |
+| ----------- | ---------------------------------- | ------------------------------- |
+| `template`  | `cyan-template-abc123-`            | Template container (no session) |
+| `processor` | `cyan-processor-def456-session789` | Processor container             |
+| `plugin`    | `cyan-plugin-ghi012-session789`    | Plugin container                |
+| `merger`    | `cyan-merger-jkl345-session789`    | Merger container                |
 
 **Format**: `cyan-<cyanType>-<stripped(cyanId)>-<sessionId>`
 
@@ -97,10 +98,10 @@ Containers are named `cyan-<type>-<uuid>-<session>`:
 
 Volumes are named `cyan-<uuid>` or `cyan-<uuid>-<session>`:
 
-| Volume | Name | Purpose |
-|--------|------|---------|
-| Template volume | `cyan-abc123` | Read-only template files (no session) |
-| Session volume | `cyan-abc123-session789` | Read-write work area for a session |
+| Volume          | Name                     | Purpose                               |
+| --------------- | ------------------------ | ------------------------------------- |
+| Template volume | `cyan-abc123`            | Read-only template files (no session) |
+| Session volume  | `cyan-abc123-session789` | Read-write work area for a session    |
 
 **Format**: `cyan-<stripped(cyanId)>[-<sessionId>]`
 

@@ -15,6 +15,7 @@ Boron is the **Execution Coordinator** for CyanPrint - a Go-based service that o
 Boron sits in the **Execution Cluster** of the CyanPrint platform, orchestrating Docker containers (templates, processors, plugins, and mergers) to transform project templates into customized output.
 
 **Key Responsibilities**:
+
 - Session Management - Isolated execution environments with unique naming
 - Container Orchestration - Launch and coordinate template, processor, plugin, and merger containers
 - File Merging - Combine outputs from multiple processors into unified output
@@ -23,11 +24,11 @@ Boron sits in the **Execution Cluster** of the CyanPrint platform, orchestrating
 
 ## Technology Stack
 
-| Component | Technology | Version |
-|-----------|------------|---------|
-| Language | Go | 1.24 |
-| HTTP Framework | Gin | v1.9.1 |
-| Docker Client | docker/docker | v28.5.2+incompatible |
+| Component      | Technology    | Version              |
+| -------------- | ------------- | -------------------- |
+| Language       | Go            | 1.24                 |
+| HTTP Framework | Gin           | v1.9.1               |
+| Docker Client  | docker/docker | v28.5.2+incompatible |
 
 ## Quick Start
 
