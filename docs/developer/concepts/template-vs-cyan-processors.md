@@ -73,7 +73,7 @@ flowchart TD
 
 | Template.Processors (cyan.yaml)                             | Cyan.Processors (from script)                                  |
 | ----------------------------------------------------------- | -------------------------------------------------------------- |
-| **What MAY be used**                                        | **what WILL be used**                                          |
+| **What MAY be used**                                        | **What WILL be used**                                          |
 | All processors available for this template                  | Processors to run for this specific build                      |
 | Static, defined at template creation time                   | Dynamic, determined by user script execution                   |
 | Author writes: `['cyan/default', 'atomi/ts:3']`             | Script returns: `{name: 'atomi/ts'}` or `{name: 'atomi/ts:3'}` |
