@@ -20,3 +20,4 @@ pkg/
 **/secrets.tfvars
 
 .kagent/
+.kagent
