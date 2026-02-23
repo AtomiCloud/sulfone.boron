@@ -19,4 +19,4 @@ pkg/
 **.tfstate.**
 **/secrets.tfvars
 
-dev-loop/
+.kagent/
