@@ -132,7 +132,7 @@ sequenceDiagram
 
 **Context**: Need to limit concurrent container starts based on CPU cores.
 
-**Decision**: Use buffered channels as semitters with size `NumCPU()`.
+**Decision**: Use buffered channels as semaphores with size `NumCPU()`.
 
 **Rationale**: Prevents resource exhaustion while maximizing CPU utilization. Go channels provide clean synchronization without locks.
 

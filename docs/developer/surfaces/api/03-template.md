@@ -44,7 +44,7 @@ Warm a template by pulling images and creating the template volume.
 {
   "title": "Failed to warm template",
   "status": 400,
-  "detail": "Failed to warn template image, templates, and volumes",
+  "detail": "Failed to warm template image, templates, and volumes",
   "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
   "trace_id": null,
   "data": ["error1", "error2"]

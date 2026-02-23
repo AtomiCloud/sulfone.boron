@@ -13,7 +13,7 @@ A template artifact contains:
 - **Script** - A Turing-complete script that asks users questions and generates a build plan
 - **cyan.yaml** - Template metadata
 
-```
+```text
 template/
 ├── script          # User-provided, asks questions, returns Cyan object
 └── cyan.yaml       # Template metadata

@@ -23,7 +23,7 @@ What this module is responsible for:
 
 ## Structure
 
-```
+```text
 docker_executor/
 ├── executor.go           # Main orchestration logic
 ├── docker.go             # Docker API wrapper

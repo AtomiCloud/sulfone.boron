@@ -1,6 +1,6 @@
 # Algorithms Overview
 
-This section contains detailed implementation algorithms for complex logic in Boron. HA!
+This section contains detailed implementation algorithms for complex logic in Boron.
 
 ## Map
 

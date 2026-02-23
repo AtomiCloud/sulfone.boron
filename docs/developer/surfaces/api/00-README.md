@@ -4,7 +4,7 @@ Boron exposes a REST API on port 9000 for build orchestration, template warming,
 
 ## Base URL
 
-```
+```text
 http://localhost:9000
 ```
 

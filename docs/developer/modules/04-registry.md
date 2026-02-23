@@ -22,7 +22,7 @@ What this module is responsible for:
 
 ## Structure
 
-```
+```text
 registry.go
 ├── RegistryClient struct        # HTTP client
 ├── getProcessorVersion()        # Get specific version

@@ -88,7 +88,7 @@ Returns `application/x-gzip` stream with header `Content-Disposition: attachment
 {
   "title": "Failed to clean",
   "status": 400,
-  "detail": "Failed to session session-id",
+  "detail": "Failed to clean session-id",
   "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
   "trace_id": null,
   "data": ["error1", "error2"]
@@ -128,7 +128,7 @@ Clean up session resources (containers and volumes).
 {
   "title": "Failed to clean",
   "status": 400,
-  "detail": "Failed to session session-id",
+  "detail": "Failed to clean session-id",
   "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
   "trace_id": null,
   "data": ["error1", "error2"]
@@ -173,7 +173,7 @@ Warm a session by pulling images and creating the session volume.
 {
   "title": "Failed to warm executor",
   "status": 400,
-  "detail": "Failed to warn executor image, templates, and volumes",
+  "detail": "Failed to warm executor image, templates, and volumes",
   "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
   "trace_id": null,
   "data": ["error1", "error2"]

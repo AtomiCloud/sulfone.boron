@@ -22,7 +22,7 @@ What this module is responsible for:
 
 ## Structure
 
-```
+```text
 merger.go
 ├── Merger struct           # Main coordinator
 ├── execProcessors()        # Parallel processor execution

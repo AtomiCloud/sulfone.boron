@@ -85,7 +85,7 @@ Containers are named `cyan-<type>-<uuid>-<session>`:
 
 | Type        | Example                            | Purpose                         |
 | ----------- | ---------------------------------- | ------------------------------- |
-| `template`  | `cyan-template-abc123-`            | Template container (no session) |
+| `template`  | `cyan-template-abc123`             | Template container (no session) |
 | `processor` | `cyan-processor-def456-session789` | Processor container             |
 | `plugin`    | `cyan-plugin-ghi012-session789`    | Plugin container                |
 | `merger`    | `cyan-merger-jkl345-session789`    | Merger container                |
