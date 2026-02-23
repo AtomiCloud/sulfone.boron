@@ -24,7 +24,7 @@ go build -o boron ./main.go
 
 ```bash
 # Enter development environment
-nix-shell
+nix develop
 
 # Or use direnv
 direnv allow
@@ -32,13 +32,9 @@ direnv allow
 
 ## Setup
 
-### 1. Initialize Docker Network
+### 1. Docker Network (Automatic)
 
-Boron requires a bridge network named `cyanprint` for inter-container communication.
-
-```bash
-docker network create cyanprint
-```
+Boron requires a bridge network named `cyanprint` for inter-container communication. This is created automatically on first run via `EnforceNetwork()` - no manual setup required.
 
 **Key File**: `docker.go:391` → `EnforceNetwork()`
 
@@ -55,24 +51,23 @@ Configure the Zinc registry endpoint (defaults to internal cluster):
 
 ## Configuration
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--registry` | `https://api.zinc.sulfone.raichu.cluster.atomi.cloud` | Zinc registry endpoint |
-| Port | `9000` | HTTP server port |
-| Network | `cyanprint` | Docker bridge network name |
-| Parallelism | `NumCPU()` | Max concurrent operations |
+| Option       | Default                                               | Description                |
+| ------------ | ----------------------------------------------------- | -------------------------- |
+| `--registry` | `https://api.zinc.sulfone.raichu.cluster.atomi.cloud` | Zinc registry endpoint     |
+| Port         | `9000`                                                | HTTP server port           |
+| Network      | `cyanprint`                                           | Docker bridge network name |
+| Parallelism  | `NumCPU()`                                            | Max concurrent operations  |
 
 ## Common Issues
 
-### Issue: Network Already Exists
+### Issue: Network Creation Fails
 
-**Symptom**: `Error creating network` or `network already exists`
+**Symptom**: `Error creating network` during startup
 
-**Solution**: Boron auto-creates the network on first run. If you see this error, manually remove and recreate:
+**Solution**: Boron's `EnforceNetwork()` first checks if the network exists and only creates it if needed - this is idempotent. If creation still fails, it may be a Docker daemon issue. Check Docker is running:
 
 ```bash
-docker network rm cyanprint
-docker network create cyanprint
+docker info
 ```
 
 **Key File**: `docker.go:391` → `EnforceNetwork()`

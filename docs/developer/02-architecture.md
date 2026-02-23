@@ -44,14 +44,14 @@ flowchart LR
     S -->|Zipped Output| C
 ```
 
-| Component | Role | Key Files |
-|-----------|------|-----------|
-| **Zinc Registry** | Stores templates, processors, plugins with version metadata | External service |
-| **Gin Server** | HTTP API for build initiation, warm, cleanup | `server.go:28` |
-| **Executor** | Orchestrates container lifecycle (start, health check, cleanup) | `executor.go:10` |
-| **Merger** | Coordinates 3-stage pipeline execution | `merger.go:15` |
-| **Registry Client** | Resolves processor/plugin versions from Zinc | `registry.go:11` |
-| **Docker Client** | Manages containers, volumes, images, networks | `docker.go:18` |
+| Component           | Role                                                            | Key Files        |
+| ------------------- | --------------------------------------------------------------- | ---------------- |
+| **Zinc Registry**   | Stores templates, processors, plugins with version metadata     | External service |
+| **Gin Server**      | HTTP API for build initiation, warm, cleanup                    | `server.go:28`   |
+| **Executor**        | Orchestrates container lifecycle (start, health check, cleanup) | `executor.go:10` |
+| **Merger**          | Coordinates 3-stage pipeline execution                          | `merger.go:15`   |
+| **Registry Client** | Resolves processor/plugin versions from Zinc                    | `registry.go:11` |
+| **Docker Client**   | Manages containers, volumes, images, networks                   | `docker.go:18`   |
 
 ### Component Interaction
 
@@ -83,35 +83,35 @@ sequenceDiagram
     S-->>C: 16. Stream tar.gz output
 ```
 
-| # | Step | What | Key File |
-|---|------|------|----------|
-| 1 | Start request | Client initiates execution | `server.go:183` |
-| 2 | Delegate | Server calls executor to orchestrate | `server.go:231` |
-| 3 | Start processors | Launch processor containers in parallel | `executor.go:93` |
-| 4 | Start plugins | Launch plugin containers in parallel | `executor.go:153` |
-| 5 | Start merger | Launch merger container | `executor.go:61` |
-| 6 | Created | Docker confirms container creation | `docker.go:177` |
-| 7 | Started | Server returns OK to client | `server.go:242` |
-| 8 | Merge request | Client requests merged output | `server.go:68` |
-| 9 | Delegate | Server creates merger, calls Merge | `server.go:86` |
-| 10 | Resolve | Query Zinc for processor versions | `registry.go:147` |
-| 11 | Process | Call each processor container via HTTP | `merger.go:102` |
-| 12 | Outputs | Processors return output directories | `merger.go:144` |
-| 13 | Merge | Call merger container to consolidate | `merger.go:238` |
-| 14 | Plugins | Call plugins sequentially | `merger.go:179` |
-| 15 | Path | Return merged output path | `merger.go:296` |
-| 16 | Stream | Server streams zipped output | `server.go:169` |
+| #   | Step             | What                                    | Key File          |
+| --- | ---------------- | --------------------------------------- | ----------------- |
+| 1   | Start request    | Client initiates execution              | `server.go:183`   |
+| 2   | Delegate         | Server calls executor to orchestrate    | `server.go:231`   |
+| 3   | Start processors | Launch processor containers in parallel | `executor.go:93`  |
+| 4   | Start plugins    | Launch plugin containers in parallel    | `executor.go:153` |
+| 5   | Start merger     | Launch merger container                 | `executor.go:61`  |
+| 6   | Created          | Docker confirms container creation      | `docker.go:177`   |
+| 7   | Started          | Server returns OK to client             | `server.go:242`   |
+| 8   | Merge request    | Client requests merged output           | `server.go:68`    |
+| 9   | Delegate         | Server creates merger, calls Merge      | `server.go:86`    |
+| 10  | Resolve          | Query Zinc for processor versions       | `registry.go:147` |
+| 11  | Process          | Call each processor container via HTTP  | `merger.go:102`   |
+| 12  | Outputs          | Processors return output directories    | `merger.go:144`   |
+| 13  | Merge            | Call merger container to consolidate    | `merger.go:238`   |
+| 14  | Plugins          | Call plugins sequentially               | `merger.go:179`   |
+| 15  | Path             | Return merged output path               | `merger.go:296`   |
+| 16  | Stream           | Server streams zipped output            | `server.go:169`   |
 
 ## Key Components
 
-| Component | Purpose | Key Files |
-|-----------|---------|-----------|
-| **Gin Server** | HTTP API for build orchestration, warm, cleanup, and proxying | `server.go:28` |
-| **Executor** | Container lifecycle management (start, health check, clean) | `executor.go:10`, `docker.go:18` |
-| **Merger** | 3-stage pipeline coordination | `merger.go:15` |
-| **Registry Client** | Version resolution from Zinc | `registry.go:11` |
-| **Template Executor** | Template warming (pre-pull, volume creation) | `template_executor.go:10` |
-| **Domain Models** | Container/volume/image naming conventions | `domain_model.go` |
+| Component             | Purpose                                                       | Key Files                        |
+| --------------------- | ------------------------------------------------------------- | -------------------------------- |
+| **Gin Server**        | HTTP API for build orchestration, warm, cleanup, and proxying | `server.go:28`                   |
+| **Executor**          | Container lifecycle management (start, health check, clean)   | `executor.go:10`, `docker.go:18` |
+| **Merger**            | 3-stage pipeline coordination                                 | `merger.go:15`                   |
+| **Registry Client**   | Version resolution from Zinc                                  | `registry.go:11`                 |
+| **Template Executor** | Template warming (pre-pull, volume creation)                  | `template_executor.go:10`        |
+| **Domain Models**     | Container/volume/image naming conventions                     | `domain_model.go`                |
 
 ## Key Decisions
 
@@ -120,6 +120,7 @@ sequenceDiagram
 **Context**: Processors need read-only access to templates but write access for outputs.
 
 **Decision**: Mount two volumes per container:
+
 - `/workspace/cyanprint` (read-only) - Template volume
 - `/workspace/area` (read-write) - Work area for outputs
 
@@ -153,7 +154,7 @@ sequenceDiagram
 
 **Decision**: Use a dedicated "merger" container that runs the Boron image itself.
 
-**Rationale**: Reuses existing HTTP endpoints (`/merge`, `/zip`) without adding complexity to the coordinator. Merger can be scaled independently.
+**Rationale**: Reuses existing HTTP endpoints (`/merge`, `/zip`) without adding complexity to the coordinator. The merger container runs independently from the coordinator process, allowing the merge operation to execute in its own containerized environment.
 
 **Key File**: `server.go:503` → `/merge/:sessionId` endpoint
 
@@ -169,7 +170,7 @@ sequenceDiagram
 
 **Key Files**: `executor.go:75` → container creation, `merger.go:264` → `MergeFiles()`
 
-### 7. Bridge Network over Container Links
+### 6. Bridge Network over Container Links
 
 **Context**: Containers need to communicate via HTTP (health checks, API calls).
 
@@ -179,7 +180,7 @@ sequenceDiagram
 
 **Key File**: `docker.go:391` → `EnforceNetwork()`
 
-### 8. Health Check Polling
+### 7. Health Check Polling
 
 **Context**: Containers take time to start up; need to know when they're ready.
 
@@ -246,8 +247,8 @@ flowchart LR
     SV -->|"read-write"| L1
 ```
 
-| Container | /workspace/cyanprint | /workspace/area |
-|-----------|---------------------|-----------------|
+| Container | /workspace/cyanprint        | /workspace/area                    |
+| --------- | --------------------------- | ---------------------------------- |
 | Processor | Template volume (read-only) | Unique UUID work area (read-write) |
-| Merger | Template volume (read-only) | Session volume (read-write) |
-| Plugin | Not mounted | Session volume (read-write) |
+| Merger    | Template volume (read-only) | Session volume (read-write)        |
+| Plugin    | Not mounted                 | Session volume (read-write)        |
