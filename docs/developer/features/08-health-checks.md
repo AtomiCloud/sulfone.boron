@@ -94,7 +94,7 @@ sequenceDiagram
 
 ## Implementation
 
-**Key File**: `docker_executor/executor.go:266` → `statusCheck()`
+**Key File**: `docker_executor/executor.go:266` → `statusCheck(endpoint, maxAttempts)`
 
 ```go
 for i := 0; i < maxAttempts; i++ {

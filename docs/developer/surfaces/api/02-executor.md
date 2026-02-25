@@ -151,9 +151,9 @@ Warm a session by pulling images and creating the session volume.
 }
 ```
 
-| Field      | Type                 | Required | Description                                           |
-| ---------- | -------------------- | -------- | ----------------------------------------------------- |
-| `template` | `TemplateVersionRes` | Yes      | Template version definition (id, version, properties) |
+| Field      | Type                 | Required | Description                                                                   |
+| ---------- | -------------------- | -------- | ----------------------------------------------------------------------------- |
+| `template` | `TemplateVersionRes` | Yes      | Template definition (id, version, properties, principal, plugins, processors) |
 
 ### Response 200 OK
 

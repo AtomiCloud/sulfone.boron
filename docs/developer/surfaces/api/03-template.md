@@ -28,12 +28,12 @@ Warm a template by pulling images and creating the template volume.
 }
 ```
 
-| Field        | Type                    | Required | Description                                           |
-| ------------ | ----------------------- | -------- | ----------------------------------------------------- |
-| `principal`  | `PrincipalVersionRes`   | Yes      | Template principal with Docker image references       |
-| `template`   | `TemplateVersionRes`    | Yes      | Template version definition (id, version, properties) |
-| `plugins`    | `[]PluginVersionRes`    | No       | Plugin definitions                                    |
-| `processors` | `[]ProcessorVersionRes` | No       | Processor definitions                                 |
+| Field        | Type                          | Required | Description                                           |
+| ------------ | ----------------------------- | -------- | ----------------------------------------------------- |
+| `principal`  | `TemplateVersionPrincipalRes` | Yes      | Template principal with Docker image references       |
+| `template`   | `TemplateVersionRes`          | Yes      | Template version definition (id, version, properties) |
+| `plugins`    | `[]PluginVersionRes`          | No       | Plugin definitions                                    |
+| `processors` | `[]ProcessorVersionRes`       | No       | Processor definitions                                 |
 
 ### Response 200 OK
 

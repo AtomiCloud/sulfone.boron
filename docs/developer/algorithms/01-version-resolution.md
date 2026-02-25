@@ -77,8 +77,8 @@ sequenceDiagram
 
 | #   | Step     | What                                                       | Why                                  | Key File                          |
 | --- | -------- | ---------------------------------------------------------- | ------------------------------------ | --------------------------------- |
-| 1   | Parse    | Split name by `:` for optional version                     | Extract version if specified         | `merger.go:87`                    |
-| 2   | Parse    | Split by `/` into user and name                            | Extract username and processor name  | `merger.go:95`                    |
+| 1   | Parse    | Split name by `:` for optional version                     | Extract version if specified         | `docker_executor/merger.go:87`    |
+| 2   | Parse    | Split by `/` into user and name                            | Extract username and processor name  | `docker_executor/merger.go:95`    |
 | 3   | Check    | Determine if version was specified                         | Choose resolution path               | `docker_executor/registry.go:154` |
 | 4   | Query    | GET `/api/v1/Processor/slug/:user/:name/versions/latest`   | Get highest version number           | `docker_executor/registry.go:48`  |
 | 5   | Set      | maxVersion = latest.version                                | Establish upper bound for iteration  | `docker_executor/registry.go:160` |
@@ -96,7 +96,7 @@ sequenceDiagram
 
 ### Step 1-2: Parse Reference
 
-**Key File**: `merger.go:84` → `parseCyanReference()`
+**Key File**: `docker_executor/merger.go:84` → `parseCyanReference()`
 
 Parse the reference string into components:
 
@@ -105,7 +105,7 @@ Parse the reference string into components:
 
 ### Step 3-9: Latest Version Resolution
 
-**Key File**: `registry.go:147` → `convertProcessor()`
+**Key File**: `docker_executor/registry.go:147` → `convertProcessor()`
 
 When no version is specified (script returned `atomi/typescript`):
 

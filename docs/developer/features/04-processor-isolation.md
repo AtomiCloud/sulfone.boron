@@ -77,23 +77,23 @@ sequenceDiagram
 
 > **Note:** The table below expands diagram step 2 (Configure mounts) into finer-grained sub-steps (rows 2–6).
 
-| #   | Step             | What                                               | Key File              |
-| --- | ---------------- | -------------------------------------------------- | --------------------- |
-| 1   | Create container | Executor requests container with dual volumes      | `executor.go:113`     |
-| 2   | Configure mounts | Set up read-only and read-write mounts             | `docker.go:343`       |
-| 3   | Template volume  | Mount `cyan-<uuid>` to `/workspace/cyanprint`      | `docker.go:347`       |
-| 4   | Read-only        | Template mount marked `ReadOnly: true`             | `docker.go:348`       |
-| 5   | Session volume   | Mount `cyan-<uuid>-<session>` to `/workspace/area` | `docker.go:352`       |
-| 6   | Read-write       | Session mount marked `ReadOnly: false`             | `docker.go:354`       |
-| 7   | Create           | Docker creates container with configured mounts    | `docker.go:357`       |
-| 8   | Start            | Container starts, processor initializes            | `docker.go:361`       |
-| 9   | Write output     | Processor writes to `/workspace/area/<uuid>`       | Internal to processor |
-| 10  | Protected        | Template cannot be modified                        | Enforced by Docker    |
-| 11  | Return           | Processor returns output path for merging          | `merger.go:160`       |
+| #   | Step             | What                                               | Key File                          |
+| --- | ---------------- | -------------------------------------------------- | --------------------------------- |
+| 1   | Create container | Executor requests container with dual volumes      | `docker_executor/executor.go:113` |
+| 2   | Configure mounts | Set up read-only and read-write mounts             | `docker_executor/docker.go:343`   |
+| 3   | Template volume  | Mount `cyan-<uuid>` to `/workspace/cyanprint`      | `docker_executor/docker.go:347`   |
+| 4   | Read-only        | Template mount marked `ReadOnly: true`             | `docker_executor/docker.go:348`   |
+| 5   | Session volume   | Mount `cyan-<uuid>-<session>` to `/workspace/area` | `docker_executor/docker.go:352`   |
+| 6   | Read-write       | Session mount marked `ReadOnly: false`             | `docker_executor/docker.go:354`   |
+| 7   | Create           | Docker creates container with configured mounts    | `docker_executor/docker.go:357`   |
+| 8   | Start            | Container starts, processor initializes            | `docker_executor/docker.go:361`   |
+| 9   | Write output     | Processor writes to `/workspace/area/<uuid>`       | Internal to processor             |
+| 10  | Protected        | Template cannot be modified                        | Enforced by Docker                |
+| 11  | Return           | Processor returns output path for merging          | `docker_executor/merger.go:160`   |
 
 ## Volume Mount Configuration
 
-**Key File**: `docker.go:328` → `CreateContainerWithReadWriteVolume()`
+**Key File**: `docker_executor/docker.go:328` → `CreateContainerWithReadWriteVolume()`
 
 | Mount    | Source                           | Target                 | Mode       | Purpose                                                           |
 | -------- | -------------------------------- | ---------------------- | ---------- | ----------------------------------------------------------------- |
