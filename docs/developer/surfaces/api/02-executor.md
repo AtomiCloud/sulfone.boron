@@ -143,7 +143,7 @@ Warm a session by pulling images and creating the session volume.
 
 ### Request Body
 
-> **Note:** The JSON below is illustrative. See `TemplateVersionRes` type definition for full field schema.
+> **Note:** The JSON below is illustrative. See `TemplateVersionRes` type definition for full field schema, which includes `id`, `version`, `properties`, `principal`, `plugins`, and `processors`.
 
 ```json
 {

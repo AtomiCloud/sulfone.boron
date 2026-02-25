@@ -8,7 +8,7 @@ Warm a template by pulling images and creating the template volume.
 
 ### Request Body
 
-> **Note:** The JSON below is illustrative. See `PrincipalVersionRes`, `TemplateVersionRes`, `PluginVersionRes`, and `ProcessorVersionRes` type definitions for full field schemas.
+> **Note:** The JSON below is illustrative. See `TemplateVersionPrincipalRes`, `TemplateVersionRes`, `PluginVersionRes`, and `ProcessorVersionRes` type definitions for full field schemas.
 
 ```json
 {

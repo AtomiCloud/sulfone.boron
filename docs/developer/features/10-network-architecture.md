@@ -103,7 +103,7 @@ _, err := d.Docker.NetworkCreate(ctx, "cyanprint", network.CreateOptions{
 
 ## Container Network Attachment
 
-**Key File**: `docker.go:187` → `CreateContainer()`
+**Key File**: `docker_executor/docker.go:187` → `CreateContainer()`
 
 All containers use `NetworkMode: "cyanprint"`:
 

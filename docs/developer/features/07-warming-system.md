@@ -141,9 +141,9 @@ for _, image := range images {
     wg.Add(1)
     go func(img Image) {
         defer wg.Done()
+        defer func() { <-semaphore }()  // Release on exit
         semaphore <- 0  // Acquire
-        d.Docker.ImagePull(ctx, ref, opts)
-        <-semaphore  // Release
+        d.Docker.ImagePull(ctx, img.Ref, opts)
     }(image)
 }
 wg.Wait()

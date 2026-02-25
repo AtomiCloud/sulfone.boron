@@ -26,14 +26,14 @@ flowchart TD
 
 ## All Modules
 
-| Module                                     | What                                     | Why                                               | Key Files                        |
-| ------------------------------------------ | ---------------------------------------- | ------------------------------------------------- | -------------------------------- |
-| [Server](./01-server.md)                   | Gin HTTP API handlers                    | Provide REST interface for build orchestration    | `server.go:28`                   |
-| [Docker Executor](./02-docker-executor.md) | Template execution, container management | Orchestrate container lifecycle and health checks | `executor.go:10`, `docker.go:18` |
-| [Merger](./03-merger.md)                   | File consolidation from processors       | Combine parallel outputs into single directory    | `merger.go:15`                   |
-| [Registry](./04-registry.md)               | Image registry operations                | Resolve processor/plugin versions from Zinc       | `registry.go:11`                 |
-| Template Executor                          | Template warming                         | Pre-pull images and create template volumes       | `template_executor.go:282`       |
-| Domain Models                              | Container/volume naming                  | Standardize Docker resource naming conventions    | `domain_model.go:42`             |
+| Module                                                         | What                                     | Why                                               | Key Files                        |
+| -------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------- | -------------------------------- |
+| [Server](./01-server.md)                                       | Gin HTTP API handlers                    | Provide REST interface for build orchestration    | `server.go:28`                   |
+| [Docker Executor](./02-docker-executor.md)                     | Template execution, container management | Orchestrate container lifecycle and health checks | `executor.go:10`, `docker.go:18` |
+| [Merger](./03-merger.md)                                       | File consolidation from processors       | Combine parallel outputs into single directory    | `merger.go:15`                   |
+| [Registry](./04-registry.md)                                   | Image registry operations                | Resolve processor/plugin versions from Zinc       | `registry.go:11`                 |
+| [Template Executor](./02-docker-executor.md#template-executor) | Template warming                         | Pre-pull images and create template volumes       | `template_executor.go:282`       |
+| [Domain Models](./02-docker-executor.md#domain-models)         | Container/volume naming                  | Standardize Docker resource naming conventions    | `domain_model.go:42`             |
 
 ## Groups
 
