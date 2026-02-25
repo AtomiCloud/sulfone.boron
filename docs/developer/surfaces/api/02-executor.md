@@ -31,7 +31,7 @@ Start a new execution session. Creates and starts processor, plugin, and merger 
 | `session_id`          | `string`                | Yes      | Unique identifier for this execution            |
 | `template`            | `TemplateVersionRes`    | Yes      | Template definition with processors and plugins |
 | `write_vol_reference` | `DockerVolumeReference` | Yes      | Session volume reference                        |
-| `merger_id`           | `string`                | Yes      | Merger container ID                             |
+| `merger`              | `MergerReq`             | Yes      | Merger container reference                      |
 
 ### Response 200 OK
 
@@ -88,7 +88,7 @@ Returns `application/x-gzip` stream with header `Content-Disposition: attachment
 {
   "title": "Failed to clean",
   "status": 400,
-  "detail": "Failed to clean session-id",
+  "detail": "Failed to clean <session-id>",
   "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
   "trace_id": null,
   "data": ["error1", "error2"]
@@ -99,7 +99,7 @@ Returns `application/x-gzip` stream with header `Content-Disposition: attachment
 
 ```json
 {
-  "title": "Failed to contract upstream server",
+  "title": "Failed to contact upstream server",
   "status": 503,
   "detail": "Error contacting upstream (merger) server for zipping",
   "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503",
@@ -128,7 +128,7 @@ Clean up session resources (containers and volumes).
 {
   "title": "Failed to clean",
   "status": 400,
-  "detail": "Failed to clean session-id",
+  "detail": "Failed to clean <session-id>",
   "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
   "trace_id": null,
   "data": ["error1", "error2"]
@@ -143,17 +143,17 @@ Warm a session by pulling images and creating the session volume.
 
 ### Request Body
 
+> **Note:** The JSON below is illustrative. See `TemplateVersionRes` type definition for full field schema.
+
 ```json
 {
-  "principal": { ... },
-  "plugins": [ ... ],
-  "processors": [ ... ]
+  "template": { "id": "...", "version": 1, "properties": {} }
 }
 ```
 
-| Field      | Type                 | Required | Description         |
-| ---------- | -------------------- | -------- | ------------------- |
-| `template` | `TemplateVersionRes` | Yes      | Template definition |
+| Field      | Type                 | Required | Description                                           |
+| ---------- | -------------------- | -------- | ----------------------------------------------------- |
+| `template` | `TemplateVersionRes` | Yes      | Template version definition (id, version, properties) |
 
 ### Response 200 OK
 
@@ -177,6 +177,19 @@ Warm a session by pulling images and creating the session volume.
   "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
   "trace_id": null,
   "data": ["error1", "error2"]
+}
+```
+
+### Response 503 Service Unavailable
+
+```json
+{
+  "title": "Failed to configure network",
+  "status": 503,
+  "detail": "Failed to start cyanprint Docker bridge network",
+  "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503",
+  "trace_id": null,
+  "data": ["error1"]
 }
 ```
 

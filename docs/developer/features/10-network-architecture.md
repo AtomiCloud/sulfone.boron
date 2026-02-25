@@ -66,30 +66,30 @@ sequenceDiagram
 
     Note over C: Containers can now address each other
 
-    C->>C: 12. HTTP http://cyan-processor-uuid:5551/
+    C->>C: 12. HTTP http://cyan-processor-uuid-session:5551/
 ```
 
-| #   | Step             | What                                   | Key File        |
-| --- | ---------------- | -------------------------------------- | --------------- |
-| 1   | Enforce          | Check/create network before containers | `server.go:214` |
-| 2   | List             | Query existing networks                | `docker.go:369` |
-| 3   | Found            | Network exists, skip creation          | `docker.go:374` |
-| 4   | Existing         | Return success, use existing           | `docker.go:394` |
-| 5   | Not found        | Network doesn't exist                  | `docker.go:399` |
-| 6   | Create           | Create bridge network                  | `docker.go:382` |
-| 7   | Created          | New network ready                      | `docker.go:388` |
-| 8   | Ready            | Network available for containers       | `docker.go:406` |
-| 9   | Create container | Attach to cyanprint network            | `docker.go:357` |
-| 10  | Attach           | Container joins network                | `docker.go:187` |
-| 11  | Joined           | Container can communicate              | `docker.go:361` |
-| 12  | Communicate      | HTTP between containers by name        | `merger.go:144` |
+| #   | Step             | What                                   | Key File                        |
+| --- | ---------------- | -------------------------------------- | ------------------------------- |
+| 1   | Enforce          | Check/create network before containers | `server.go:214`                 |
+| 2   | List             | Query existing networks                | `docker_executor/docker.go:369` |
+| 3   | Found            | Network exists, skip creation          | `docker_executor/docker.go:374` |
+| 4   | Existing         | Return success, use existing           | `docker_executor/docker.go:394` |
+| 5   | Not found        | Network doesn't exist                  | `docker_executor/docker.go:399` |
+| 6   | Create           | Create bridge network                  | `docker_executor/docker.go:382` |
+| 7   | Created          | New network ready                      | `docker_executor/docker.go:388` |
+| 8   | Ready            | Network available for containers       | `docker_executor/docker.go:406` |
+| 9   | Create container | Attach to cyanprint network            | `docker_executor/docker.go:357` |
+| 10  | Attach           | Container joins network                | `docker_executor/docker.go:187` |
+| 11  | Joined           | Container can communicate              | `docker_executor/docker.go:361` |
+| 12  | Communicate      | HTTP between containers by name        | `docker_executor/merger.go:144` |
 
 ## Network Configuration
 
-**Key File**: `docker.go:382` → `CreateNetwork()`
+**Key File**: `docker_executor/docker.go:382` → `CreateNetwork()`
 
 ```go
-_, err := d.Docker.NetworkCreate(ctx, "cyanprint", types.CreateOptions{
+_, err := d.Docker.NetworkCreate(ctx, "cyanprint", network.CreateOptions{
     Driver: "bridge",
 })
 ```

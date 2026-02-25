@@ -48,12 +48,17 @@ flowchart LR
     E[Merger] --> A
 ```
 
-| Dependency        | Why                                     |
-| ----------------- | --------------------------------------- |
-| Docker Client SDK | Container and volume management         |
-| Registry Client   | Image reference resolution              |
-| Server            | Calls executor for container operations |
-| Merger            | Uses executor for container creation    |
+| Dependency        | Why                             |
+| ----------------- | ------------------------------- |
+| Docker Client SDK | Container and volume management |
+| Registry Client   | Image reference resolution      |
+
+## Used By
+
+| Module | How                                     |
+| ------ | --------------------------------------- |
+| Server | Calls executor for container operations |
+| Merger | Uses executor for container creation    |
 
 ## Key Components
 

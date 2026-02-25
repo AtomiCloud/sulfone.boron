@@ -136,13 +136,17 @@ Both template and session warming use parallel image pulls:
 
 ```go
 semaphore := make(chan int, d.ParallelismLimit)
+wg := sync.WaitGroup{}
 for _, image := range images {
+    wg.Add(1)
     go func(img Image) {
+        defer wg.Done()
         semaphore <- 0  // Acquire
         d.Docker.ImagePull(ctx, ref, opts)
         <-semaphore  // Release
     }(image)
 }
+wg.Wait()
 ```
 
 ## Edge Cases

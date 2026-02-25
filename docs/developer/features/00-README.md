@@ -16,7 +16,7 @@ flowchart TD
 
     NA[Network Architecture] --> SM
     NA --> PI
-    VR[Version Resolution] --> MS
+    VR[Version Resolution] --> PI
 ```
 
 | Feature                  | Role                                                    |
@@ -37,7 +37,7 @@ flowchart TD
 | Feature                                              | What                                                                 | Why                                                            | Key Files                                     |
 | ---------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------- |
 | [Network Architecture](./10-network-architecture.md) | Manages `cyanprint` bridge network for inter-container communication | Enable HTTP-based container communication                      | `docker.go:391`                               |
-| [Session Management](./01-session-management.md)     | Isolates executions with session-scoped containers and volumes       | Prevent resource conflicts between concurrent executions       | `executor.go:297`, `domain_model.go:42`       |
+| [Session Management](./01-session-management.md)     | Isolates executions with session-scoped containers and volumes       | Prevent resource conflicts between concurrent executions       | `domain_model.go:42`, `executor.go:328`       |
 | [Warming System](./07-warming-system.md)             | Pre-pulls images and creates template/session volumes                | Reduce latency by preparing resources ahead of execution       | `template_executor.go:282`, `executor.go:385` |
 | [Version Resolution](./02-version-resolution.md)     | Queries Zinc registry to resolve processor/plugin versions           | Support version references with fallback to latest compatible  | `registry.go:147`, `registry.go:205`          |
 | [Processor Isolation](./04-processor-isolation.md)   | Two-volume architecture (read-only template, read-write work area)   | Protect template integrity while enabling parallel writes      | `docker.go:328`, `executor.go:93`             |

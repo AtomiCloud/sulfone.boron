@@ -7,7 +7,7 @@
 
 ## Overview
 
-The parallel execution algorithm uses Go channels as semaphores to limit concurrent operations. It spawns goroutines for each item (processors, plugins, containers) but uses a buffered channel to ensure only `n` operations run simultaneously, where `n` is the CPU count.
+The parallel execution algorithm uses Go channels as semaphores to limit concurrent operations. It spawns goroutines for each item (processors, plugins, containers) but uses a buffered channel to ensure only `p` operations run simultaneously, where `p` is the parallelism limit (typically `NumCPU()`).
 
 This prevents resource exhaustion while maximizing CPU utilization during container starts, pulls, and HTTP calls to processors.
 
@@ -75,7 +75,7 @@ sequenceDiagram
 
 ```go
 semaphore := make(chan int, parallelismLimit)  // Buffer = limit
-errChan := make(chan error, len(processors))  // Buffer = item count
+errChan := make(chan error, len(items))        // Buffer = item count
 ```
 
 The semaphore channel controls concurrency. When the buffer is full, sends block.
@@ -93,10 +93,10 @@ Each worker:
 
 ```go
 go func(container DockerContainerReference, image DockerImageReference) {
-    semaphore <- 0                              // Acquire
+    semaphore <- 0                                          // Acquire
+    defer func() { <-semaphore }()                          // Release on any exit
     err := e.Docker.CreateContainerWithReadWriteVolume(...)
-    errChan <- err                              // Report
-    <-semaphore                                // Release
+    errChan <- err                                          // Report
 }(c, i)
 ```
 
@@ -168,7 +168,7 @@ Used for removing multiple containers concurrently:
 
 ## Complexity
 
-- **Time**: O(n/p + p) where n = items, p = parallelism limit
+- **Time**: O(n/p) where n = items, p = parallelism limit
 - **Space**: O(p) for semaphore, O(n) for error channel
 
 ## Related

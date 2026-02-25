@@ -2,7 +2,7 @@
 
 **What**: Queries the Zinc registry to resolve processor and plugin version references to concrete IDs.
 
-**Why**: Supports flexible version references (e.g., `username/name:latest` or `username/name`) with automatic fallback to compatible versions defined in the template.
+**Why**: Supports flexible version references (e.g., `username/name:3` or `username/name`) with automatic fallback to compatible versions defined in the template.
 
 **Key Files**:
 

@@ -9,7 +9,7 @@
 
 The version resolution algorithm converts flexible processor/plugin references (like `user/processor` or `user/processor:3`) into concrete template-defined IDs. When no version is specified, it iterates from the latest version down to find the first match in the template.
 
-This enables clients to use `username/name:latest` references while ensuring the resolved version actually exists in the template definition.
+This enables clients to use `username/name` (no version) references while ensuring the resolved version actually exists in the template definition.
 
 **Background**: See [Template vs Cyan Processors](../concepts/template-vs-cyan-processors.md) for why two separate processor lists exist.
 
@@ -75,22 +75,22 @@ sequenceDiagram
     end
 ```
 
-| #   | Step     | What                                               | Why                                  | Key File          |
-| --- | -------- | -------------------------------------------------- | ------------------------------------ | ----------------- |
-| 1   | Parse    | Split by `/` into user and name                    | Extract username and processor name  | `merger.go:95`    |
-| 2   | Parse    | Split name by `:` for optional version             | Extract version if specified         | `merger.go:87`    |
-| 3   | Check    | Determine if version was specified                 | Choose resolution path               | `registry.go:154` |
-| 4   | Query    | GET `/Processor/slug/user/name/versions/latest`    | Get highest version number           | `registry.go:48`  |
-| 5   | Set      | maxVersion = latest.version                        | Establish upper bound for iteration  | `registry.go:160` |
-| 6   | Loop     | For i = maxVersion down to 1                       | Check versions from newest to oldest | `registry.go:160` |
-| 7   | Query    | GET `/versions/{i}`                                | Get processor ID for this version    | `registry.go:162` |
-| 8   | Check    | Loop through template processors for ID match      | Verify version exists in template    | `registry.go:167` |
-| 9   | Return   | Construct CyanProcessor with ID, config, files     | Return resolved processor            | `registry.go:170` |
-| 10  | Continue | Try next version down                              | Find compatible version              | `registry.go:160` |
-| 11  | Query    | GET `/Processor/slug/user/name/versions/{version}` | Get specific version                 | `registry.go:188` |
-| 12  | Check    | Loop through template processors for ID match      | Verify version exists in template    | `registry.go:193` |
-| 13  | Return   | Construct CyanProcessor with ID, config, files     | Return resolved processor            | `registry.go:193` |
-| 14  | Error    | Return "does not have a matching version"          | No compatible version found          | `registry.go:201` |
+| #   | Step     | What                                                       | Why                                  | Key File          |
+| --- | -------- | ---------------------------------------------------------- | ------------------------------------ | ----------------- |
+| 1   | Parse    | Split name by `:` for optional version                     | Extract version if specified         | `merger.go:87`    |
+| 2   | Parse    | Split by `/` into user and name                            | Extract username and processor name  | `merger.go:95`    |
+| 3   | Check    | Determine if version was specified                         | Choose resolution path               | `registry.go:154` |
+| 4   | Query    | GET `/api/v1/Processor/slug/:user/:name/versions/latest`   | Get highest version number           | `registry.go:48`  |
+| 5   | Set      | maxVersion = latest.version                                | Establish upper bound for iteration  | `registry.go:160` |
+| 6   | Loop     | For i = maxVersion down to 1                               | Check versions from newest to oldest | `registry.go:160` |
+| 7   | Query    | GET `/api/v1/Processor/slug/:user/:name/versions/{i}`      | Get processor ID for this version    | `registry.go:162` |
+| 8   | Check    | Loop through template processors for ID match              | Verify version exists in template    | `registry.go:167` |
+| 9   | Return   | Construct CyanProcessor with ID, config, files             | Return resolved processor            | `registry.go:170` |
+| 10  | Continue | Try next version down                                      | Find compatible version              | `registry.go:160` |
+| 11  | Query    | GET `/api/v1/Processor/slug/:user/:name/versions/:version` | Get specific version                 | `registry.go:188` |
+| 12  | Check    | Loop through template processors for ID match              | Verify version exists in template    | `registry.go:193` |
+| 13  | Return   | Construct CyanProcessor with ID, config, files             | Return resolved processor            | `registry.go:193` |
+| 14  | Error    | Return "does not have a matching version"                  | No compatible version found          | `registry.go:201` |
 
 ## Detailed Walkthrough
 
@@ -124,7 +124,7 @@ When no version is specified (script returned `atomi/typescript`):
 
 ### Step 11-14: Specific Version Resolution
 
-**Key File**: `registry.go:188` → `getProcessorVersion()`
+**Key File**: `registry.go:15` → `getProcessorVersion()`
 
 When version is specified (script returned `atomi/typescript:3`):
 

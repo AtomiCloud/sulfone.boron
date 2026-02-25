@@ -69,12 +69,13 @@ sequenceDiagram
     D->>P: 6. ContainerStart
     P->>P: 7. Processor runs
 
-    P->>V: 8. Write to /workspace/area/<output-uuid>
-    V-->>P: 9. Output directory created
+    P->>V: 8. Write to /workspace/area/<output-uuid> (creates directory)
 
-    P->>P: 10. Cannot write to /workspace/cyanprint
-    P-->>E: 11. Output: /workspace/area/<output-uuid>
+    P->>P: 9. Cannot write to /workspace/cyanprint
+    P-->>E: 10. Output: /workspace/area/<output-uuid>
 ```
+
+> **Note:** The table below expands diagram step 2 (Configure mounts) into finer-grained sub-steps (rows 2–6).
 
 | #   | Step             | What                                               | Key File              |
 | --- | ---------------- | -------------------------------------------------- | --------------------- |
@@ -94,16 +95,16 @@ sequenceDiagram
 
 **Key File**: `docker.go:328` → `CreateContainerWithReadWriteVolume()`
 
-| Mount    | Source                           | Target                 | Mode       | Purpose                                        |
-| -------- | -------------------------------- | ---------------------- | ---------- | ---------------------------------------------- |
-| Template | `cyan-<template-uuid>`           | `/workspace/cyanprint` | Read-only  | Source files, immutable                        |
-| Session  | `cyan-<template-uuid>-<session>` | `/workspace/area`      | Read-write | Output directory for all processors in session |
+| Mount    | Source                           | Target                 | Mode       | Purpose                                                           |
+| -------- | -------------------------------- | ---------------------- | ---------- | ----------------------------------------------------------------- |
+| Template | `cyan-<template-uuid>`           | `/workspace/cyanprint` | Read-only  | Source files, immutable                                           |
+| Session  | `cyan-<template-uuid>-<session>` | `/workspace/area`      | Read-write | Shared volume; each processor writes to its own UUID subdirectory |
 
 ## Processor Output Isolation
 
 Each processor writes to a **unique UUID-based directory** within `/workspace/area`:
 
-```
+```text
 /workspace/area/
   ├── 550e8400-e29b-41d4-a716-446655440000/  (processor 1 output)
   ├── 6ba7b810-9dad-11d1-80b4-00c04fd430c8/  (processor 2 output)

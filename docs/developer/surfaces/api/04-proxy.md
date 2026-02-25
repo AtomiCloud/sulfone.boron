@@ -31,7 +31,7 @@ Returns the template container's response with original status code and headers.
   "detail": "Failed to forward request to upstream template",
   "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502",
   "trace_id": null,
-  "data": ["error1"]
+  "data": ["upstream connection refused"]
 }
 ```
 
@@ -64,7 +64,7 @@ Returns the template container's response with original status code and headers.
   "detail": "Failed to forward request to upstream template",
   "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502",
   "trace_id": null,
-  "data": ["error1"]
+  "data": ["upstream connection refused"]
 }
 ```
 
@@ -72,9 +72,9 @@ Returns the template container's response with original status code and headers.
 
 **Key File**: `domain_model.go:48` → `DockerContainerToString()`
 
-Template containers are addressed via the `cyanprint` network:
+Template containers are addressed via the `cyanprint` network (the UUID has its dashes stripped when constructing the name):
 
-- Container name: `cyan-template-<stripped-uuid>`
+- Container name: `cyan-template-<stripped-uuid>` (e.g., `123e4567-e89b-...` → `123e4567e89b...`)
 - HTTP endpoint: `http://cyan-template-<stripped-uuid>:5550`
 
 The proxy constructs the endpoint and forwards the request with the original body and headers.

@@ -23,7 +23,7 @@ What this module is responsible for:
 ## Structure
 
 ```text
-registry.go
+docker_executor/registry.go
 ├── RegistryClient struct        # HTTP client
 ├── getProcessorVersion()        # Get specific version
 ├── getProcessorVersionLatest()  # Get latest version
@@ -33,9 +33,9 @@ registry.go
 └── convertPlugin()              # Resolve plugin reference
 ```
 
-| File          | Purpose                   |
-| ------------- | ------------------------- |
-| `registry.go` | Zinc registry HTTP client |
+| File                          | Purpose                   |
+| ----------------------------- | ------------------------- |
+| `docker_executor/registry.go` | Zinc registry HTTP client |
 
 ## Dependencies
 
@@ -45,16 +45,23 @@ flowchart LR
     C[Merger] --> A
 ```
 
-| Dependency | Why                                  |
-| ---------- | ------------------------------------ |
-| Zinc API   | Source of version metadata           |
-| Merger     | Uses registry for version resolution |
+| Dependency | Why                        |
+| ---------- | -------------------------- |
+| Zinc API   | Source of version metadata |
 
-## Key Interfaces
+## Used By
+
+| Module | Why                                  |
+| ------ | ------------------------------------ |
+| Merger | Uses registry for version resolution |
+
+## Key Internal Functions
+
+> **Note:** The methods below are unexported (internal) helpers on `RegistryClient`. They are not part of the public API.
 
 ### Registry Client
 
-**Key File**: `registry.go:11` → `RegistryClient` struct
+**Key File**: `docker_executor/registry.go:11` → `RegistryClient` struct
 
 ```go
 type RegistryClient struct {
@@ -64,7 +71,7 @@ type RegistryClient struct {
 
 ### Version Query Methods
 
-**Key File**: `registry.go:15` → Version queries
+**Key File**: `docker_executor/registry.go:15` → Version queries
 
 ```go
 func (rc RegistryClient) getProcessorVersion(username, name, version string) (RegistryProcessorVersionRes, error)
@@ -75,7 +82,7 @@ func (rc RegistryClient) getPluginVersionLatest(username, name string) (Registry
 
 ### Conversion Methods
 
-**Key File**: `registry.go:147` → Reference conversion
+**Key Files**: `docker_executor/registry.go:147` → `convertProcessor()`, `docker_executor/registry.go:205` → `convertPlugin()`
 
 ```go
 func (rc RegistryClient) convertProcessor(cp CyanProcessorReq, processors []ProcessorRes) (CyanProcessor, error)

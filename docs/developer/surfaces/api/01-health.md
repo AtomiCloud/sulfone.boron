@@ -18,6 +18,8 @@ Check if the Boron server is running.
 
 ## Example
 
+> **Note:** Port 9000 here refers to the Boron coordinator/server process, not a Merger container (which also uses port 9000 for its own health endpoint).
+
 ```bash
 curl http://localhost:9000/
 ```
