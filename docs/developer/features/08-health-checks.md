@@ -69,17 +69,17 @@ sequenceDiagram
     end
 ```
 
-| #   | Step       | What                                      | Key File              |
-| --- | ---------- | ----------------------------------------- | --------------------- |
-| 1   | Start      | Docker starts container                   | `docker.go:192`       |
-| 2   | Initialize | Container starts HTTP server              | Internal to container |
-| 3   | Poll       | Executor sends GET request                | `executor.go:271`     |
-| 4   | Success    | Container returns 200 OK                  | `executor.go:279`     |
-| 5   | Ready      | Break loop, proceed                       | `executor.go:281`     |
-| 6   | Not ready  | Container not ready or connection refused | `executor.go:272`     |
-| 7   | Retry      | Wait 1 second, try again                  | `executor.go:275`     |
-| 8   | Success    | All attempts passed, return nil           | `executor.go:293`     |
-| 9   | Timeout    | Max attempts reached, return error        | `executor.go:287`     |
+| #   | Step       | What                                      | Key File                          |
+| --- | ---------- | ----------------------------------------- | --------------------------------- |
+| 1   | Start      | Docker starts container                   | `docker_executor/docker.go:192`   |
+| 2   | Initialize | Container starts HTTP server              | Internal to container             |
+| 3   | Poll       | Executor sends GET request                | `docker_executor/executor.go:271` |
+| 4   | Success    | Container returns 200 OK                  | `docker_executor/executor.go:279` |
+| 5   | Ready      | Break loop, proceed                       | `docker_executor/executor.go:281` |
+| 6   | Not ready  | Container not ready or connection refused | `docker_executor/executor.go:272` |
+| 7   | Retry      | Wait 1 second, try again                  | `docker_executor/executor.go:275` |
+| 8   | Success    | All attempts passed, return nil           | `docker_executor/executor.go:293` |
+| 9   | Timeout    | Max attempts reached, return error        | `docker_executor/executor.go:287` |
 
 ## Health Check Endpoints
 

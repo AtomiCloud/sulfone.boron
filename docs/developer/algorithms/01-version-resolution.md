@@ -124,7 +124,7 @@ When no version is specified (script returned `atomi/typescript`):
 
 ### Step 11-14: Specific Version Resolution
 
-**Key File**: `registry.go:15` → `getProcessorVersion()`
+**Key File**: `docker_executor/registry.go:15` → `getProcessorVersion()`
 
 When version is specified (script returned `atomi/typescript:3`):
 

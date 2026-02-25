@@ -44,7 +44,7 @@ flowchart TD
 ### Group 2: Orchestration
 
 - **[Docker Executor](./02-docker-executor.md)** - Container lifecycle
-- **[Template Executor](./02-docker-executor.md#templateexecutor)** - Template warming
+- **[Template Executor](./02-docker-executor.md#template-executor)** - Template warming
 
 ### Group 3: Pipeline
 
