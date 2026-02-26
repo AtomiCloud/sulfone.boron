@@ -43,7 +43,7 @@ sequenceDiagram
     participant E as Executor
     participant D as Docker
 
-    C->>S: 1. POST /executor/:sessionId
+    C->>S: 1. POST /executor/:sessionId/warm
     S->>E: 2. Warm(sessionId)
     E->>D: 3. CreateVolume(sessionVolume)
     D-->>E: 4. Volume created

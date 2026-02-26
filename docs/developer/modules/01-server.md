@@ -20,19 +20,21 @@
 
 ## Structure
 
-```
+```text
 server.go
 ├── server()              # Main server function
 ├── handlers              # HTTP endpoint handlers
 │   ├── GET /             # Health check
 │   ├── POST /executor    # Start execution
-│   ├── POST /executor/:id  # Merge and zip
-│   ├── DELETE /executor/:id  # Cleanup
-│   ├── POST /executor/:id/warm  # Warm session
+│   ├── POST /executor/:sessionId  # Merge and zip
+│   ├── DELETE /executor/:sessionId  # Cleanup
+│   ├── POST /executor/:sessionId/warm  # Warm session
 │   ├── POST /template/warm  # Warm template
-│   ├── POST /proxy/template/*  # Template proxy
-│   ├── POST /merge/:id   # Merger endpoint
+│   ├── POST /proxy/template/:cyanId/*  # Template proxy
+│   ├── POST /merge/:sessionId   # Merger endpoint
 │   └── POST /zip         # Zip endpoint
+
+main.go
 └── main()                # CLI entry point
 ```
 
@@ -50,9 +52,6 @@ flowchart LR
     A --> C[Merger]
     A --> D[Gin Framework]
     A --> E[Docker Client]
-
-    B --> A
-    C --> A
 ```
 
 | Dependency      | Why                            |

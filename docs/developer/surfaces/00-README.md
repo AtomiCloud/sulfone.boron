@@ -13,9 +13,9 @@ flowchart LR
     S --> M[Merge Endpoints]
 ```
 
-| Surface Type | Purpose                                                         | Location  |
-| ------------ | --------------------------------------------------------------- | --------- |
-| **HTTP API** | REST endpoints for build orchestration, warm, cleanup, proxying | Port 9000 |
+| Surface Type | Purpose                                                                                       | Location  |
+| ------------ | --------------------------------------------------------------------------------------------- | --------- |
+| **HTTP API** | REST endpoints for build orchestration (executor), template management, proxying, and merging | Port 9000 |
 
 ## All Surfaces
 

@@ -6,8 +6,8 @@ This section contains detailed implementation algorithms for complex logic in Bo
 
 ```mermaid
 flowchart TD
-    VR[Version Resolution] --> MS[Merger System]
-    PE[Parallel Execution] --> MS
+    VR[Version Resolution] --> PE[Parallel Execution]
+    PE --> MS[Merger System]
     FM[File Merging] --> MS
 ```
 

@@ -31,14 +31,13 @@ This pattern is used for:
 flowchart LR
     A[Start] --> B[Create Semaphore<br/>size=NumCPU]
     B --> C[For each processor]
-    C --> D{Semaphore open?}
-    D -->|Yes| E[Launch goroutine]
-    D -->|No| F[Wait]
-    E --> G[Execute work]
+    C --> E[Launch goroutine immediately]
+    E --> F[Worker: acquire semaphore<br/>block if full]
+    F --> G[Execute work]
     G --> H[Release semaphore]
     H --> I[Send result/error]
     I --> J{All done?}
-    J -->|No| D
+    J -->|No| C
     J -->|Yes| K[Collect results]
 ```
 

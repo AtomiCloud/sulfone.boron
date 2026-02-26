@@ -113,12 +113,18 @@ Both container and volume removal use parallel execution:
 
 ```go
 semaphore := make(chan int, d.ParallelismLimit)
+errs := make(chan error, len(refs))
 for _, ref := range refs {
     go func(r Reference) {
         semaphore <- 0
-        d.RemoveContainer(r)  // or RemoveVolume(r)
-        <-semaphore
+        defer func() { <-semaphore }()
+        errs <- d.RemoveContainer(r)  // or RemoveVolume(r)
     }(ref)
+}
+for i := 0; i < len(refs); i++ {
+    if err := <-errs; err != nil {
+        // collect error
+    }
 }
 ```
 
@@ -150,7 +156,7 @@ Volumes are named `cyan-<uuid>` or `cyan-<uuid>-<session>`:
 | Some removals fail    | Returns errors for failed items, successful removals persist |
 | Container in use      | Force flag enabled, removes anyway                           |
 | Volume in use         | Force flag enabled, removes anyway                           |
-| Session ID empty      | Would match all resources (should not happen)                |
+| Session ID empty      | Would match all resources (caller must validate session ID)  |
 
 ## Error Handling
 

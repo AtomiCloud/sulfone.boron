@@ -31,12 +31,12 @@ Health checks are used for:
 
 ```mermaid
 flowchart LR
-    A[Start Container] --> B[Wait 1 second]
-    B --> C[HTTP GET health endpoint]
+    A[Start Container] --> C[HTTP GET health endpoint]
     C --> D{Status 200?}
     D -->|Yes| E[Ready]
-    D -->|No| F{Max attempts?}
-    F -->|No| B
+    D -->|No| B[Wait 1 second]
+    B --> F{Max attempts?}
+    F -->|No| C
     F -->|Yes| G[Timeout Error]
 ```
 
@@ -69,17 +69,17 @@ sequenceDiagram
     end
 ```
 
-| #   | Step       | What                                      | Key File              |
-| --- | ---------- | ----------------------------------------- | --------------------- |
-| 1   | Start      | Docker starts container                   | `docker.go:192`       |
-| 2   | Initialize | Container starts HTTP server              | Internal to container |
-| 3   | Poll       | Executor sends GET request                | `executor.go:271`     |
-| 4   | Success    | Container returns 200 OK                  | `executor.go:279`     |
-| 5   | Ready      | Break loop, proceed                       | `executor.go:281`     |
-| 6   | Not ready  | Container not ready or connection refused | `executor.go:272`     |
-| 7   | Retry      | Wait 1 second, try again                  | `executor.go:275`     |
-| 8   | Success    | All attempts passed, return nil           | `executor.go:293`     |
-| 9   | Timeout    | Max attempts reached, return error        | `executor.go:287`     |
+| #   | Step       | What                                      | Key File                          |
+| --- | ---------- | ----------------------------------------- | --------------------------------- |
+| 1   | Start      | Docker starts container                   | `docker_executor/docker.go:192`   |
+| 2   | Initialize | Container starts HTTP server              | Internal to container             |
+| 3   | Poll       | Executor sends GET request                | `docker_executor/executor.go:271` |
+| 4   | Success    | Container returns 200 OK                  | `docker_executor/executor.go:279` |
+| 5   | Ready      | Break loop, proceed                       | `docker_executor/executor.go:281` |
+| 6   | Not ready  | Container not ready or connection refused | `docker_executor/executor.go:272` |
+| 7   | Retry      | Wait 1 second, try again                  | `docker_executor/executor.go:275` |
+| 8   | Success    | All attempts passed, return nil           | `docker_executor/executor.go:293` |
+| 9   | Timeout    | Max attempts reached, return error        | `docker_executor/executor.go:287` |
 
 ## Health Check Endpoints
 
@@ -90,11 +90,11 @@ sequenceDiagram
 | Plugin         | `http://cyan-plugin-<uuid>-<session>:5552/`    | 5552 | Plugin API server    |
 | Merger         | `http://cyan-merger-<uuid>-<session>:9000/`    | 9000 | Merger API server    |
 
-**Key File**: `executor.go:266` → `statusCheck(endpoint, maxAttempts)`
+**Key File**: `docker_executor/executor.go:266` → `statusCheck(endpoint, maxAttempts)`
 
 ## Implementation
 
-**Key File**: `executor.go:266` → `statusCheck()`
+**Key File**: `docker_executor/executor.go:266` → `statusCheck(endpoint, maxAttempts)`
 
 ```go
 for i := 0; i < maxAttempts; i++ {
@@ -104,8 +104,10 @@ for i := 0; i < maxAttempts; i++ {
         continue
     }
     if resp.StatusCode == http.StatusOK {
+        resp.Body.Close()
         return nil  // Success
     }
+    resp.Body.Close()
     time.Sleep(1 * time.Second)
 }
 return fmt.Errorf("reached maximum attempts")

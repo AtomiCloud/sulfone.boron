@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Docker** - Container runtime for isolated execution
-- **Go 1.23+** - Build and run Boron locally
+- **Go 1.24+** - Build and run Boron locally
 - **Zinc Registry** - Access to template/processor/plugin registry
 
 ## Installation

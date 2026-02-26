@@ -66,12 +66,28 @@ Create a tar.gz archive from a directory and stream it to the client. Called aft
 
 ### Response 200 OK
 
-Returns `application/octet-stream` with tar.gz archive.
+Returns `application/x-gzip` stream with tar.gz archive.
 
 Headers:
 
 - `Content-Disposition: attachment; filename=cyan-output.tar.gz`
-- `Content-Type: application/octet-stream`
+- `Content-Type: application/x-gzip`
+
+### Response 400 Bad Request
+
+```json
+{
+  "error": ["target directory not found or unreadable"]
+}
+```
+
+### Response 500 Internal Server Error
+
+```json
+{
+  "error": ["failed to create archive: permission denied"]
+}
+```
 
 ## Related
 

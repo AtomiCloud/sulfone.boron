@@ -81,7 +81,7 @@ for _, dir := range fromDirs {
 
 ### Step 3a: Directory Creation
 
-**Key File**: `merger.go:280` → directory handling
+**Key File**: `merger.go:282` → directory handling
 
 When a directory entry is encountered:
 
@@ -97,7 +97,7 @@ if info.IsDir() {
 
 ### Step 3b-8: File Copy
 
-**Key File**: `merger.go:22` → `copyFile()`
+**Key File**: `merger.go:24` → `copyFile()`
 
 When a file entry is encountered:
 
@@ -137,13 +137,15 @@ The file merge is stage 2 of the 3-stage pipeline:
 
 ## Edge Cases
 
-| Case               | Input                      | Behavior                                  | Key File        |
-| ------------------ | -------------------------- | ----------------------------------------- | --------------- |
-| Empty source list  | `fromDirs = []`            | Returns immediately with no error         | `merger.go:265` |
-| Empty directory    | `fromDirs = ["empty/"]`    | Creates no files in destination           | `merger.go:266` |
-| Overwrite conflict | Two dirs have same file    | Later source overwrites earlier           | `merger.go:284` |
-| Nested directories | Deep source directory tree | Preserves full directory structure        | `merger.go:272` |
-| Symlinks           | Source contains symlinks   | Copies symlink target, not symlink itself | `merger.go:24`  |
+| Case               | Input                         | Behavior                                                                                   | Key File        |
+| ------------------ | ----------------------------- | ------------------------------------------------------------------------------------------ | --------------- |
+| Empty source list  | `fromDirs = []`               | Returns immediately with no error                                                          | `merger.go:265` |
+| Empty directory    | `fromDirs = ["empty/"]`       | Creates no files in destination                                                            | `merger.go:266` |
+| Overwrite conflict | Two dirs have same file       | Later source overwrites earlier                                                            | `merger.go:284` |
+| Nested directories | Deep source directory tree    | Preserves full directory structure                                                         | `merger.go:272` |
+| File symlinks      | Source file is a symlink      | Copies symlink target contents via os.Open transparency                                    | `merger.go:24`  |
+| Directory symlinks | Source dir entry is a symlink | Not filtered by ModeSymlink; falls through to copyFile causing "is a directory" error      | `merger.go:266` |
+| Missing toDir      | toDir does not exist          | Created automatically by os.MkdirAll (returns error only on permission/filesystem failure) | `merger.go:282` |
 
 ## Error Handling
 

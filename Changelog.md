@@ -6,7 +6,6 @@
 * add Boron execution cluster architecture and operations documentation ([bba5cd4](https://github.com/AtomiCloud/sulfone.boron/commit/bba5cd457c7c0aae55a9d27cd991c68952c6fc3c))
 * address CodeRabbit review feedback [CU-86ewk3qxh] ([240ebcd](https://github.com/AtomiCloud/sulfone.boron/commit/240ebcdc3026d63ee524ab671a7af5171ce5db64))
 * fix capitalization inconsistency in table headers [CU-86ewk3qxh] ([71e8222](https://github.com/AtomiCloud/sulfone.boron/commit/71e82224bc4006e63bcbdd27aaa7282408598fe5))
-* fix mermaid diagrams and improve docs [CU-86ewk3qxh] ([d4a8561](https://github.com/AtomiCloud/sulfone.boron/commit/d4a8561d3d58c34f5648f55ca787807a500c279f))
 * fix mermaid diagrams and improve docs [CU-86ewk3qxh] ([#23](https://github.com/AtomiCloud/sulfone.boron/issues/23)) ([67389b6](https://github.com/AtomiCloud/sulfone.boron/commit/67389b6a01a35ee8ec36ac322edbad0d549980e7))
 * format documentation files [CU-86ewk3qxh] ([cc3b8aa](https://github.com/AtomiCloud/sulfone.boron/commit/cc3b8aaff50315693f422905e046b0d2b4b3f61c))
 

@@ -8,6 +8,8 @@ Warm a template by pulling images and creating the template volume.
 
 ### Request Body
 
+> **Note:** The JSON below is illustrative. See `TemplateVersionPrincipalRes`, `TemplateVersionRes`, `PluginVersionRes`, and `ProcessorVersionRes` type definitions for full field schemas.
+
 ```json
 {
   "principal": {
@@ -20,15 +22,18 @@ Warm a template by pulling images and creating the template volume.
       "blobDockerTag": "latest"
     }
   },
-  "template": { ... },
-  "plugins": [ ... ],
-  "processors": [ ... ]
+  "template": { "id": "...", "version": 1, "properties": {} },
+  "plugins": [],
+  "processors": []
 }
 ```
 
-| Field      | Type                 | Required | Description                                     |
-| ---------- | -------------------- | -------- | ----------------------------------------------- |
-| `template` | `TemplateVersionRes` | Yes      | Template definition with processors and plugins |
+| Field        | Type                          | Required | Description                                           |
+| ------------ | ----------------------------- | -------- | ----------------------------------------------------- |
+| `principal`  | `TemplateVersionPrincipalRes` | Yes      | Template principal with Docker image references       |
+| `template`   | `TemplateVersionRes`          | Yes      | Template version definition (id, version, properties) |
+| `plugins`    | `[]PluginVersionRes`          | No       | Plugin definitions                                    |
+| `processors` | `[]ProcessorVersionRes`       | No       | Processor definitions                                 |
 
 ### Response 200 OK
 

@@ -47,13 +47,13 @@ flowchart LR
 
 ## Key Concepts
 
-| Concept       | Description                                                  | Link                                                        |
-| ------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
-| **Session**   | Isolated execution context with dedicated containers/volumes | [Session Management](./features/01-session-management.md)   |
-| **Template**  | Code generation template with processors and plugins         | [Warming System](./features/07-warming-system.md)           |
-| **Processor** | Container that transforms input files to output files        | [Processor Isolation](./features/04-processor-isolation.md) |
-| **Plugin**    | Container that post-processes merged output                  | [Plugin Lifecycle](./features/06-plugin-lifecycle.md)       |
-| **Merger**    | Container that consolidates processor outputs                | [Merger System](./features/03-merger-system.md)             |
+| Concept       | Description                                                  | Link                                                                     |
+| ------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| **Session**   | Isolated execution context with dedicated containers/volumes | [Session Management](./features/01-session-management.md)                |
+| **Template**  | Code generation template with processors and plugins         | [Template vs Cyan Processors](./concepts/template-vs-cyan-processors.md) |
+| **Processor** | Container that transforms input files to output files        | [Processor Isolation](./features/04-processor-isolation.md)              |
+| **Plugin**    | Container that post-processes merged output                  | [Plugin Lifecycle](./features/06-plugin-lifecycle.md)                    |
+| **Merger**    | Container that consolidates processor outputs                | [Merger System](./features/03-merger-system.md)                          |
 
 ## Architecture Overview
 
@@ -93,7 +93,8 @@ flowchart LR
 1. **Read** [Getting Started](./01-getting-started.md) for setup instructions
 2. **Review** [Architecture](./02-architecture.md) for system design
 3. **Explore** [Features](./features/) to understand capabilities
-4. **Reference** [Surfaces](./surfaces/) for API integration
+4. **Navigate** [Modules](./modules/) for code organization
+5. **Reference** [Surfaces](./surfaces/) for API integration
 
 ## Technology Stack
 

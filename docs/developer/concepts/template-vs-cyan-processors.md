@@ -71,14 +71,14 @@ flowchart TD
 
 ## Two Lists, Different Purposes
 
-| Template.Processors (cyan.yaml)                             | Cyan.Processors (from script)                                  |
-| ----------------------------------------------------------- | -------------------------------------------------------------- |
-| **What MAY be used**                                        | **What WILL be used**                                          |
-| All processors available for this template                  | Processors to run for this specific build                      |
-| Static, defined at template creation time                   | Dynamic, determined by user script execution                   |
-| Author writes: `['cyan/default', 'atomi/ts:3']`             | Script returns: `{name: 'atomi/ts'}` or `{name: 'atomi/ts:3'}` |
-| Server pins to: `{id, version, dockerReference, dockerTag}` | Used with per-build config, file globs                         |
-| Used for warming/pre-downloading images                     |                                                                |
+| Template.Processors (cyan.yaml)                             | Cyan.Processors (from script)                                                  |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| **What MAY be used**                                        | **What WILL be used**                                                          |
+| All processors available for this template                  | Processors to run for this specific build                                      |
+| Static, defined at template creation time                   | Dynamic, determined by user script execution                                   |
+| Author writes: `['cyan/default', 'atomi/typescript:3']`     | Script returns: `{name: 'atomi/typescript'}` or `{name: 'atomi/typescript:3'}` |
+| Server pins to: `{id, version, dockerReference, dockerTag}` | Used with per-build config, file globs                                         |
+| Used for warming/pre-downloading images                     |                                                                                |
 
 ## Push Time: Pinning Versions
 
@@ -131,7 +131,7 @@ The script is Turing-complete and can return different processors based on user 
 
 Authors write simple strings, scripts can also use simple strings.
 
-**Author's perspective:** Writing `processors: ['atomi/typescript:3.2.1']` is cumbersome. Just use `atomi/typescript`.
+**Author's perspective:** Writing `processors: ['atomi/typescript:3']` is cumbersome. Just use `atomi/typescript`.
 
 **Script's perspective:** Script author also doesn't want to write versions. Just return `{name: 'atomi/typescript'}`.
 
@@ -213,7 +213,7 @@ processors: ['cyan/default', 'atomi/typescript']
 3. Validate: Is `proc-ts-999` in template.processors?
 4. Result: **No** ✗ → Error "processor atomi/typescript does not have a matching version defined in the template"
 
-**Why this error?** The template only pinned versions 1 and 2. Version 3 exists in the registry but wasn't approved for this template.
+**Why this error?** The template only pinned version 2 (proc-ts-456). Version 3 exists in the registry but wasn't approved for this template.
 
 ## Key Takeaways
 

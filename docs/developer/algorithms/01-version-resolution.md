@@ -9,7 +9,7 @@
 
 The version resolution algorithm converts flexible processor/plugin references (like `user/processor` or `user/processor:3`) into concrete template-defined IDs. When no version is specified, it iterates from the latest version down to find the first match in the template.
 
-This enables clients to use `username/name:latest` references while ensuring the resolved version actually exists in the template definition.
+This enables clients to use `username/name` (no version) references while ensuring the resolved version actually exists in the template definition.
 
 **Background**: See [Template vs Cyan Processors](../concepts/template-vs-cyan-processors.md) for why two separate processor lists exist.
 
@@ -75,28 +75,28 @@ sequenceDiagram
     end
 ```
 
-| #   | Step     | What                                               | Why                                  | Key File          |
-| --- | -------- | -------------------------------------------------- | ------------------------------------ | ----------------- |
-| 1   | Parse    | Split by `/` into user and name                    | Extract username and processor name  | `merger.go:95`    |
-| 2   | Parse    | Split name by `:` for optional version             | Extract version if specified         | `merger.go:87`    |
-| 3   | Check    | Determine if version was specified                 | Choose resolution path               | `registry.go:154` |
-| 4   | Query    | GET `/Processor/slug/user/name/versions/latest`    | Get highest version number           | `registry.go:48`  |
-| 5   | Set      | maxVersion = latest.version                        | Establish upper bound for iteration  | `registry.go:160` |
-| 6   | Loop     | For i = maxVersion down to 1                       | Check versions from newest to oldest | `registry.go:160` |
-| 7   | Query    | GET `/versions/{i}`                                | Get processor ID for this version    | `registry.go:162` |
-| 8   | Check    | Loop through template processors for ID match      | Verify version exists in template    | `registry.go:167` |
-| 9   | Return   | Construct CyanProcessor with ID, config, files     | Return resolved processor            | `registry.go:170` |
-| 10  | Continue | Try next version down                              | Find compatible version              | `registry.go:160` |
-| 11  | Query    | GET `/Processor/slug/user/name/versions/{version}` | Get specific version                 | `registry.go:188` |
-| 12  | Check    | Loop through template processors for ID match      | Verify version exists in template    | `registry.go:193` |
-| 13  | Return   | Construct CyanProcessor with ID, config, files     | Return resolved processor            | `registry.go:193` |
-| 14  | Error    | Return "does not have a matching version"          | No compatible version found          | `registry.go:201` |
+| #   | Step     | What                                                       | Why                                  | Key File                          |
+| --- | -------- | ---------------------------------------------------------- | ------------------------------------ | --------------------------------- |
+| 1   | Parse    | Split name by `:` for optional version                     | Extract version if specified         | `docker_executor/merger.go:87`    |
+| 2   | Parse    | Split by `/` into user and name                            | Extract username and processor name  | `docker_executor/merger.go:95`    |
+| 3   | Check    | Determine if version was specified                         | Choose resolution path               | `docker_executor/registry.go:154` |
+| 4   | Query    | GET `/api/v1/Processor/slug/:user/:name/versions/latest`   | Get highest version number           | `docker_executor/registry.go:48`  |
+| 5   | Set      | maxVersion = latest.version                                | Establish upper bound for iteration  | `docker_executor/registry.go:160` |
+| 6   | Loop     | For i = maxVersion down to 1                               | Check versions from newest to oldest | `docker_executor/registry.go:160` |
+| 7   | Query    | GET `/api/v1/Processor/slug/:user/:name/versions/{i}`      | Get processor ID for this version    | `docker_executor/registry.go:162` |
+| 8   | Check    | Loop through template processors for ID match              | Verify version exists in template    | `docker_executor/registry.go:167` |
+| 9   | Return   | Construct CyanProcessor with ID, config, files             | Return resolved processor            | `docker_executor/registry.go:170` |
+| 10  | Continue | Try next version down                                      | Find compatible version              | `docker_executor/registry.go:160` |
+| 11  | Query    | GET `/api/v1/Processor/slug/:user/:name/versions/:version` | Get specific version                 | `docker_executor/registry.go:188` |
+| 12  | Check    | Loop through template processors for ID match              | Verify version exists in template    | `docker_executor/registry.go:193` |
+| 13  | Return   | Construct CyanProcessor with ID, config, files             | Return resolved processor            | `docker_executor/registry.go:193` |
+| 14  | Error    | Return "does not have a matching version"                  | No compatible version found          | `docker_executor/registry.go:201` |
 
 ## Detailed Walkthrough
 
 ### Step 1-2: Parse Reference
 
-**Key File**: `merger.go:84` → `parseCyanReference()`
+**Key File**: `docker_executor/merger.go:84` → `parseCyanReference()`
 
 Parse the reference string into components:
 
@@ -105,7 +105,7 @@ Parse the reference string into components:
 
 ### Step 3-9: Latest Version Resolution
 
-**Key File**: `registry.go:147` → `convertProcessor()`
+**Key File**: `docker_executor/registry.go:147` → `convertProcessor()`
 
 When no version is specified (script returned `atomi/typescript`):
 
@@ -124,7 +124,7 @@ When no version is specified (script returned `atomi/typescript`):
 
 ### Step 11-14: Specific Version Resolution
 
-**Key File**: `registry.go:188` → `getProcessorVersion()`
+**Key File**: `docker_executor/registry.go:15` → `getProcessorVersion()`
 
 When version is specified (script returned `atomi/typescript:3`):
 
@@ -148,12 +148,12 @@ When version is specified (script returned `atomi/typescript:3`):
 
 ## Edge Cases
 
-| Case                     | Input                   | Template Has                                 | Behavior                                  | Key File          |
-| ------------------------ | ----------------------- | -------------------------------------------- | ----------------------------------------- | ----------------- |
-| Latest not in template   | `atomi/ts` (no version) | `proc-ts-v2` (v2), but registry latest is v5 | Iterates v5, v4, v3, finds v2 match       | `registry.go:160` |
-| Specific version missing | `atomi/ts:3`            | Only v1, v2 pinned                           | Error: "does not have a matching version" | `registry.go:201` |
-| No versions match        | `atomi/ts`              | Different processor only                     | Error after iteration completes           | `registry.go:183` |
-| Invalid reference format | `invalid-format`        | N/A                                          | Error: "invalid reference"                | `merger.go:90`    |
+| Case                     | Input                   | Template Has                                 | Behavior                                  | Key File                          |
+| ------------------------ | ----------------------- | -------------------------------------------- | ----------------------------------------- | --------------------------------- |
+| Latest not in template   | `atomi/ts` (no version) | `proc-ts-v2` (v2), but registry latest is v5 | Iterates v5, v4, v3, finds v2 match       | `docker_executor/registry.go:160` |
+| Specific version missing | `atomi/ts:3`            | Only v1, v2 pinned                           | Error: "does not have a matching version" | `docker_executor/registry.go:201` |
+| No versions match        | `atomi/ts`              | Different processor only                     | Error after iteration completes           | `docker_executor/registry.go:183` |
+| Invalid reference format | `invalid-format`        | N/A                                          | Error: "invalid reference"                | `docker_executor/merger.go:90`    |
 
 ## Error Handling
 

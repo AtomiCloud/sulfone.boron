@@ -42,15 +42,20 @@ merger.go
 ```mermaid
 flowchart LR
     A[Merger] --> B[Registry Client]
+    A --> D[Docker Executor]
     C[Server] --> A
-    D[Docker Executor] --> A
 ```
 
 | Dependency      | Why                                 |
 | --------------- | ----------------------------------- |
 | Registry Client | Resolve processor/plugin versions   |
-| Server          | Calls merger for build execution    |
 | Docker Executor | Container references for HTTP calls |
+
+## Used By
+
+| Module | Why                              |
+| ------ | -------------------------------- |
+| Server | Calls merger for build execution |
 
 ## Key Interfaces
 
