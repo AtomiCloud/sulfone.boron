@@ -1,3 +1,17 @@
+## [2.4.1](https://github.com/AtomiCloud/sulfone.boron/compare/v2.4.0...v2.4.1) (2026-02-26)
+
+
+### 📜 Documentation 📜
+
+* address CodeRabbit PR review feedback [CU-86ewk3qxh] ([a7badc7](https://github.com/AtomiCloud/sulfone.boron/commit/a7badc7f1e0354362a1fa75a9c67c8ba1a7c6f06))
+* fix all remaining CodeRabbit feedback [CU-86ewk3qxh] ([7421aa3](https://github.com/AtomiCloud/sulfone.boron/commit/7421aa3bd038f4e4bbf4cbab159c59a36cfe52de))
+* fix remaining CodeRabbit review feedback [CU-86ewk3qxh] ([1bc4b78](https://github.com/AtomiCloud/sulfone.boron/commit/1bc4b78dede5f126b850b9599a923273164710dd))
+
+
+### 🐛 Bug Fixes 🐛
+
+* address coderabbit local review findings ([672e779](https://github.com/AtomiCloud/sulfone.boron/commit/672e77941329301584e5f7b2bf7b1fdd2f1fe16d))
+
 ## [2.4.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.3.0...v2.4.0) (2026-02-23)
 
 
