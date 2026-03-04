@@ -386,9 +386,9 @@ func server(registryEndpoint string) {
 		reqBody, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			// Handle error
-			c.JSON(http.StatusBadGateway, ProblemDetails{
+			c.JSON(http.StatusBadRequest, ProblemDetails{
 				Title:   "Read request failed",
-				Status:  400,
+				Status:  http.StatusBadRequest,
 				Detail:  "Failed read the initial request body",
 				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
 				TraceId: nil,
@@ -452,9 +452,9 @@ func server(registryEndpoint string) {
 		reqBody, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			// Handle error
-			c.JSON(http.StatusBadGateway, ProblemDetails{
+			c.JSON(http.StatusBadRequest, ProblemDetails{
 				Title:   "Read request failed",
-				Status:  400,
+				Status:  http.StatusBadRequest,
 				Detail:  "Failed read the initial request body",
 				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
 				TraceId: nil,
@@ -516,9 +516,9 @@ func server(registryEndpoint string) {
 
 		reqBody, err := io.ReadAll(c.Request.Body)
 		if err != nil {
-			c.JSON(http.StatusBadGateway, ProblemDetails{
+			c.JSON(http.StatusBadRequest, ProblemDetails{
 				Title:   "Read request failed",
-				Status:  400,
+				Status:  http.StatusBadRequest,
 				Detail:  "Failed read the initial request body",
 				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
 				TraceId: nil,
