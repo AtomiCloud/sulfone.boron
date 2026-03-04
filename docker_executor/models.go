@@ -6,6 +6,7 @@ type TemplateVersionRes struct {
 	Plugins    []PluginRes                   `json:"plugins"`
 	Processors []ProcessorRes                `json:"processors"`
 	Templates  []TemplateVersionPrincipalRes `json:"templates"`
+	Resolvers  []ResolverRes                 `json:"resolvers"`
 }
 
 type PropertyRes struct {
@@ -25,6 +26,15 @@ type PluginRes struct {
 }
 
 type ProcessorRes struct {
+	ID              string `json:"id"`
+	Version         int64  `json:"version"`
+	CreatedAt       string `json:"createdAt"`
+	Description     string `json:"description"`
+	DockerReference string `json:"dockerReference"`
+	DockerTag       string `json:"dockerTag"`
+}
+
+type ResolverRes struct {
 	ID              string `json:"id"`
 	Version         int64  `json:"version"`
 	CreatedAt       string `json:"createdAt"`

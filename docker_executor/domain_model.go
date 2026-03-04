@@ -98,3 +98,9 @@ func DockerVolumeNameToStruct(realName string) (DockerVolumeReference, error) {
 	}
 	return DockerVolumeReference{}, errors.New("invalid volume realName")
 }
+
+// CyanTypeResolver is the container type string for resolver containers
+const CyanTypeResolver = "resolver"
+
+// ResolverPort is the port that resolver containers listen on
+const ResolverPort = 5553
