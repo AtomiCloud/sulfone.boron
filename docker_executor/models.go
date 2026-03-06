@@ -35,12 +35,14 @@ type ProcessorRes struct {
 }
 
 type ResolverRes struct {
-	ID              string `json:"id"`
-	Version         int64  `json:"version"`
-	CreatedAt       string `json:"createdAt"`
-	Description     string `json:"description"`
-	DockerReference string `json:"dockerReference"`
-	DockerTag       string `json:"dockerTag"`
+	ID              string      `json:"id"`
+	Version         int64       `json:"version"`
+	CreatedAt       string      `json:"createdAt"`
+	Description     string      `json:"description"`
+	DockerReference string      `json:"dockerReference"`
+	DockerTag       string      `json:"dockerTag"`
+	Config          interface{} `json:"config"`
+	Files           []string    `json:"files"`
 }
 
 type TemplateVersionPrincipalRes struct {

@@ -27,7 +27,7 @@ type ResolverRes struct {
 **Testing:**
 
 - Verify JSON deserialization works with the new fields
-- Run `go build ./...` to. Confirm compilation
+- Run `go build ./...` to confirm compilation
 
 **Checklist:**
 
