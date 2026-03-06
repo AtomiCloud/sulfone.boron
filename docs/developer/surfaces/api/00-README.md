@@ -22,8 +22,9 @@ http://localhost:9000
 | POST   | `/template/warm`                                | Warm template (pre-pull images, create volume) | `server.go:312` |
 | POST   | `/proxy/template/:cyanId/api/template/init`     | Proxy to template init endpoint                | `server.go:371` |
 | POST   | `/proxy/template/:cyanId/api/template/validate` | Proxy to template validate endpoint            | `server.go:437` |
-| POST   | `/merge/:sessionId`                             | Internal merge endpoint                        | `server.go:503` |
-| POST   | `/zip`                                          | Create tar.gz from directory                   | `server.go:531` |
+| POST   | `/proxy/resolver/:cyanId/api/resolve`           | Proxy to resolver resolve endpoint             | `server.go:502` |
+| POST   | `/merge/:sessionId`                             | Internal merge endpoint                        | `server.go:567` |
+| POST   | `/zip`                                          | Create tar.gz from directory                   | `server.go:595` |
 
 ## Common Response Formats
 

@@ -31,6 +31,7 @@ flowchart LR
         P[Processor Containers]
         L[Plugin Containers]
         G[Merger Container]
+        RV[Resolver Containers]
     end
 
     Z -->|Template Metadata| R
@@ -39,7 +40,7 @@ flowchart LR
     S --> E & M
     E --> D
     M --> D
-    D -->|Create/Manage| N & T & P & L & G
+    D -->|Create/Manage| N & T & P & L & G & RV
     D -->|Status Updates| E
     S -->|Zipped Output| C
 ```
@@ -110,7 +111,7 @@ sequenceDiagram
 | **Executor**          | Container lifecycle management (start, health check, clean)   | `executor.go:10`, `docker.go:18` |
 | **Merger**            | 3-stage pipeline coordination                                 | `merger.go:15`                   |
 | **Registry Client**   | Version resolution from Zinc                                  | `registry.go:11`                 |
-| **Template Executor** | Template warming (pre-pull, volume creation)                  | `template_executor.go:10`        |
+| **Template Executor** | Template and resolver warming (pre-pull, volume creation)     | `template_executor.go:10`        |
 | **Domain Models**     | Container/volume/image naming conventions                     | `domain_model.go`                |
 
 ## Key Decisions

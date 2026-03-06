@@ -8,7 +8,7 @@ Warm a template by pulling images and creating the template volume.
 
 ### Request Body
 
-> **Note:** The JSON below is illustrative. See `TemplateVersionPrincipalRes`, `TemplateVersionRes`, `PluginVersionRes`, and `ProcessorVersionRes` type definitions for full field schemas.
+> **Note:** The JSON below is illustrative. See `TemplateVersionPrincipalRes`, `TemplateVersionRes`, `PluginVersionRes`, `ProcessorVersionRes`, and `ResolverRes` type definitions for full field schemas.
 
 ```json
 {
@@ -24,7 +24,8 @@ Warm a template by pulling images and creating the template volume.
   },
   "template": { "id": "...", "version": 1, "properties": {} },
   "plugins": [],
-  "processors": []
+  "processors": [],
+  "resolvers": []
 }
 ```
 
@@ -34,6 +35,7 @@ Warm a template by pulling images and creating the template volume.
 | `template`   | `TemplateVersionRes`          | Yes      | Template version definition (id, version, properties) |
 | `plugins`    | `[]PluginVersionRes`          | No       | Plugin definitions                                    |
 | `processors` | `[]ProcessorVersionRes`       | No       | Processor definitions                                 |
+| `resolvers`  | `[]ResolverRes`               | No       | Resolver definitions                                  |
 
 ### Response 200 OK
 
