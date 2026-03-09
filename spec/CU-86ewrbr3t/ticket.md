@@ -94,7 +94,7 @@ Copy response back
 Create resolver reference struct in model.go:
 
 type ResolverReference struct {
-Id string `json:"id"`
+Id string `json:"id"` // Exposed as ID in Go code
 Username string `json:"username"`
 Name string `json:"name"`
 Version int `json:"version"`
@@ -200,28 +200,34 @@ Component Responsibilities
 Resolver Configuration
 Template Resolver Declaration
 Templates declare resolvers in cyan.yaml:
+
+```yaml
 username: atomi
 name: nix-init
 description: Nix Flake template
 
-resolvers: - resolver: 'atomi/json-merger:1' # username/name:version
-config:
-strategy: 'deep-merge'
-array_strategy: 'append'
-files: - 'package.json' - '\*\*/tsconfig.json'
+resolvers:
+  - resolver: 'atomi/json-merger:1' # username/name:version
+    config:
+      strategy: 'deep-merge'
+      array_strategy: 'append'
+    files:
+      - 'package.json'
+      - '**/tsconfig.json'
 
-    - resolver: 'atomi/yaml-merger'           # version omitted -> latest at push-time
+  - resolver: 'atomi/yaml-merger' # version omitted -> latest at push-time
     config:
       merge_arrays: true
     files:
-            - '.github/workflows/*.yaml'
+      - '.github/workflows/*.yaml'
 
-    - resolver: 'atomi/markdown-merger:1'
+  - resolver: 'atomi/markdown-merger:1'
     config:
       include_source_headers: true
     files:
-            - 'README.md'
-            - 'CLAUDE.md'
+      - 'README.md'
+      - 'CLAUDE.md'
+```
 
 Resolver Config Schema
 interface ResolverConfig {
