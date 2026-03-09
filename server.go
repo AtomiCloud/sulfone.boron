@@ -176,6 +176,7 @@ func server(registryEndpoint string) {
 		source := req.Source
 		if source == "" {
 			source = "image"
+			req.Source = source // Persist the default to the request struct
 		}
 		if source != "image" && source != "path" {
 			ctx.JSON(http.StatusBadRequest, ProblemDetails{
