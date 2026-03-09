@@ -147,6 +147,12 @@ func (e *TryExecutor) populateBlobFromImage(blobVol DockerVolumeReference) error
 		return fmt.Errorf("failed to start unzip container: %w", err)
 	}
 
+	// Ensure container is removed on all exit paths
+	defer func() {
+		fmt.Println("🧹 Removing unzip container")
+		_ = e.Docker.RemoveContainer(cc) // best effort cleanup
+	}()
+
 	// Wait for the unzip container to complete
 	fmt.Println("⚙️ Waiting for blob extraction to complete...")
 	if exitCode, err := e.Docker.WaitContainer(cc); err != nil {
@@ -155,13 +161,6 @@ func (e *TryExecutor) populateBlobFromImage(blobVol DockerVolumeReference) error
 		return fmt.Errorf("unzip container failed with exit code %d", exitCode)
 	}
 	fmt.Println("✅ Blob extraction completed")
-
-	// Remove the unzip container
-	fmt.Println("🧹 Removing unzip container")
-	if err := e.Docker.RemoveContainer(cc); err != nil {
-		return fmt.Errorf("failed to remove unzip container: %w", err)
-	}
-	fmt.Println("✅ Unzip container removed")
 
 	return nil
 }
