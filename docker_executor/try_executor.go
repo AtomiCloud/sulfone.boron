@@ -269,8 +269,14 @@ func (e *TryExecutor) warmResolvers() []error {
 	for _, resolver := range uniqueResolvers {
 		// Check if container exists and is running
 		missing, conRef := e.missingResolverContainer(resolver, runningContainers, stoppedContainers)
+
 		if !missing {
+			// Container already running - verify health before skipping
 			fmt.Println("✅ Resolver container already running:", resolver.ID)
+			ep := fmt.Sprintf("http://%s:%d/", DockerContainerToString(conRef), ResolverPort)
+			if err := e.statusCheck(ep, 10); err != nil {
+				allErrs = append(allErrs, fmt.Errorf("resolver %s health check failed: %w", resolver.ID, err))
+			}
 			continue
 		}
 
