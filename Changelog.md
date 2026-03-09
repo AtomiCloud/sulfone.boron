@@ -1,3 +1,10 @@
+## [2.5.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.4.1...v2.5.0) (2026-03-09)
+
+
+### ✨ Features ✨
+
+* **cleanup:** add daemon shutdown and cleanup functionality ([acff0a7](https://github.com/AtomiCloud/sulfone.boron/commit/acff0a75e2542893b30b045427090730f92a5aea))
+
 ## [2.4.1](https://github.com/AtomiCloud/sulfone.boron/compare/v2.4.0...v2.4.1) (2026-02-26)
 
 

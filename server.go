@@ -31,6 +31,47 @@ func server(registryEndpoint string) {
 		c.JSON(200, docker_executor.StandardResponse{Status: "OK"})
 	})
 
+	r.DELETE("/cleanup", func(ctx *gin.Context) {
+		dCli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, ProblemDetails{
+				Title:   "Failed to create docker client",
+				Status:  500,
+				Detail:  "Failed to create docker client for cleanup",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500",
+				TraceId: nil,
+				Data:    []string{err.Error()},
+			})
+			return
+		}
+		defer func(dCli *client.Client) {
+			_ = dCli.Close()
+		}(dCli)
+		cpu := rt.NumCPU()
+		d := docker_executor.DockerClient{
+			Docker:           dCli,
+			Context:          ctx,
+			ParallelismLimit: cpu,
+		}
+		containersRemoved, imagesRemoved, volumesRemoved, err := d.Cleanup()
+		// Always return partial results even when there are errors
+		response := gin.H{
+			"status":             "OK",
+			"containers_removed": containersRemoved,
+			"images_removed":     imagesRemoved,
+			"volumes_removed":    volumesRemoved,
+			"containers_count":   len(containersRemoved),
+			"images_count":       len(imagesRemoved),
+			"volumes_count":      len(volumesRemoved),
+		}
+		if err != nil {
+			response["error"] = err.Error()
+			ctx.JSON(http.StatusMultiStatus, response)
+			return
+		}
+		ctx.JSON(http.StatusOK, response)
+	})
+
 	r.DELETE("/executor/:sessionId", func(ctx *gin.Context) {
 		sessionId := ctx.Param("sessionId")
 		dCli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())

@@ -240,33 +240,37 @@ func (d *DockerClient) RemoveContainer(cc DockerContainerReference) error {
 	return nil
 }
 
+type indexedError struct {
+	index int
+	err   error
+}
+
 func (d *DockerClient) RemoveAllContainers(containerRefs []DockerContainerReference) []error {
 
-	errChan := make(chan error, len(containerRefs))
+	errChan := make(chan indexedError, len(containerRefs))
 	semaphore := make(chan int, d.ParallelismLimit)
 
-	for _, containerRef := range containerRefs {
+	for i, containerRef := range containerRefs {
 		semaphore <- 0
-		go func(cc DockerContainerReference) {
+		go func(idx int, cc DockerContainerReference) {
 			fmt.Println("🗑 Removing container:", DockerContainerToString(cc))
 			err := d.RemoveContainer(cc)
 			if err != nil {
-				fmt.Println("🚨Failed to remove container:", DockerContainerToString(cc))
+				fmt.Println("🚨 Failed to remove container:", DockerContainerToString(cc))
 			} else {
 				fmt.Println("✅ Container removed:", DockerContainerToString(cc))
 			}
-			errChan <- err
+			errChan <- indexedError{index: idx, err: err}
 			<-semaphore
-		}(containerRef)
+		}(i, containerRef)
 	}
 
-	var allErr []error
+	// Initialize slice with nil values to preserve order
+	allErr := make([]error, len(containerRefs))
 
 	for i := 0; i < len(containerRefs); i++ {
-		err := <-errChan
-		if err != nil {
-			allErr = append(allErr, err)
-		}
+		ie := <-errChan
+		allErr[ie.index] = ie.err
 	}
 
 	for i := 0; i < cap(semaphore); i++ {
@@ -289,31 +293,30 @@ func (d *DockerClient) RemoveVolume(vol DockerVolumeReference) error {
 
 func (d *DockerClient) RemoveAllVolumes(volRefs []DockerVolumeReference) []error {
 
-	errChan := make(chan error, len(volRefs))
+	errChan := make(chan indexedError, len(volRefs))
 	semaphore := make(chan int, d.ParallelismLimit)
 
-	for _, volRef := range volRefs {
+	for i, volRef := range volRefs {
 		semaphore <- 0
-		go func(v DockerVolumeReference) {
+		go func(idx int, v DockerVolumeReference) {
 			fmt.Println("🗑 Removing volume:", DockerVolumeToString(v))
 			err := d.RemoveVolume(v)
 			if err != nil {
-				fmt.Println("🚨Failed to remove volume:", DockerVolumeToString(v))
+				fmt.Println("🚨 Failed to remove volume:", DockerVolumeToString(v))
 			} else {
 				fmt.Println("✅ Volume removed:", DockerVolumeToString(v))
 			}
-			errChan <- err
+			errChan <- indexedError{index: idx, err: err}
 			<-semaphore
-		}(volRef)
+		}(i, volRef)
 	}
 
-	var allErr []error
+	// Initialize slice with nil values to preserve order
+	allErr := make([]error, len(volRefs))
 
 	for i := 0; i < len(volRefs); i++ {
-		err := <-errChan
-		if err != nil {
-			allErr = append(allErr, err)
-		}
+		ie := <-errChan
+		allErr[ie.index] = ie.err
 	}
 
 	for i := 0; i < cap(semaphore); i++ {
@@ -439,4 +442,113 @@ func (d *DockerClient) CreateVolume(vol DockerVolumeReference) error {
 		Name: volName,
 	})
 	return err
+}
+
+// RemoveImage removes a Docker image by its reference
+func (d *DockerClient) RemoveImage(imageRef DockerImageReference) error {
+	imageName := DockerImageToString(imageRef)
+	_, err := d.Docker.ImageRemove(d.Context, imageName, imageTypes.RemoveOptions{
+		Force:         true,
+		PruneChildren: false,
+	})
+	return err
+}
+
+// RemoveAllImages removes multiple Docker images in parallel
+func (d *DockerClient) RemoveAllImages(imageRefs []DockerImageReference) []error {
+	errChan := make(chan indexedError, len(imageRefs))
+	semaphore := make(chan int, d.ParallelismLimit)
+
+	for i, imageRef := range imageRefs {
+		semaphore <- 0
+		go func(idx int, img DockerImageReference) {
+			fmt.Println("🗑 Removing image:", DockerImageToString(img))
+			err := d.RemoveImage(img)
+			if err != nil {
+				fmt.Println("🚨 Failed to remove image:", DockerImageToString(img))
+			} else {
+				fmt.Println("✅ Image removed:", DockerImageToString(img))
+			}
+			errChan <- indexedError{index: idx, err: err}
+			<-semaphore
+		}(i, imageRef)
+	}
+
+	// Initialize slice with nil values to preserve order
+	allErr := make([]error, len(imageRefs))
+
+	for i := 0; i < len(imageRefs); i++ {
+		ie := <-errChan
+		allErr[ie.index] = ie.err
+	}
+
+	for i := 0; i < cap(semaphore); i++ {
+		semaphore <- 0
+	}
+
+	close(errChan)
+	return allErr
+}
+
+// Cleanup removes all Docker resources (containers, images, volumes) labeled cyanprint.dev=true
+// It returns lists of successfully removed resources and the first error encountered (if any)
+func (d *DockerClient) Cleanup() (containersRemoved []string, imagesRemoved []string, volumesRemoved []string, err error) {
+	var firstError error
+
+	// 1. Remove containers
+	runningContainers, stoppedContainers, listErr := d.ListContainer()
+	if listErr != nil {
+		return nil, nil, nil, fmt.Errorf("failed to list containers: %w", listErr)
+	}
+	allContainers := append(runningContainers, stoppedContainers...)
+	if len(allContainers) > 0 {
+		containerErrors := d.RemoveAllContainers(allContainers)
+		for i, c := range allContainers {
+			if containerErrors[i] != nil {
+				if firstError == nil {
+					firstError = fmt.Errorf("failed to remove container %s: %w", DockerContainerToString(c), containerErrors[i])
+				}
+			} else {
+				containersRemoved = append(containersRemoved, DockerContainerToString(c))
+			}
+		}
+	}
+
+	// 2. Remove images
+	images, listErr := d.ListImages()
+	if listErr != nil {
+		return containersRemoved, nil, nil, fmt.Errorf("failed to list images: %w", listErr)
+	}
+	if len(images) > 0 {
+		imageErrors := d.RemoveAllImages(images)
+		for i, img := range images {
+			if imageErrors[i] != nil {
+				if firstError == nil {
+					firstError = fmt.Errorf("failed to remove image %s: %w", DockerImageToString(img), imageErrors[i])
+				}
+			} else {
+				imagesRemoved = append(imagesRemoved, DockerImageToString(img))
+			}
+		}
+	}
+
+	// 3. Remove volumes
+	volumes, listErr := d.ListVolumes()
+	if listErr != nil {
+		return containersRemoved, imagesRemoved, nil, fmt.Errorf("failed to list volumes: %w", listErr)
+	}
+	if len(volumes) > 0 {
+		volumeErrors := d.RemoveAllVolumes(volumes)
+		for i, v := range volumes {
+			if volumeErrors[i] != nil {
+				if firstError == nil {
+					firstError = fmt.Errorf("failed to remove volume %s: %w", DockerVolumeToString(v), volumeErrors[i])
+				}
+			} else {
+				volumesRemoved = append(volumesRemoved, DockerVolumeToString(v))
+			}
+		}
+	}
+
+	return containersRemoved, imagesRemoved, volumesRemoved, firstError
 }
