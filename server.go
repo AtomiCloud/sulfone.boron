@@ -151,6 +151,19 @@ func server(registryEndpoint string) {
 			return
 		}
 
+		// Validate path when source is "path"
+		if source == "path" && req.Path == "" {
+			ctx.JSON(http.StatusBadRequest, ProblemDetails{
+				Title:   "Missing path",
+				Status:  400,
+				Detail:  "path is required when source is 'path'",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+				TraceId: nil,
+				Data:    nil,
+			})
+			return
+		}
+
 		dCli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, ProblemDetails{
@@ -175,7 +188,7 @@ func server(registryEndpoint string) {
 		}
 
 		if err := d.EnforceNetwork(); err != nil {
-			ctx.JSON(http.StatusInternalServerError, ProblemDetails{
+			ctx.JSON(http.StatusServiceUnavailable, ProblemDetails{
 				Title:   "Failed to configure network",
 				Status:  503,
 				Detail:  "Failed to start cyanprint Docker bridge network",

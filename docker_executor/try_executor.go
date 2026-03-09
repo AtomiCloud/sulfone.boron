@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+// httpClient with timeout for health checks
+var httpClient = &http.Client{
+	Timeout: 5 * time.Second,
+}
+
 type TryExecutor struct {
 	Docker  DockerClient
 	Request TryExecutorReq
@@ -30,6 +35,8 @@ func (e *TryExecutor) TrySetup() (TryExecutorRes, []error) {
 	}
 
 	// 2. Create session volume (fail if exists)
+	// Note: Session volume is intentionally not cleaned up on partial failure
+	// to allow users to retry or inspect the state for debugging purposes.
 	sessionVol, errs := e.createSessionVolume()
 	if len(errs) > 0 {
 		return TryExecutorRes{}, errs
@@ -222,7 +229,7 @@ func (e *TryExecutor) pullMissingImages() []error {
 
 func imageExistsInList(images []DockerImageReference, ref DockerImageReference) bool {
 	for _, img := range images {
-		if strings.HasSuffix(img.Reference, ref.Reference) && img.Tag == ref.Tag {
+		if img.Reference == ref.Reference && img.Tag == ref.Tag {
 			return true
 		}
 	}
@@ -317,7 +324,7 @@ func (e *TryExecutor) startResolverContainer(resolver ResolverRes, conRef Docker
 func (e *TryExecutor) statusCheck(endpoint string, maxAttempts int) error {
 	for i := 0; i < maxAttempts; i++ {
 		fmt.Println("🏓 Ping endpoint:", endpoint, "Attempt:", i+1)
-		resp, err := http.Get(endpoint)
+		resp, err := httpClient.Get(endpoint)
 		if err != nil {
 			fmt.Println("🚨 Error:", err)
 			fmt.Println("⌛ Waiting for 1 second before next attempt...")
