@@ -107,6 +107,106 @@ func server(registryEndpoint string) {
 		ctx.JSON(200, docker_executor.StandardResponse{Status: "OK"})
 	})
 
+	r.POST("/executor/try", func(ctx *gin.Context) {
+		var req docker_executor.TryExecutorReq
+		if err := ctx.BindJSON(&req); err != nil {
+			ctx.JSON(http.StatusBadRequest, ProblemDetails{
+				Title:   "Failed to bind request",
+				Status:  400,
+				Detail:  "Request body does not match TryExecutorReq",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+				TraceId: nil,
+				Data:    []string{err.Error()},
+			})
+			return
+		}
+
+		// Validate source type
+		source := req.Source
+		if source == "" {
+			source = "image"
+		}
+		if source != "image" && source != "path" {
+			ctx.JSON(http.StatusBadRequest, ProblemDetails{
+				Title:   "Invalid source type",
+				Status:  400,
+				Detail:  fmt.Sprintf("source must be 'image' or 'path', got '%s'", source),
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+				TraceId: nil,
+				Data:    nil,
+			})
+			return
+		}
+
+		// Validate image_ref when source is "image"
+		if source == "image" && req.ImageRef == nil {
+			ctx.JSON(http.StatusBadRequest, ProblemDetails{
+				Title:   "Missing image_ref",
+				Status:  400,
+				Detail:  "image_ref is required when source is 'image'",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+				TraceId: nil,
+				Data:    nil,
+			})
+			return
+		}
+
+		dCli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, ProblemDetails{
+				Title:   "Failed to create docker client",
+				Status:  500,
+				Detail:  "Failed to create docker client",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500",
+				TraceId: nil,
+				Data:    []string{err.Error()},
+			})
+			return
+		}
+		defer func(dCli *client.Client) {
+			_ = dCli.Close()
+		}(dCli)
+
+		cpu := rt.NumCPU()
+		d := docker_executor.DockerClient{
+			Docker:           dCli,
+			Context:          ctx,
+			ParallelismLimit: cpu,
+		}
+
+		if err := d.EnforceNetwork(); err != nil {
+			ctx.JSON(http.StatusInternalServerError, ProblemDetails{
+				Title:   "Failed to configure network",
+				Status:  503,
+				Detail:  "Failed to start cyanprint Docker bridge network",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503",
+				TraceId: nil,
+				Data:    []string{err.Error()},
+			})
+			return
+		}
+
+		exec := docker_executor.TryExecutor{
+			Docker:  d,
+			Request: req,
+		}
+
+		res, errs := exec.TrySetup()
+		if len(errs) > 0 {
+			ctx.JSON(http.StatusInternalServerError, ProblemDetails{
+				Title:   "Failed to setup try session",
+				Status:  500,
+				Detail:  "Try setup failed",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500",
+				TraceId: nil,
+				Data:    stringifyErrors(errs),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, res)
+	})
+
 	r.POST("/executor/:sessionId", func(ctx *gin.Context) {
 		sessionId := ctx.Param("sessionId")
 		cpu := rt.NumCPU()

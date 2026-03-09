@@ -228,6 +228,73 @@ func (d *DockerClient) CreateContainerWithVolume(cc DockerContainerReference, v 
 	return nil
 }
 
+func (d *DockerClient) CreateContainerWithCopyMount(
+	cc DockerContainerReference,
+	sourcePath string,
+	targetVolume DockerVolumeReference,
+) error {
+	name := DockerContainerToString(cc)
+	targetVolName := DockerVolumeToString(targetVolume)
+
+	// Get self-image (coordinator)
+	image, err := d.GetCoordinatorImage()
+	if err != nil {
+		return fmt.Errorf("failed to get coordinator image: %w", err)
+	}
+	imageName := DockerImageToString(image)
+
+	// Create container with bind mount for source and volume mount for target
+	c, err := d.Docker.ContainerCreate(d.Context, &container.Config{
+		Image: imageName,
+		Cmd:   []string{"cp", "-r", "/source/.", "/target/"},
+		Labels: map[string]string{
+			"cyanprint.dev": "true",
+		},
+	}, &container.HostConfig{
+		NetworkMode: networkName,
+		Mounts: []mount.Mount{
+			{
+				Type:     "bind",
+				Source:   sourcePath,
+				Target:   "/source",
+				ReadOnly: true,
+			},
+			{
+				Type:   "volume",
+				Source: targetVolName,
+				Target: "/target",
+			},
+		},
+	}, nil, nil, name)
+	if err != nil {
+		return err
+	}
+
+	// Start container
+	err = d.Docker.ContainerStart(d.Context, c.ID, container.StartOptions{})
+	if err != nil {
+		return err
+	}
+
+	// Wait for completion and check exit status
+	statusCh, errCh := d.Docker.ContainerWait(d.Context, c.ID, container.WaitConditionNotRunning)
+	select {
+	case err := <-errCh:
+		if err != nil {
+			return err
+		}
+	case status := <-statusCh:
+		if status.StatusCode != 0 {
+			return fmt.Errorf("copy container failed with exit code %d", status.StatusCode)
+		}
+	}
+
+	// Remove container
+	return d.Docker.ContainerRemove(d.Context, c.ID, container.RemoveOptions{
+		Force: true,
+	})
+}
+
 func (d *DockerClient) RemoveContainer(cc DockerContainerReference) error {
 	name := DockerContainerToString(cc)
 	err := d.Docker.ContainerRemove(d.Context, name, container.RemoveOptions{
