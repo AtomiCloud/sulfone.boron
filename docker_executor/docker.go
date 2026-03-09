@@ -23,7 +23,7 @@ type DockerClient struct {
 
 const networkName = "cyanprint"
 
-func (d *DockerClient) WaitContainer(ref DockerContainerReference) error {
+func (d *DockerClient) WaitContainer(ref DockerContainerReference) (int, error) {
 
 	name := DockerContainerToString(ref)
 
@@ -31,12 +31,13 @@ func (d *DockerClient) WaitContainer(ref DockerContainerReference) error {
 	select {
 	case e := <-errCh:
 		if e != nil {
-			return e
+			return -1, e
 		}
-	case <-statusCh:
+	case status := <-statusCh:
+		return int(status.StatusCode), nil
 	}
 
-	return nil
+	return 0, nil
 
 }
 
@@ -270,6 +271,13 @@ func (d *DockerClient) CreateContainerWithCopyMount(
 		return err
 	}
 
+	// Ensure container is removed on all exit paths
+	defer func() {
+		_ = d.Docker.ContainerRemove(d.Context, c.ID, container.RemoveOptions{
+			Force: true,
+		})
+	}()
+
 	// Start container
 	err = d.Docker.ContainerStart(d.Context, c.ID, container.StartOptions{})
 	if err != nil {
@@ -289,10 +297,7 @@ func (d *DockerClient) CreateContainerWithCopyMount(
 		}
 	}
 
-	// Remove container
-	return d.Docker.ContainerRemove(d.Context, c.ID, container.RemoveOptions{
-		Force: true,
-	})
+	return nil
 }
 
 func (d *DockerClient) RemoveContainer(cc DockerContainerReference) error {

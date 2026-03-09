@@ -3,7 +3,7 @@ package docker_executor
 import (
 	"fmt"
 	"net/http"
-	"strings"
+	"sync"
 	"time"
 )
 
@@ -11,6 +11,9 @@ import (
 var httpClient = &http.Client{
 	Timeout: 5 * time.Second,
 }
+
+// sessionMutex protects session volume creation from race conditions
+var sessionMutex sync.Mutex
 
 type TryExecutor struct {
 	Docker  DockerClient
@@ -146,8 +149,10 @@ func (e *TryExecutor) populateBlobFromImage(blobVol DockerVolumeReference) error
 
 	// Wait for the unzip container to complete
 	fmt.Println("⚙️ Waiting for blob extraction to complete...")
-	if err := e.Docker.WaitContainer(cc); err != nil {
+	if exitCode, err := e.Docker.WaitContainer(cc); err != nil {
 		return fmt.Errorf("failed to extract blob from image: %w", err)
+	} else if exitCode != 0 {
+		return fmt.Errorf("unzip container failed with exit code %d", exitCode)
 	}
 	fmt.Println("✅ Blob extraction completed")
 
@@ -166,6 +171,10 @@ func (e *TryExecutor) createSessionVolume() (DockerVolumeReference, []error) {
 		CyanId:    e.Request.LocalTemplateId,
 		SessionId: e.Request.SessionId,
 	}
+
+	// Use mutex to ensure atomic check-and-create for session collision detection
+	sessionMutex.Lock()
+	defer sessionMutex.Unlock()
 
 	// Check if exists (collision detection)
 	volumes, err := e.Docker.ListVolumes()
@@ -237,7 +246,7 @@ func imageExistsInList(images []DockerImageReference, ref DockerImageReference) 
 }
 
 func (e *TryExecutor) warmResolvers() []error {
-	containers, _, err := e.Docker.ListContainer()
+	runningContainers, stoppedContainers, err := e.Docker.ListContainer()
 	if err != nil {
 		return []error{err}
 	}
@@ -259,8 +268,8 @@ func (e *TryExecutor) warmResolvers() []error {
 
 	var allErrs []error
 	for _, resolver := range uniqueResolvers {
-		// Check if container exists
-		missing, conRef := e.missingResolverContainer(resolver, containers)
+		// Check if container exists and is running
+		missing, conRef := e.missingResolverContainer(resolver, runningContainers, stoppedContainers)
 		if !missing {
 			fmt.Println("✅ Resolver container already running:", resolver.ID)
 			continue
@@ -293,23 +302,37 @@ func (e *TryExecutor) warmResolvers() []error {
 	return allErrs
 }
 
-func (e *TryExecutor) missingResolverContainer(resolver ResolverRes, containers []DockerContainerReference) (bool, DockerContainerReference) {
-	for _, c := range containers {
-		if c.CyanType == CyanTypeResolver && c.CyanId == resolver.ID {
-			return false, c
-		}
-	}
-	return true, DockerContainerReference{
+func (e *TryExecutor) missingResolverContainer(resolver ResolverRes, runningContainers, stoppedContainers []DockerContainerReference) (bool, DockerContainerReference) {
+	conRef := DockerContainerReference{
 		CyanId:    resolver.ID,
 		CyanType:  CyanTypeResolver,
 		SessionId: "",
 	}
+
+	// Check if container is running
+	for _, c := range runningContainers {
+		if c.CyanType == CyanTypeResolver && c.CyanId == resolver.ID {
+			return false, c
+		}
+	}
+
+	// Check if container exists but is stopped - need to restart
+	for _, c := range stoppedContainers {
+		if c.CyanType == CyanTypeResolver && c.CyanId == resolver.ID {
+			// Remove stopped container so it can be recreated
+			fmt.Println("🧹 Removing stopped resolver container:", resolver.ID)
+			_ = e.Docker.RemoveContainer(c) // best effort cleanup
+			break
+		}
+	}
+
+	return true, conRef
 }
 
 func (e *TryExecutor) missingResolverImage(resolver ResolverRes, images []DockerImageReference) (bool, DockerImageReference) {
 	ref := DockerImageReference{Reference: resolver.DockerReference, Tag: resolver.DockerTag}
 	for _, img := range images {
-		if strings.HasSuffix(img.Reference, ref.Reference) && img.Tag == ref.Tag {
+		if img.Reference == ref.Reference && img.Tag == ref.Tag {
 			return false, ref
 		}
 	}

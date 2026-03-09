@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	rt "runtime"
+	"strings"
 	"time"
 
 	"github.com/AtomiCloud/sulfone.boron/docker_executor"
@@ -24,6 +25,56 @@ func stringifyErrors(e []error) []string {
 		errs = append(errs, err.Error())
 	}
 	return errs
+}
+
+// validatePath ensures the given path is within the allow-listed DEV_ROOT directory.
+// It resolves symlinks to prevent bypass attempts through symbolic links.
+func validatePath(path string) (string, error) {
+	// Get DEV_ROOT from environment, default to current directory if not set
+	devRoot := os.Getenv("DEV_ROOT")
+	if devRoot == "" {
+		devRoot = "."
+	}
+
+	// Resolve DEV_ROOT to absolute path first
+	absDevRoot, err := filepath.Abs(devRoot)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve DEV_ROOT: %w", err)
+	}
+
+	// Resolve symlinks in DEV_ROOT to get the real path
+	realDevRoot, err := filepath.EvalSymlinks(absDevRoot)
+	if err != nil {
+		return "", fmt.Errorf("failed to evaluate symlinks in DEV_ROOT: %w", err)
+	}
+
+	// Resolve the requested path to an absolute path
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve path: %w", err)
+	}
+
+	// Resolve symlinks in the requested path to get the real path
+	realPath, err := filepath.EvalSymlinks(absPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to evaluate symlinks in path: %w", err)
+	}
+
+	// Check if the resolved real path is within the resolved DEV_ROOT
+	relPath, err := filepath.Rel(realDevRoot, realPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to compute relative path: %w", err)
+	}
+
+	// If the relative path escapes DEV_ROOT, reject it
+	// Check for: exactly "..", starts with "../" (or "..\" on Windows), or is absolute
+	if relPath == ".." ||
+		strings.HasPrefix(relPath, ".."+string(filepath.Separator)) ||
+		filepath.IsAbs(relPath) {
+		return "", fmt.Errorf("path '%s' is outside allowed DEV_ROOT '%s'", path, devRoot)
+	}
+
+	return absPath, nil
 }
 
 func server(registryEndpoint string) {
@@ -109,7 +160,7 @@ func server(registryEndpoint string) {
 
 	r.POST("/executor/try", func(ctx *gin.Context) {
 		var req docker_executor.TryExecutorReq
-		if err := ctx.BindJSON(&req); err != nil {
+		if err := ctx.ShouldBindJSON(&req); err != nil {
 			ctx.JSON(http.StatusBadRequest, ProblemDetails{
 				Title:   "Failed to bind request",
 				Status:  400,
@@ -152,16 +203,33 @@ func server(registryEndpoint string) {
 		}
 
 		// Validate path when source is "path"
-		if source == "path" && req.Path == "" {
-			ctx.JSON(http.StatusBadRequest, ProblemDetails{
-				Title:   "Missing path",
-				Status:  400,
-				Detail:  "path is required when source is 'path'",
-				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
-				TraceId: nil,
-				Data:    nil,
-			})
-			return
+		if source == "path" {
+			if req.Path == "" {
+				ctx.JSON(http.StatusBadRequest, ProblemDetails{
+					Title:   "Missing path",
+					Status:  400,
+					Detail:  "path is required when source is 'path'",
+					Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+					TraceId: nil,
+					Data:    nil,
+				})
+				return
+			}
+
+			// Validate path is within allow-listed DEV_ROOT
+			validatedPath, err := validatePath(req.Path)
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, ProblemDetails{
+					Title:   "Invalid path",
+					Status:  400,
+					Detail:  err.Error(),
+					Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+					TraceId: nil,
+					Data:    []string{req.Path},
+				})
+				return
+			}
+			req.Path = validatedPath
 		}
 
 		dCli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())

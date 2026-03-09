@@ -207,7 +207,7 @@ Setup a try/test session for local testing. Creates blob volume from local image
   "local_template_id": "local-abc123",
   "source": "image",
   "image_ref": {
-    "reference": "my-template:latest",
+    "reference": "my-template",
     "tag": "latest"
   },
   "template": {
@@ -297,6 +297,19 @@ Setup a try/test session for local testing. Creates blob volume from local image
   "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500",
   "trace_id": null,
   "data": ["error1", "error2"]
+}
+```
+
+### Response 503 Service Unavailable
+
+```json
+{
+  "title": "Failed to configure network",
+  "status": 503,
+  "detail": "Failed to start cyanprint Docker bridge network",
+  "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503",
+  "trace_id": null,
+  "data": ["error1"]
 }
 ```
 
