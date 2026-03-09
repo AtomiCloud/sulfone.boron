@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	rt "runtime"
+	"time"
 
 	"github.com/AtomiCloud/sulfone.boron/docker_executor"
 	"github.com/docker/docker/client"
@@ -378,8 +379,9 @@ func server(registryEndpoint string) {
 			ParallelismLimit: cpu,
 		}
 		exec := docker_executor.TemplateExecutor{
-			Docker:   d,
-			Template: template.Principal,
+			Docker:    d,
+			Template:  template.Principal,
+			Resolvers: template.Resolvers,
 		}
 		err = d.EnforceNetwork()
 		if err != nil {
@@ -426,9 +428,9 @@ func server(registryEndpoint string) {
 		reqBody, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			// Handle error
-			c.JSON(http.StatusBadGateway, ProblemDetails{
+			c.JSON(http.StatusBadRequest, ProblemDetails{
 				Title:   "Read request failed",
-				Status:  400,
+				Status:  http.StatusBadRequest,
 				Detail:  "Failed read the initial request body",
 				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
 				TraceId: nil,
@@ -472,7 +474,7 @@ func server(registryEndpoint string) {
 			return
 		}
 		fmt.Println("Status Code from upstream:", resp.StatusCode)
-		c.Data(resp.StatusCode, "Content-Type", body)
+		c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
 
 	})
 	r.POST("/proxy/template/:cyanId/api/template/validate", func(c *gin.Context) {
@@ -492,9 +494,9 @@ func server(registryEndpoint string) {
 		reqBody, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			// Handle error
-			c.JSON(http.StatusBadGateway, ProblemDetails{
+			c.JSON(http.StatusBadRequest, ProblemDetails{
 				Title:   "Read request failed",
-				Status:  400,
+				Status:  http.StatusBadRequest,
 				Detail:  "Failed read the initial request body",
 				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
 				TraceId: nil,
@@ -503,10 +505,11 @@ func server(registryEndpoint string) {
 			return
 		}
 
-		fmt.Println("📦 Request Body:", string(reqBody))
+		fmt.Println("📦 Request Body Size:", len(reqBody), "bytes")
 
 		// Forward the request body directly without reading it first
-		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
+		client := &http.Client{Timeout: 30 * time.Second}
+		resp, err := client.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
 		if err != nil {
 			// Handle error
 			c.JSON(http.StatusBadGateway, ProblemDetails{
@@ -537,7 +540,68 @@ func server(registryEndpoint string) {
 			})
 			return
 		}
-		c.Data(resp.StatusCode, "Content-Type", body)
+		c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
+	})
+
+	r.POST("/proxy/resolver/:cyanId/api/resolve", func(c *gin.Context) {
+
+		cyanId := c.Param("cyanId")
+		fmt.Println("📇 Resolver Cyan ID:", cyanId)
+
+		d := docker_executor.DockerContainerReference{
+			CyanId:    cyanId,
+			CyanType:  docker_executor.CyanTypeResolver,
+			SessionId: "",
+		}
+		endpoint := fmt.Sprintf("http://%s:%d/api/resolve", docker_executor.DockerContainerToString(d), docker_executor.ResolverPort)
+		fmt.Println("🌐 Upstream Endpoint:", endpoint)
+		fmt.Println("🆕 Start forwarding request...")
+
+		reqBody, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, ProblemDetails{
+				Title:   "Read request failed",
+				Status:  http.StatusBadRequest,
+				Detail:  "Failed read the initial request body",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400",
+				TraceId: nil,
+				Data:    []string{err.Error()},
+			})
+			return
+		}
+
+		fmt.Println("📦 Request Body Size:", len(reqBody), "bytes")
+
+		client := &http.Client{Timeout: 30 * time.Second}
+		resp, err := client.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
+		if err != nil {
+			c.JSON(http.StatusBadGateway, ProblemDetails{
+				Title:   "Upstream failed",
+				Status:  502,
+				Detail:  "Failed to forward request to upstream resolver",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502",
+				TraceId: nil,
+				Data:    []string{err.Error()},
+			})
+			return
+		}
+		defer func(Body io.ReadCloser) {
+			_ = Body.Close()
+		}(resp.Body)
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			c.JSON(http.StatusBadGateway, ProblemDetails{
+				Title:   "Upstream failed",
+				Status:  502,
+				Detail:  "Failed to read respond from upstream resolver",
+				Type:    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502",
+				TraceId: nil,
+				Data:    []string{err.Error()},
+			})
+			return
+		}
+		c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
 	})
 
 	// for merger

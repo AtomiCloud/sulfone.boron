@@ -14,7 +14,8 @@
 The warming system prepares resources ahead of execution:
 
 1. **Template warming** - Pre-pull template images, create template volume and container
-2. **Session warming** - Pre-pull processor/plugin images, create session volume
+2. **Resolver warming** - Pre-pull resolver images, create resolver containers
+3. **Session warming** - Pre-pull processor/plugin images, create session volume
 
 Warming happens via two endpoints:
 
@@ -44,8 +45,12 @@ flowchart TD
 
     I -->|Yes| J[Unzip volume]
     I -->|No| K[Done]
-    J --> L[Health check]
-    L --> K
+    J --> L[Health check template]
+    L --> M{Resolvers?}
+    M -->|Yes| N[Warm resolvers]
+    M -->|No| K
+    N --> O[Health check resolvers]
+    O --> K
 ```
 
 ### Detailed
@@ -69,16 +74,23 @@ sequenceDiagram
     D->>D: 8. Unzip volume contents
     TE->>D: 9. Start template container
     TE->>TE: 10. Health check on :5550
-    TE-->>S: 11. Template warmed
+
+    Note over TE,D: Resolver warming (for each resolver)
+    TE->>TE: 11. Check if resolver container exists
+    TE->>D: 12. Pull resolver image if missing
+    TE->>D: 13. Start resolver container if missing
+    TE->>TE: 14. Health check on :5553
+
+    TE-->>S: 15. Template warmed
 
     Note over S,E: Separate endpoint for session warming
 
-    S->>E: 12. POST /executor/:sessionId/warm
-    E->>D: 13. List images
-    E->>E: 14. Check missing processor/plugin images
-    E->>D: 15. Pull missing images (parallel)
-    E->>D: 16. Create session volume
-    E-->>S: 17. Session warmed
+    S->>E: 16. POST /executor/:sessionId/warm
+    E->>D: 17. List images
+    E->>E: 18. Check missing processor/plugin images
+    E->>D: 19. Pull missing images (parallel)
+    E->>D: 20. Create session volume
+    E-->>S: 21. Session warmed
 ```
 
 | #   | Step               | What                                         | Key File                   |
@@ -93,13 +105,17 @@ sequenceDiagram
 | 8   | Unzipped           | Volume populated with template files         | `template_executor.go:188` |
 | 9   | Template container | Start template API container                 | `template_executor.go:146` |
 | 10  | Health check       | Poll :5550 until 200 OK                      | `template_executor.go:338` |
-| 11  | Warmed             | Template ready for use                       | `template_executor.go:344` |
-| 12  | Warm session       | Server receives session warm request         | `server.go:248`            |
-| 13  | List images        | Query local images                           | `executor.go:388`          |
-| 14  | Check missing      | Identify processor/plugin images not present | `executor.go:396`          |
-| 15  | Pull images        | Download missing images in parallel          | `executor.go:407`          |
-| 16  | Create volume      | Create session-scoped volume                 | `executor.go:428`          |
-| 17  | Warmed             | Session ready for execution                  | `executor.go:450`          |
+| 11  | Check resolver     | Check if resolver container exists           | `template_executor.go:75`  |
+| 12  | Pull resolver      | Pull resolver image if missing               | `template_executor.go:401` |
+| 13  | Start resolver     | Start resolver container if missing          | `template_executor.go:408` |
+| 14  | Resolver health    | Poll :5553 until 200 OK                      | `template_executor.go:420` |
+| 15  | Warmed             | Template ready for use                       | `template_executor.go:428` |
+| 16  | Warm session       | Server receives session warm request         | `server.go:248`            |
+| 17  | List images        | Query local images                           | `executor.go:388`          |
+| 18  | Check missing      | Identify processor/plugin images not present | `executor.go:396`          |
+| 19  | Pull images        | Download missing images in parallel          | `executor.go:407`          |
+| 20  | Create volume      | Create session-scoped volume                 | `executor.go:428`          |
+| 21  | Warmed             | Session ready for execution                  | `executor.go:450`          |
 
 ## Template Warming
 
@@ -115,6 +131,24 @@ Prepares shared template resources:
 | Template container | `cyan-template-<uuid>`        | Template API server      |
 
 **Unzip process**: A "volume" container temporarily mounts the volume and extracts files from the blob image, then is removed.
+
+## Resolver Warming
+
+**Key File**: `template_executor.go:282` → `WarmTemplate()` (resolver warming happens after template warming)
+
+Prepares resolver containers for use during template execution:
+
+| Resource           | Name                        | Purpose             |
+| ------------------ | --------------------------- | ------------------- |
+| Resolver image     | `dockerReference:dockerTag` | Resolver container  |
+| Resolver container | `cyan-resolver-<uuid>`      | Resolver API server |
+
+Resolver warming happens as part of template warming, after the template container health check succeeds. Each resolver is:
+
+1. Checked for existing container
+2. Image pulled if missing
+3. Container started if missing
+4. Health checked on port 5553
 
 ## Session Warming
 
@@ -158,6 +192,11 @@ wg.Wait()
 | Container exists, volume missing | Recreates volume and container                     |
 | Network missing                  | Auto-creates `cyanprint` network                   |
 | Image pull fails                 | Returns error, partial resources may exist         |
+| Empty resolvers slice            | No resolver warming needed, continues normally     |
+| Resolver already running         | Idempotent, skips container creation               |
+| Resolver image pull fails        | Returns error, fails entire warm request           |
+| Resolver health check times out  | Returns error, fails entire warm request           |
+| Multiple resolvers               | Warms all sequentially, fails if any fail          |
 
 ## Related
 

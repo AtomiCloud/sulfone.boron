@@ -8,8 +8,9 @@ import (
 )
 
 type TemplateExecutor struct {
-	Docker   DockerClient
-	Template TemplateVersionPrincipalRes
+	Docker    DockerClient
+	Template  TemplateVersionPrincipalRes
+	Resolvers []ResolverRes
 }
 
 func (de TemplateExecutor) missingTemplateContainer(containers []DockerContainerReference) (bool, DockerContainerReference) {
@@ -62,6 +63,33 @@ func (de TemplateExecutor) missingTemplateImages(images []DockerImageReference) 
 	i := DockerImageReference{
 		Reference: template.Properties.TemplateDockerReference,
 		Tag:       template.Properties.TemplateDockerTag,
+	}
+	for _, image := range images {
+		if strings.HasSuffix(i.Reference, image.Reference) && image.Tag == i.Tag {
+			return false, i
+		}
+	}
+	return true, i
+}
+
+func (de TemplateExecutor) missingResolverContainer(resolver ResolverRes, containers []DockerContainerReference) (bool, DockerContainerReference) {
+	c := DockerContainerReference{
+		CyanType:  CyanTypeResolver,
+		CyanId:    resolver.ID,
+		SessionId: "",
+	}
+	for _, container := range containers {
+		if container.CyanType == CyanTypeResolver && container.CyanId == resolver.ID {
+			return false, c
+		}
+	}
+	return true, c
+}
+
+func (de TemplateExecutor) missingResolverImages(resolver ResolverRes, images []DockerImageReference) (bool, DockerImageReference) {
+	i := DockerImageReference{
+		Reference: resolver.DockerReference,
+		Tag:       resolver.DockerTag,
 	}
 	for _, image := range images {
 		if strings.HasSuffix(i.Reference, image.Reference) && image.Tag == i.Tag {
@@ -154,6 +182,18 @@ func (de TemplateExecutor) startContainer(conRef DockerContainerReference) error
 		return err
 	}
 
+	return nil
+}
+
+func (de TemplateExecutor) startResolverContainer(resolver ResolverRes, conRef DockerContainerReference) error {
+	imageRef := DockerImageReference{
+		Reference: resolver.DockerReference,
+		Tag:       resolver.DockerTag,
+	}
+	err := de.Docker.CreateContainer(conRef, imageRef)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -263,20 +303,20 @@ func (de TemplateExecutor) statusCheck(endpoint string, maxAttempts int) error {
 
 		if resp.StatusCode == http.StatusOK {
 			fmt.Println("✅ Health Check successful, Status code:", resp.StatusCode)
-			break // Escape from the loop if status code is 200
+			resp.Body.Close()
+			return nil // Success - escape from the loop
 		} else {
 			fmt.Println("🚨 Request failed! Status code:", resp.StatusCode)
+			resp.Body.Close()
 		}
-		if i == maxAttempts {
-			fmt.Println("🚨 Reached maximum attempts of", maxAttempts)
-			return fmt.Errorf("reached maximum attempts of %d", maxAttempts)
-		} else {
-			fmt.Println("⌛ Waiting for 1 second before next attempt...")
-			time.Sleep(1 * time.Second)
-		}
+
+		fmt.Println("⌛ Waiting for 1 second before next attempt...")
+		time.Sleep(1 * time.Second)
 	}
 
-	return nil
+	// If we get here, we exhausted all attempts without success
+	fmt.Println("🚨 Reached maximum attempts of", maxAttempts)
+	return fmt.Errorf("reached maximum attempts of %d without successful health check for %s", maxAttempts, endpoint)
 }
 
 func (de TemplateExecutor) WarmTemplate() []error {
@@ -341,6 +381,64 @@ func (de TemplateExecutor) WarmTemplate() []error {
 		return []error{err}
 	}
 	fmt.Println("✅ Template container is running")
+
+	// De-duplicate resolvers by ID before warming
+	seenResolvers := make(map[string]bool)
+	uniqueResolvers := make([]ResolverRes, 0, len(de.Resolvers))
+	for _, resolver := range de.Resolvers {
+		if !seenResolvers[resolver.ID] {
+			seenResolvers[resolver.ID] = true
+			uniqueResolvers = append(uniqueResolvers, resolver)
+		}
+	}
+
+	// Warm resolvers
+	for _, resolver := range uniqueResolvers {
+		if strings.TrimSpace(resolver.DockerReference) == "" || strings.TrimSpace(resolver.DockerTag) == "" {
+			return []error{fmt.Errorf("resolver %s is missing docker reference/tag", resolver.ID)}
+		}
+
+		resolverConMissing, resolverCon := de.missingResolverContainer(resolver, containerRefs)
+		resolverImageMissing, resolverImage := de.missingResolverImages(resolver, imageRefs)
+
+		if resolverConMissing {
+			fmt.Println("🚧 Resolver container is missing:", resolver.ID)
+		} else {
+			fmt.Println("✅ Resolver container exists:", resolver.ID)
+		}
+		if resolverImageMissing {
+			fmt.Println("🚧 Resolver image is missing:", resolver.ID)
+		} else {
+			fmt.Println("✅ Resolver image exists:", resolver.ID)
+		}
+
+		if resolverImageMissing {
+			errs = d.PullImages([]DockerImageReference{resolverImage})
+			if len(errs) > 0 {
+				return errs
+			}
+		}
+
+		if resolverConMissing {
+			fmt.Println("🚀 Starting Resolver container:", resolver.ID)
+			err := de.startResolverContainer(resolver, resolverCon)
+			if err != nil {
+				fmt.Println("🚨 Failed to start Resolver container:", resolver.ID, err)
+				return []error{err}
+			}
+			fmt.Println("✅ Resolver container started:", resolver.ID)
+		}
+
+		resolverRealName := DockerContainerToString(resolverCon)
+		fmt.Println("🔍 Checking if resolver container is running:", resolver.ID)
+		err := de.statusCheck(fmt.Sprintf("http://%s:%d/", resolverRealName, ResolverPort), 60)
+		if err != nil {
+			fmt.Println("🚨 Starting resolver container failed:", resolver.ID, err)
+			return []error{err}
+		}
+		fmt.Println("✅ Resolver container is running:", resolver.ID)
+	}
+
 	return nil
 
 }

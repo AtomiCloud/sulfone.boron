@@ -4,7 +4,7 @@
 
 Boron uses two separate processor lists that serve different purposes. Understanding why both exist is key to understanding the system's design.
 
-**Note:** This applies to processors, plugins, and child templates - all follow the same pattern.
+**Note:** This applies to processors, plugins, templates, and resolvers - all follow the same pattern.
 
 ## The Template Artifact
 
@@ -222,4 +222,4 @@ processors: ['cyan/default', 'atomi/typescript']
 3. **Template.Processors** = All processors that MIGHT be used (for warming)
 4. **Cyan.Processors** = Processors to ACTUALLY use (from script, dynamic)
 5. **Version resolution** = Script says `user/name[:version]` → registry finds ID → template validates
-6. **Same pattern** for processors, plugins, and child templates
+6. **Same pattern** for processors, plugins, child templates, and resolvers
