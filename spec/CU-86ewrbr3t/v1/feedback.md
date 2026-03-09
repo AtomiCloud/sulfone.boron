@@ -2,7 +2,7 @@
 
 ## FB1: ResolverRes Missing Config and Files Fields
 
-**Status**: ❌ Not Addressed
+**Status**: ✅ Addressed
 **Severity**: High
 **Source**: Zinc Registry Swagger (`localhost:9001`)
 

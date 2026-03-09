@@ -5,8 +5,9 @@
 **Scope:** Single struct change - add `Config` and `Files` fields to existing `ResolverRes` struct
 
 **Files to modify:**
-| File | Changes |
-| ---- | ------- |
+
+| File                        | Changes                                                 |
+| --------------------------- | ------------------------------------------------------- |
 | `docker_executor/models.go` | Add `Config` and `Files` fields to `ResolverRes` struct |
 
 **Implementation:**

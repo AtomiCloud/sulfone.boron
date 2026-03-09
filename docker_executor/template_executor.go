@@ -394,6 +394,10 @@ func (de TemplateExecutor) WarmTemplate() []error {
 
 	// Warm resolvers
 	for _, resolver := range uniqueResolvers {
+		if strings.TrimSpace(resolver.DockerReference) == "" || strings.TrimSpace(resolver.DockerTag) == "" {
+			return []error{fmt.Errorf("resolver %s is missing docker reference/tag", resolver.ID)}
+		}
+
 		resolverConMissing, resolverCon := de.missingResolverContainer(resolver, containerRefs)
 		resolverImageMissing, resolverImage := de.missingResolverImages(resolver, imageRefs)
 

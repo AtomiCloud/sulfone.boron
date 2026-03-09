@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	rt "runtime"
+	"time"
 
 	"github.com/AtomiCloud/sulfone.boron/docker_executor"
 	"github.com/docker/docker/client"
@@ -473,7 +474,7 @@ func server(registryEndpoint string) {
 			return
 		}
 		fmt.Println("Status Code from upstream:", resp.StatusCode)
-		c.Data(resp.StatusCode, "Content-Type", body)
+		c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
 
 	})
 	r.POST("/proxy/template/:cyanId/api/template/validate", func(c *gin.Context) {
@@ -504,10 +505,11 @@ func server(registryEndpoint string) {
 			return
 		}
 
-		fmt.Println("📦 Request Body:", string(reqBody))
+		fmt.Println("📦 Request Body Size:", len(reqBody), "bytes")
 
 		// Forward the request body directly without reading it first
-		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
+		client := &http.Client{Timeout: 30 * time.Second}
+		resp, err := client.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
 		if err != nil {
 			// Handle error
 			c.JSON(http.StatusBadGateway, ProblemDetails{
@@ -538,7 +540,7 @@ func server(registryEndpoint string) {
 			})
 			return
 		}
-		c.Data(resp.StatusCode, "Content-Type", body)
+		c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
 	})
 
 	r.POST("/proxy/resolver/:cyanId/api/resolve", func(c *gin.Context) {
@@ -568,9 +570,10 @@ func server(registryEndpoint string) {
 			return
 		}
 
-		fmt.Println("📦 Request Body:", string(reqBody))
+		fmt.Println("📦 Request Body Size:", len(reqBody), "bytes")
 
-		resp, err := http.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
+		client := &http.Client{Timeout: 30 * time.Second}
+		resp, err := client.Post(endpoint, c.GetHeader("Content-Type"), bytes.NewBuffer(reqBody))
 		if err != nil {
 			c.JSON(http.StatusBadGateway, ProblemDetails{
 				Title:   "Upstream failed",
@@ -598,7 +601,7 @@ func server(registryEndpoint string) {
 			})
 			return
 		}
-		c.Data(resp.StatusCode, "Content-Type", body)
+		c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
 	})
 
 	// for merger
