@@ -1,3 +1,25 @@
+## [2.6.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.5.0...v2.6.0) (2026-03-09)
+
+
+### 📜 Documentation 📜
+
+* add task spec and implementation plan for CU-86ewrbr3t ([9b73155](https://github.com/AtomiCloud/sulfone.boron/commit/9b73155eea7c6f2a48e45ba976298b10b5930897))
+* **spec:** add v1 feedback for resolver coordinator ([136b882](https://github.com/AtomiCloud/sulfone.boron/commit/136b882c8eca280e4588714a167c5c051affdc72))
+* add v2 implementation plans for CU-86ewrbr3t ([896c2bd](https://github.com/AtomiCloud/sulfone.boron/commit/896c2bd378e6fbda3ea7572e40ed8cd13bebe33b))
+
+
+### ✨ Features ✨
+
+* **resolver:** implement resolver coordinator for warming and proxying ([9b71d5a](https://github.com/AtomiCloud/sulfone.boron/commit/9b71d5a320ad38bda220e7e45e1c246e41991ca0))
+
+
+### 🐛 Bug Fixes 🐛
+
+* address coderabbit local review findings ([78ce85b](https://github.com/AtomiCloud/sulfone.boron/commit/78ce85bdb5caeae15135970772a09bfbcd47ea7f))
+* address CodeRabbit local review findings ([a71992a](https://github.com/AtomiCloud/sulfone.boron/commit/a71992a70d21eded9548f227a44e2760233689e5))
+* **resolver:** address CodeRabbit review feedback ([ed29940](https://github.com/AtomiCloud/sulfone.boron/commit/ed299405201e4e7f489c6f45e283adf73b34ecb5))
+* **resolver:** de-duplicate resolvers before warming ([6820579](https://github.com/AtomiCloud/sulfone.boron/commit/6820579af994b74cc8ab0f9e9be1e17597bf6690))
+
 ## [2.5.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.4.1...v2.5.0) (2026-03-09)
 
 
