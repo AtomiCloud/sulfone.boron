@@ -382,8 +382,18 @@ func (de TemplateExecutor) WarmTemplate() []error {
 	}
 	fmt.Println("✅ Template container is running")
 
-	// Warm resolvers
+	// De-duplicate resolvers by ID before warming
+	seenResolvers := make(map[string]bool)
+	uniqueResolvers := make([]ResolverRes, 0, len(de.Resolvers))
 	for _, resolver := range de.Resolvers {
+		if !seenResolvers[resolver.ID] {
+			seenResolvers[resolver.ID] = true
+			uniqueResolvers = append(uniqueResolvers, resolver)
+		}
+	}
+
+	// Warm resolvers
+	for _, resolver := range uniqueResolvers {
 		resolverConMissing, resolverCon := de.missingResolverContainer(resolver, containerRefs)
 		resolverImageMissing, resolverImage := de.missingResolverImages(resolver, imageRefs)
 
