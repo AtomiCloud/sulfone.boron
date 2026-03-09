@@ -74,7 +74,7 @@ func validatePath(path string) (string, error) {
 		return "", fmt.Errorf("path '%s' is outside allowed DEV_ROOT '%s'", path, devRoot)
 	}
 
-	return absPath, nil
+	return realPath, nil
 }
 
 func server(registryEndpoint string) {
