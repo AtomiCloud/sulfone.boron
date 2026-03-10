@@ -6,10 +6,10 @@
 
 ## Files to Modify
 
-| File | Changes |
-|------|---------|
-| `go.mod` | Add `github.com/bmatcuk/doublestar/v4` dependency |
-| `docker_executor/model.go` | Add resolver request/response data structures |
+| File                        | Changes                                                                  |
+| --------------------------- | ------------------------------------------------------------------------ |
+| `go.mod`                    | Add `github.com/bmatcuk/doublestar/v4` dependency                        |
+| `docker_executor/model.go`  | Add resolver request/response data structures                            |
 | `docker_executor/merger.go` | Rewrite `MergeFiles()` to detect conflicts, match resolvers, and resolve |
 
 ## Implementation Approach
@@ -27,6 +27,7 @@ require github.com/bmatcuk/doublestar/v4
 Run `go mod tidy` to add dependency.
 
 **Why:** Go's `path/filepath.Match()` does NOT support `**` globstar. Research found:
+
 - **Helium** uses `glob` v11 (Node.js) - supports `**`
 - **Iridium** uses `glob` v0.3 (Rust) - supports `**`
 - We need compatibility across CyanPrint ecosystem
@@ -200,11 +201,13 @@ import "github.com/bmatcuk/doublestar/v4"
 ```
 
 `doublestar.Match()` supports:
+
 - Standard patterns: `*`, `?`, `[...]`, `{a,b}`
 - **Recursive patterns**: `**` matches files at any depth
 - Pattern matching applied to full file paths
 
 **Examples of expected behavior:**
+
 - `**/*.json` - matches any `.json` file at any depth (recursive)
 - `*.json` - matches any `.json` file in current directory
 - `package.json` - matches exactly `package.json`
@@ -217,38 +220,44 @@ import "github.com/bmatcuk/doublestar/v4"
 
 All errors fail entire merge:
 
-| Error | Message |
-|-------|----------|
-| Multiple resolvers match | "Multiple resolvers match conflicting file '{path}': [id1, id2]. Template resolver configuration may be misconfigured." |
-| Resolver container not running | "Resolver container for '{id}' not found or not running" |
-| Resolver call fails (non-200) | "Resolver call failed for '{file-path}': {status} {body}" |
-| Resolver returns wrong path | "Resolver returned invalid path: expected '{expected}', got '{actual}'" |
-| File read error | "Failed to read file '{path}': {error}" |
+| Error                          | Message                                                                                                                 |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Multiple resolvers match       | "Multiple resolvers match conflicting file '{path}': [id1, id2]. Template resolver configuration may be misconfigured." |
+| Resolver container not running | "Resolver container for '{id}' not found or not running"                                                                |
+| Resolver call fails (non-200)  | "Resolver call failed for '{file-path}': {status} {body}"                                                               |
+| Resolver returns wrong path    | "Resolver returned invalid path: expected '{expected}', got '{actual}'"                                                 |
+| File read error                | "Failed to read file '{path}': {error}"                                                                                 |
 
 ### Edge Cases
 
 ### Empty Processors
+
 - If `fromDirs` is empty, succeed with no output
 - If all directories are empty, create empty merge directory
 
 ### Identical File Contents
+
 - Even if file contents are identical across processors, still call resolver
 - Let resolver decide how to handle identical versions
 
 ### Nested File Paths
+
 - File paths include directory structure (e.g., `src/config.json`)
 - Conflicts determined by full path (not just filename)
 - Copy maintains directory structure in merge output
 
 ### Resolvers with Empty Config
+
 - Resolver with `Config: null` or `Config: {}` is valid
 - Pass empty config object in request
 
 ### Many Conflicts
+
 - Handle large numbers of conflicts efficiently
 - One resolver call per conflict (not parallel - fail-fast on errors)
 
 ### Non-Matching Resolver Pattern
+
 - LWW behavior logged at info level
 - Maintain backward compatibility
 
@@ -285,30 +294,35 @@ go mod verify
 ### Manual Testing
 
 1. **Test LWW (no resolvers):**
+
    - Create template with `resolvers: []`
    - Create processors with conflicting outputs
    - Run merge
    - Verify last processor's file wins
 
 2. **Test resolver call (1 resolver):**
+
    - Create template with 1 resolver matching `**/*.json`
    - Create processors with conflicting `package.json` outputs
    - Run merge
    - Verify resolver is called and resolved content is written
 
 3. **Test multiple conflicts (1 resolver):**
+
    - Create template with 1 resolver
    - Create processors with conflicts on `package.json`, `tsconfig.json`
    - Run merge
    - Verify 2 separate resolver calls are made
 
 4. **Test multiple resolvers (ERROR):**
+
    - Create template with 2 overlapping resolvers for `*.json`
    - Create processors with conflicting `package.json` outputs
    - Run merge
    - Verify error is returned with matching resolver IDs
 
 5. **Test glob patterns:**
+
    - Create template with resolver using `**/*.json`
    - Verify `src/config.json` matches (recursive)
    - Verify `package.json` matches (exact)

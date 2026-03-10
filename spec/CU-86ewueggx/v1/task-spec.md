@@ -17,6 +17,7 @@ When multiple processors output same file path (e.g., `package.json`), MERGER us
 ### Desired Behavior
 
 The MERGER should:
+
 1. Detect all file conflicts across all processor outputs
 2. For each unique conflicted file path, determine if a resolver applies
 3. Call applicable resolver ONCE per conflicted file with ALL versions
@@ -48,11 +49,11 @@ For each conflicted file, determine which resolver (if any) should handle it.
 
 **Resolver matching rules:**
 
-| Matchers | Action |
-|----------|--------|
-| Exactly 1 resolver | Include this file in resolver call |
-| 0 resolvers | Exclude from resolver call; use LWW |
-| 2+ resolvers | ERROR (template misconfiguration) |
+| Matchers           | Action                              |
+| ------------------ | ----------------------------------- |
+| Exactly 1 resolver | Include this file in resolver call  |
+| 0 resolvers        | Exclude from resolver call; use LWW |
+| 2+ resolvers       | ERROR (template misconfiguration)   |
 
 **Rationale for ERROR on 2+ resolvers:** Single-template scope means one author with perfect information configured overlapping patterns → mistake, not ambiguity.
 
@@ -134,12 +135,12 @@ Files that appear in only ONE processor output are not involved in resolution.
 
 Resolver failures fail entire merge operation.
 
-| Error Scenario | Action |
-|----------------|--------|
-| Multiple resolvers match same file | ERROR: fail merge with descriptive message |
-| Resolver container not running | ERROR: fail merge |
-| Resolver call fails (non-200, timeout) | ERROR: fail merge |
-| Resolver returns invalid/unexpected data | ERROR: fail merge |
+| Error Scenario                           | Action                                     |
+| ---------------------------------------- | ------------------------------------------ |
+| Multiple resolvers match same file       | ERROR: fail merge with descriptive message |
+| Resolver container not running           | ERROR: fail merge                          |
+| Resolver call fails (non-200, timeout)   | ERROR: fail merge                          |
+| Resolver returns invalid/unexpected data | ERROR: fail merge                          |
 
 **No fallback to LWW on resolver errors** - fail fast to surface configuration issues.
 
@@ -164,6 +165,7 @@ Templates without resolvers work exactly as before.
 ### Deterministic Layering
 
 Processor order determines layer order:
+
 - First processor in `req.Cyan.Processors` = layer 0 (bottom)
 - Last processor = layer N (top)
 - Layer information is included in resolver request for merge strategy
@@ -224,6 +226,7 @@ Resolvers are stateless containers warmed alongside templates.
 **Template:** Has resolver with `files: ["**/*.json"]`
 
 **Processor outputs:**
+
 - Processor 0: `package.json`, `app.js`, `utils.js`
 - Processor 1: `package.json`, `styles.css`, `index.html`
 - Processor 2: `config.json`
@@ -231,6 +234,7 @@ Resolvers are stateless containers warmed alongside templates.
 **Conflicts detected:** `package.json` (Processor 0, 1)
 
 **Resolver call includes:**
+
 - Both versions of `package.json` (from Processor 0 and 1)
 - Layer info: Processor 0 = layer 0, Processor 1 = layer 1
 
@@ -243,6 +247,7 @@ Resolvers are stateless containers warmed alongside templates.
 **Template:** Has resolver with `files: ["**/*.yaml"]`
 
 **Processor outputs:**
+
 - Processor 0: `config.json`
 - Processor 1: `config.json`
 
@@ -253,8 +258,9 @@ Resolvers are stateless containers warmed alongside templates.
 ### Example 3: Multiple Resolvers Match (ERROR)
 
 **Template:**
+
 - Resolver A: `files: ["**/*.json"]`
-- Resolver B: `files: ["package.json"]`  // Overlaps!
+- Resolver B: `files: ["package.json"]` // Overlaps!
 
 **Conflict:** `package.json` from multiple processors
 
@@ -265,12 +271,14 @@ Resolvers are stateless containers warmed alongside templates.
 **Template:** Has resolver with `files: ["**/*.json"]`
 
 **Processor outputs:**
+
 - Processor 0: `package.json`, `tsconfig.json`, `app.js`
 - Processor 1: `package.json`, `tsconfig.json`, `styles.css`
 
 **Conflicts:** `package.json`, `tsconfig.json` (both appear in Processor 0 and 1)
 
 **Resolver calls:**
+
 - Request 1: `package.json` with versions from Processor 0, 1
 - Request 2: `tsconfig.json` with versions from Processor 0, 1
 
