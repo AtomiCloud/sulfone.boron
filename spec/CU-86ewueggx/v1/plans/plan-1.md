@@ -2,15 +2,15 @@
 
 **Goal:** Enable MERGER to detect conflicts and call resolvers to intelligently merge conflicting files.
 
-**Scope:** Add resolver conflict detection and resolution to the MERGER component.
+**Scope:** Add resolver conflict detection and resolution to MERGER component.
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
+| `go.mod` | Add `github.com/bmatcuk/doublestar/v4` dependency |
 | `docker_executor/model.go` | Add resolver request/response data structures |
 | `docker_executor/merger.go` | Rewrite `MergeFiles()` to detect conflicts, match resolvers, and resolve |
-| `go.mod` | Add `github.com/bmatcuk/doublestar/v4` dependency |
 
 ## Implementation Approach
 
@@ -21,12 +21,17 @@
 **In `go.mod`:**
 
 ```
-require github.com/bmatcuk/doublestar/v4 v4.x.x
+require github.com/bmatcuk/doublestar/v4
 ```
 
-Run `go mod tidy` to add the dependency.
+Run `go mod tidy` to add dependency.
 
-**Why:** Go's `path/filepath.Match()` does NOT support `**` globstar. Helium uses `glob` v11 (Node.js) and Iridium uses `glob` v0.3 (Rust) - both support `**`. Using `doublestar` ensures compatibility.
+**Why:** Go's `path/filepath.Match()` does NOT support `**` globstar. Research found:
+- **Helium** uses `glob` v11 (Node.js) - supports `**`
+- **Iridium** uses `glob` v0.3 (Rust) - supports `**`
+- We need compatibility across CyanPrint ecosystem
+
+`doublestar` provides globstar (`**`) support compatible with both.
 
 ### Step 1: Add Resolver Models
 
@@ -34,7 +39,7 @@ Run `go mod tidy` to add the dependency.
 
 **In `docker_executor/model.go`:**
 
-Add the following structs after existing model definitions:
+Add following structs after existing model definitions:
 
 ```go
 // ResolverFile represents a file version sent to resolver
@@ -108,7 +113,7 @@ func (m Merger) MergeFiles(fromDirs []string, mergeDir string) error {
         if len(matchingResolver) == 0 {
             // LWW: use last version
             lastVersion := fileMap[conflictPath][len(fileMap[conflictPath])-1]
-            copy last version to mergeDir
+            copyFile(lastVersion, filepath.Join(mergeDir, conflictPath))
         } else if len(matchingResolver) == 1 {
             // Call resolver with all versions
             resolver := matchingResolver[0]
@@ -119,7 +124,10 @@ func (m Merger) MergeFiles(fromDirs []string, mergeDir string) error {
             }
             response, err := callResolver(resolver.ID, request)
             if err != nil { return err }
-            write resolved content to mergeDir
+
+            // Write resolved content to merge directory
+            err = os.WriteFile(filepath.Join(mergeDir, response.Path), response.Content, 0644)
+            if err != nil { return err }
         } else {
             // Multiple resolvers match - ERROR
             return fmt.Errorf("multiple resolvers match conflicting file '%s': %+v",
@@ -129,7 +137,8 @@ func (m Merger) MergeFiles(fromDirs []string, mergeDir string) error {
 
     // Step 4: Copy non-conflicts
     for _, path := range nonConflicts {
-        copy directly to mergeDir
+        version := fileMap[path][0]
+        copyFile(version, filepath.Join(mergeDir, path))
     }
 
     return nil
@@ -141,29 +150,6 @@ func (m Merger) MergeFiles(fromDirs []string, mergeDir string) error {
 ```go
 func findMatchingResolver(path string, resolvers []ResolverRes) []ResolverRes {
     // Use doublestar.Match() for globstar-compatible matching
-    // Return all resolvers that match the file path
-}
-
-func buildResolverFiles(path string, versions []processorFile) []ResolverFile {
-    // Read file contents from each processor output
-    // Build ResolverFile structs with layer info
-}
-
-func callResolver(resolverID string, req ResolverRequest) (*ResolverResponse, error) {
-    // HTTP POST to resolver container
-    // Container name: "cyan-resolver-{id-without-dashes}"
-    // Endpoint: "http://...:5553/api/resolve"
-}
-```
-
-### Step 3: Glob Pattern Matching
-
-**Use `doublestar.Match()` for resolver pattern matching.**
-
-```go
-import "github.com/bmatcuk/doublestar/v4"
-
-func findMatchingResolver(path string, resolvers []ResolverRes) []ResolverRes {
     var matches []ResolverRes
     for _, resolver := range resolvers {
         for _, pattern := range resolver.Files {
@@ -176,11 +162,47 @@ func findMatchingResolver(path string, resolvers []ResolverRes) []ResolverRes {
     }
     return matches
 }
+
+func buildResolverFiles(path string, versions []processorFile) []ResolverFile {
+    // Read file contents from each processor output
+    var files []ResolverFile
+    for i, version := range versions {
+        content, err := os.ReadFile(version.Path)
+        if err != nil { return nil } // Let caller handle error
+        files = append(files, ResolverFile{
+            Path:    path,
+            Content: string(content),
+            Origin:  ResolverOrigin{
+                Template: version.Template,
+                Layer:    i,
+            },
+        })
+    }
+    return files
+}
+
+func callResolver(resolverID string, req ResolverRequest) (*ResolverResponse, error) {
+    // HTTP POST to resolver container
+    containerName := fmt.Sprintf("cyan-resolver-%s", stripDashes(resolverID))
+    endpoint := fmt.Sprintf("http://%s:5553/api/resolve", containerName)
+
+    // Use PostJSON generic function from existing code
+    return PostJSON[ResolverRequest, ResolverResponse](endpoint, req)
+}
 ```
 
-**Globstar support:** `doublestar.Match()` supports `**` for recursive matching, compatible with:
-- Helium's `glob` package (Node.js)
-- Iridium's `glob` crate (Rust)
+### Step 3: Glob Pattern Matching
+
+**Use `doublestar.Match()` for globstar-compatible matching.**
+
+```go
+import "github.com/bmatcuk/doublestar/v4"
+```
+
+`doublestar.Match()` supports:
+- Standard patterns: `*`, `?`, `[...]`, `{a,b}`
+- **Recursive patterns**: `**` matches files at any depth
+- Pattern matching applied to full file paths
 
 **Examples of expected behavior:**
 - `**/*.json` - matches any `.json` file at any depth (recursive)
@@ -188,6 +210,8 @@ func findMatchingResolver(path string, resolvers []ResolverRes) []ResolverRes {
 - `package.json` - matches exactly `package.json`
 - `config/*.yaml` - matches YAML files in `config/` directory
 - `src/**/*.go` - matches `.go` files in `src/**/` (recursive)
+
+**Pattern compatibility:** Uses same glob syntax as Helium's `glob` package and Iridium's `glob` crate, ensuring consistent behavior across CyanPrint ecosystem.
 
 ### Step 4: Error Handling
 
@@ -201,7 +225,7 @@ All errors fail entire merge:
 | Resolver returns wrong path | "Resolver returned invalid path: expected '{expected}', got '{actual}'" |
 | File read error | "Failed to read file '{path}': {error}" |
 
-## Edge Cases
+### Edge Cases
 
 ### Empty Processors
 - If `fromDirs` is empty, succeed with no output
@@ -241,10 +265,24 @@ All errors fail entire merge:
 - `copyFile()` function can be reused for non-conflict files
 - `PostJSON[Req, Res]` generic function already exists for HTTP calls
 - Container naming from `DockerContainerToString()` and `DockerContainerReference`
+- `stripDashes()` from existing code
 
 ## Testing Strategy
 
-Since no test infrastructure exists, verify manually:
+### Build & Validation
+
+```bash
+# Build project
+go build
+
+# Run pre-commit on all files
+pre-commit run --all-files
+
+# Verify doublestar library is included
+go mod verify
+```
+
+### Manual Testing
 
 1. **Test LWW (no resolvers):**
    - Create template with `resolvers: []`
@@ -254,31 +292,31 @@ Since no test infrastructure exists, verify manually:
 
 2. **Test resolver call (1 resolver):**
    - Create template with 1 resolver matching `**/*.json`
-   - Create processors with conflicting `package.json`
+   - Create processors with conflicting `package.json` outputs
    - Run merge
    - Verify resolver is called and resolved content is written
 
-3. **Test multiple conflicts:**
-   - Create template with 1 resolver matching `**/*.json`
+3. **Test multiple conflicts (1 resolver):**
+   - Create template with 1 resolver
    - Create processors with conflicts on `package.json`, `tsconfig.json`
    - Run merge
    - Verify 2 separate resolver calls are made
 
 4. **Test multiple resolvers (ERROR):**
    - Create template with 2 overlapping resolvers for `*.json`
-   - Create processors with conflicting `package.json`
+   - Create processors with conflicting `package.json` outputs
    - Run merge
-   - Verify error is returned
+   - Verify error is returned with matching resolver IDs
 
 5. **Test glob patterns:**
-   - Verify `**/*.json` matches recursively (e.g., `src/config.json`)
-   - Verify `*.json` matches `.json` files in current directory only
-   - Verify nested patterns like `config/*.yaml` work
+   - Create template with resolver using `**/*.json`
+   - Verify `src/config.json` matches (recursive)
+   - Verify `package.json` matches (exact)
+   - Verify `*.json` matches only current directory (not recursive)
 
 6. **Test globstar compatibility:**
-   - Use same patterns as Helium/Iridium examples
-   - Verify `**/tsconfig.json` matches at any depth
-   - Verify `**/*.json` matches all `.json` files recursively
+   - Run merge with nested paths
+   - Verify behavior matches Helium/Iridium expectations
 
 ## Implementation Checklist
 
@@ -294,17 +332,29 @@ Since no test infrastructure exists, verify manually:
 - [ ] Implement `findMatchingResolver()` with `doublestar.Match()`
 - [ ] Implement resolver container name construction
 - [ ] Implement `callResolver()` with HTTP POST
+- [ ] Implement `buildResolverFiles()` to read file contents
 - [ ] Implement LWW fallback for non-matched conflicts
 - [ ] Implement error for multiple resolver matches
-- [ ] Handle and propagate resolver errors
+- [ ] Implement error handling and propagation
 - [ ] Copy non-conflict files directly
+
+### Build & Validation
+
+- [ ] Run `go mod tidy` to add doublestar dependency
+- [ ] Run `go build` to verify project builds
+- [ ] Run `pre-commit run --all-files` to validate all files
+- [ ] Run `go mod verify` to verify dependencies
+
+### Documentation
+
+- [ ] Update relevant documentation to reflect resolver support in MERGER
+- [ ] Check if any API documentation needs updating
 
 ### Testing
 
 - [ ] Manual test: LWW behavior (no resolvers)
 - [ ] Manual test: Single resolver call
 - [ ] Manual test: Multiple conflicts with 1 resolver
-- [ ] Manual test: Multiple resolvers match (ERROR case)
-- [ ] Manual test: Glob pattern matching behavior
-- [ ] Manual test: Globstar recursive matching (`**/*.json`)
-- [ ] Manual test: Pattern compatibility with Helium/Iridium
+- [ ] Manual test: Multiple resolvers match (ERROR)
+- [ ] Manual test: Glob patterns (`**/*.json`, `*.json`, `package.json`)
+- [ ] Manual test: Globstar compatibility with Helium/Iridium
