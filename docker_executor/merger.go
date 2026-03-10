@@ -151,7 +151,11 @@ func callResolver(resolverID string, sessionID string, req ResolverRequest) (*Re
 		}
 		// For other errors, format as "Resolver call failed for '{file-path}': {error}"
 		// PostJSON returns "{code} {body}" for non-200 status codes
-		return nil, fmt.Errorf("Resolver call failed for '%s': %s", req.Files[0].Path, err.Error())
+		filePath := "unknown"
+		if len(req.Files) > 0 {
+			filePath = req.Files[0].Path
+		}
+		return nil, fmt.Errorf("Resolver call failed for '%s': %s", filePath, err.Error())
 	}
 
 	return &response, nil
