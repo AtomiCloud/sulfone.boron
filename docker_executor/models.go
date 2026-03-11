@@ -67,18 +67,18 @@ type TemplatePrincipalRes struct {
 
 // TryExecutorReq is the request body for POST /executor/try
 type TryExecutorReq struct {
-	SessionId       string                `json:"session_id" binding:"required"`
-	LocalTemplateId string                `json:"local_template_id" binding:"required"`
+	SessionId       string                `json:"sessionId" binding:"required"`
+	LocalTemplateId string                `json:"localTemplateId" binding:"required"`
 	Source          string                `json:"source"` // "image" (default) or "path"
-	ImageRef        *DockerImageReference `json:"image_ref"`
+	ImageRef        *DockerImageReference `json:"imageRef"`
 	Path            string                `json:"path"`
 	Template        TemplateVersionRes    `json:"template" binding:"required"`
-	MergerId        string                `json:"merger_id" binding:"required"`
+	MergerId        string                `json:"mergerId" binding:"required"`
 }
 
 // TryExecutorRes is the response for POST /executor/try
 type TryExecutorRes struct {
-	SessionId     string                `json:"session_id"`
-	BlobVolume    DockerVolumeReference `json:"blob_volume"`
-	SessionVolume DockerVolumeReference `json:"session_volume"`
+	SessionId     string                `json:"sessionId"`
+	BlobVolume    DockerVolumeReference `json:"blobVolume"`
+	SessionVolume DockerVolumeReference `json:"sessionVolume"`
 }

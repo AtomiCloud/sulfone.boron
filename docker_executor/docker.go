@@ -129,10 +129,13 @@ func (d *DockerClient) GetCoordinatorImage() (DockerImageReference, error) {
 	var latest imageTypes.Summary
 
 	for _, image := range images {
+		// Skip images without repo tags (dangling/untagged images)
+		if len(image.RepoTags) == 0 {
+			continue
+		}
 		if latest.Created < image.Created {
 			latest = image
 		}
-
 	}
 
 	for _, tag := range latest.RepoTags {
@@ -337,12 +340,13 @@ func (d *DockerClient) RemoveAllContainers(containerRefs []DockerContainerRefere
 		}(i, containerRef)
 	}
 
-	// Initialize slice with nil values to preserve order
-	allErr := make([]error, len(containerRefs))
+	var allErr []error
 
 	for i := 0; i < len(containerRefs); i++ {
 		ie := <-errChan
-		allErr[ie.index] = ie.err
+		if ie.err != nil {
+			allErr = append(allErr, ie.err)
+		}
 	}
 
 	for i := 0; i < cap(semaphore); i++ {
@@ -383,12 +387,13 @@ func (d *DockerClient) RemoveAllVolumes(volRefs []DockerVolumeReference) []error
 		}(i, volRef)
 	}
 
-	// Initialize slice with nil values to preserve order
-	allErr := make([]error, len(volRefs))
+	var allErr []error
 
 	for i := 0; i < len(volRefs); i++ {
 		ie := <-errChan
-		allErr[ie.index] = ie.err
+		if ie.err != nil {
+			allErr = append(allErr, ie.err)
+		}
 	}
 
 	for i := 0; i < cap(semaphore); i++ {

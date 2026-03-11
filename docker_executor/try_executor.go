@@ -57,12 +57,6 @@ func (e *TryExecutor) TrySetup() (TryExecutorRes, []error) {
 		return TryExecutorRes{}, errs
 	}
 
-	// 5. Start merger
-	err := e.startMerger(blobVol, sessionVol)
-	if err != nil {
-		return TryExecutorRes{}, []error{err}
-	}
-
 	return TryExecutorRes{
 		SessionId:     e.Request.SessionId,
 		BlobVolume:    blobVol,
@@ -128,22 +122,26 @@ func (e *TryExecutor) populateBlobFromPath(blobVol DockerVolumeReference) error 
 }
 
 func (e *TryExecutor) populateBlobFromImage(blobVol DockerVolumeReference) error {
-	if e.Request.ImageRef == nil {
-		return fmt.Errorf("image_ref is required when source is 'image'")
+	props := e.Request.Template.Principal.Properties
+	if props == nil {
+		return fmt.Errorf("template properties are required for blob extraction")
 	}
 
-	// Use existing unzip pattern from template_executor.go
-	// Create container that extracts tarball from image to volume
+	blobImage := DockerImageReference{
+		Reference: props.BlobDockerReference,
+		Tag:       props.BlobDockerTag,
+	}
+
 	cc := DockerContainerReference{
 		CyanId:    e.Request.LocalTemplateId,
 		CyanType:  "unzip",
 		SessionId: "",
 	}
 
-	fmt.Println("📦 Extracting blob from image:", DockerImageToString(*e.Request.ImageRef))
+	fmt.Println("📦 Extracting blob from image:", DockerImageToString(blobImage))
 
-	// Create and start the unzip container
-	if err := e.Docker.CreateContainerWithVolume(cc, blobVol, *e.Request.ImageRef); err != nil {
+	// Create and start the unzip container with the blob image
+	if err := e.Docker.CreateContainerWithVolume(cc, blobVol, blobImage); err != nil {
 		return fmt.Errorf("failed to start unzip container: %w", err)
 	}
 
@@ -153,12 +151,14 @@ func (e *TryExecutor) populateBlobFromImage(blobVol DockerVolumeReference) error
 		_ = e.Docker.RemoveContainer(cc) // best effort cleanup
 	}()
 
-	// Wait for the template container to be ready (health check)
-	// The template container runs as a server, so we wait for it to respond, not to stop
+	// Wait for the blob extraction (tar) to complete and exit
 	fmt.Println("⚙️ Waiting for blob extraction to complete...")
-	ep := fmt.Sprintf("http://%s:5550/", DockerContainerToString(cc))
-	if err := e.statusCheck(ep, 60); err != nil {
-		return fmt.Errorf("blob extraction health check failed: %w", err)
+	exitCode, err := e.Docker.WaitContainer(cc)
+	if err != nil {
+		return fmt.Errorf("failed waiting for blob extraction: %w", err)
+	}
+	if exitCode != 0 {
+		return fmt.Errorf("blob extraction failed with exit code %d", exitCode)
 	}
 	fmt.Println("✅ Blob extraction completed")
 
@@ -370,25 +370,4 @@ func (e *TryExecutor) statusCheck(endpoint string, maxAttempts int) error {
 		time.Sleep(1 * time.Second)
 	}
 	return fmt.Errorf("health check failed for %s after %d attempts", endpoint, maxAttempts)
-}
-
-func (e *TryExecutor) startMerger(blobVol, sessionVol DockerVolumeReference) error {
-	img, err := e.Docker.GetCoordinatorImage()
-	if err != nil {
-		return err
-	}
-
-	cc := DockerContainerReference{
-		CyanId:    e.Request.MergerId,
-		CyanType:  "merger",
-		SessionId: e.Request.SessionId,
-	}
-
-	fmt.Println("🚀 Starting merger:", cc.CyanId)
-	if err := e.Docker.CreateContainerWithReadWriteVolume(cc, blobVol, sessionVol, img); err != nil {
-		return err
-	}
-
-	ep := "http://" + DockerContainerToString(cc) + ":9000"
-	return e.statusCheck(ep, 60)
 }
