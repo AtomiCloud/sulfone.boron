@@ -140,7 +140,7 @@ func callResolver(resolverID string, sessionID string, req ResolverRequest) (*Re
 	ref := DockerContainerReference{
 		CyanId:    resolverID,
 		CyanType:  CyanTypeResolver,
-		SessionId: sessionID,
+		SessionId: "",
 	}
 	containerName := DockerContainerToString(ref)
 	endpoint := fmt.Sprintf("http://%s:%d/api/resolve", containerName, ResolverPort)
@@ -360,6 +360,11 @@ func (m Merger) merge(dirs []string, processorIDs []string, mergePath string, me
 // MergeFiles used by merger container
 // Detects conflicts and calls resolvers to intelligently merge conflicting files
 func (m Merger) MergeFiles(fromDirs []string, processorIDs []string, mergeDir string) error {
+	// Ensure merge directory exists before processing
+	if err := os.MkdirAll(mergeDir, 0755); err != nil {
+		return fmt.Errorf("failed to create merge directory '%s': %w", mergeDir, err)
+	}
+
 	// Step 1: Collect all files from all processor outputs
 	fileMap := make(map[string][]processorFile) // path -> list of versions
 
@@ -458,7 +463,8 @@ func (m Merger) MergeFiles(fromDirs []string, processorIDs []string, mergeDir st
 			// Determine file permissions from source files
 			perm := os.FileMode(0644) // default fallback
 			if len(versions) > 0 {
-				if info, err := os.Stat(versions[0].Path); err == nil {
+				winning := versions[len(versions)-1]
+				if info, err := os.Stat(winning.Path); err == nil {
 					perm = info.Mode().Perm()
 				}
 			}
