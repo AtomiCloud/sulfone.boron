@@ -43,9 +43,10 @@ type CyanReq struct {
 }
 
 type MergeReq struct {
-	FromDirs []string
-	ToDir    string
-	Template TemplateVersionRes `json:"template"`
+	FromDirs     []string
+	ProcessorIDs []string `json:"processorIDs"`
+	ToDir        string
+	Template     TemplateVersionRes `json:"template"`
 }
 
 type ZipReq struct {
@@ -96,6 +97,31 @@ type IsoProcessorReq struct {
 type IsoPluginReq struct {
 	Directory string      `json:"directory"`
 	Config    interface{} `json:"config"`
+}
+
+// ResolverFile represents a file version sent to resolver
+type ResolverFile struct {
+	Path    string         `json:"path"`
+	Content string         `json:"content"`
+	Origin  ResolverOrigin `json:"origin"`
+}
+
+// ResolverOrigin tracks where a file version came from
+type ResolverOrigin struct {
+	Template string `json:"template"` // Processor reference or name
+	Layer    int    `json:"layer"`    // Layer order (0 = bottom)
+}
+
+// ResolverRequest is sent to resolver container
+type ResolverRequest struct {
+	Config interface{}    `json:"config"` // From resolver.Config
+	Files  []ResolverFile `json:"files"`  // All versions of ONE conflicting file
+}
+
+// ResolverResponse is received from resolver container
+type ResolverResponse struct {
+	Path    string `json:"path"`
+	Content string `json:"content"`
 }
 
 // Registry responses

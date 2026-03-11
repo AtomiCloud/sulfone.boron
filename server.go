@@ -807,7 +807,7 @@ func server(registryEndpoint string) {
 			Template:  req.Template,
 			SessionId: sessionId,
 		}
-		err = m.MergeFiles(req.FromDirs, req.ToDir)
+		err = m.MergeFiles(req.FromDirs, req.ProcessorIDs, req.ToDir)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": []string{err.Error()}})
 			return

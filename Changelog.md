@@ -1,3 +1,25 @@
+## [2.7.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.6.0...v2.7.0) (2026-03-11)
+
+
+### 📜 Documentation 📜
+
+* add implementation plans for CU-86ewueggx ([3b25c87](https://github.com/AtomiCloud/sulfone.boron/commit/3b25c872a1eb421162f0fa8d846ac8fba9032707))
+* add task spec for CU-86ewueggx ([d67e93c](https://github.com/AtomiCloud/sulfone.boron/commit/d67e93c108084b20d6c531b9640bbf7366948c77))
+* update task spec for CU-86ewueggx - use doublestar glob library ([5b3e39e](https://github.com/AtomiCloud/sulfone.boron/commit/5b3e39e943a8fb9efba92854cf1517483e63b757))
+
+
+### ✨ Features ✨
+
+* **merger:** implement resolver support for conflict resolution ([e6c37d5](https://github.com/AtomiCloud/sulfone.boron/commit/e6c37d59869cb1e67de43f028e1b8f8a7bc88293))
+
+
+### 🐛 Bug Fixes 🐛
+
+* add defensive nil check for req.Files in callResolver error path ([4ce33c2](https://github.com/AtomiCloud/sulfone.boron/commit/4ce33c2579bd1574501dbc0b024a46b28c017bd3))
+* **merger:** address CodeRabbit review feedback for resolver integration ([81248e1](https://github.com/AtomiCloud/sulfone.boron/commit/81248e17e858f271839a23388977ccafa87a9275))
+* **merger:** address CodeRabbit review feedback for resolver integration ([b896ec9](https://github.com/AtomiCloud/sulfone.boron/commit/b896ec960218df9448c42dc523f301f5dad3963f))
+* **merger:** use os.Chmod for file mode preservation [CU-86ewueggx] ([9cab6d7](https://github.com/AtomiCloud/sulfone.boron/commit/9cab6d7dd03857141b708c5d95e4b97e6684b1eb))
+
 ## [2.6.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.5.0...v2.6.0) (2026-03-09)
 
 
