@@ -460,12 +460,12 @@ func (m Merger) MergeFiles(fromDirs []string, processorIDs []string, mergeDir st
 				return fmt.Errorf("Resolver returned invalid path: expected '%s', got '%s'", conflictPath, response.Path)
 			}
 
-			// Determine file permissions from source files
-			perm := os.FileMode(0644) // default fallback
+			// Determine file mode from winning (last) source file
+			mode := os.FileMode(0644) // default fallback
 			if len(versions) > 0 {
 				winning := versions[len(versions)-1]
 				if info, err := os.Stat(winning.Path); err == nil {
-					perm = info.Mode().Perm()
+					mode = info.Mode()
 				}
 			}
 
@@ -474,8 +474,12 @@ func (m Merger) MergeFiles(fromDirs []string, processorIDs []string, mergeDir st
 			if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
 				return fmt.Errorf("failed to create directory for '%s': %w", response.Path, err)
 			}
-			if err := os.WriteFile(destPath, []byte(response.Content), perm); err != nil {
+			if err := os.WriteFile(destPath, []byte(response.Content), 0644); err != nil {
 				return fmt.Errorf("failed to write resolved file '%s': %w", response.Path, err)
+			}
+			// Apply exact file mode after write to bypass umask, consistent with copyFile
+			if err := os.Chmod(destPath, mode); err != nil {
+				return fmt.Errorf("failed to set file mode on resolved file '%s': %w", response.Path, err)
 			}
 			fmt.Printf("Successfully resolved conflict '%s' using resolver '%s'\n", conflictPath, resolver.ID)
 		} else {
