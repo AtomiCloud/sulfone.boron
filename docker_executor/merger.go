@@ -98,18 +98,21 @@ type processorFile struct {
 }
 
 // findMatchingResolver finds resolvers whose file patterns match the given path
-func findMatchingResolver(path string, resolvers []ResolverRes) []ResolverRes {
+func findMatchingResolver(path string, resolvers []ResolverRes) ([]ResolverRes, error) {
 	var matches []ResolverRes
 	for _, resolver := range resolvers {
 		for _, pattern := range resolver.Files {
 			matched, err := doublestar.Match(pattern, path)
-			if err == nil && matched {
+			if err != nil {
+				return nil, fmt.Errorf("invalid glob pattern '%s' in resolver '%s': %w", pattern, resolver.ID, err)
+			}
+			if matched {
 				matches = append(matches, resolver)
 				break // One pattern match per resolver is enough
 			}
 		}
 	}
-	return matches
+	return matches, nil
 }
 
 // buildResolverFiles reads file contents and builds resolver file requests
@@ -188,12 +191,14 @@ func parseCyanReference(ref string) (string, string, *string, error) {
 	return sects[0], sects[1], version, nil
 }
 
-func (m Merger) execProcessors(processors []CyanProcessorReq) ([]string, []error) {
+func (m Merger) execProcessors(processors []CyanProcessorReq) ([]string, []string, []error) {
 	errChan := make(chan error, len(processors))
 	// Pre-allocate slice with empty placeholders to preserve processor order
 	writeDirs := make([]string, len(processors))
+	processorIDs := make([]string, len(processors))
 	for i := range writeDirs {
 		writeDirs[i] = ""
+		processorIDs[i] = ""
 	}
 	semaphore := make(chan int, m.ParallelismLimit)
 	for idx, processor := range processors {
@@ -251,6 +256,7 @@ func (m Merger) execProcessors(processors []CyanProcessorReq) ([]string, []error
 			fmt.Println("🎉 Processor", pp.Id, "completed")
 			// Store result at the processor's original index to preserve order
 			writeDirs[processorIndex] = res.OutputDir
+			processorIDs[processorIndex] = pp.Id
 			errChan <- nil
 			<-semaphore
 		}(processor, idx)
@@ -263,7 +269,7 @@ func (m Merger) execProcessors(processors []CyanProcessorReq) ([]string, []error
 			errs = append(errs, err)
 		}
 	}
-	return writeDirs, errs
+	return writeDirs, processorIDs, errs
 }
 
 func (m Merger) execPlugins(mergePath string, plugins []CyanPluginReq) []error {
@@ -325,11 +331,12 @@ func (m Merger) execPlugins(mergePath string, plugins []CyanPluginReq) []error {
 	return nil
 }
 
-func (m Merger) merge(dirs []string, mergePath string, mergerId string) error {
+func (m Merger) merge(dirs []string, processorIDs []string, mergePath string, mergerId string) error {
 	req := MergeReq{
-		FromDirs: dirs,
-		ToDir:    mergePath,
-		Template: m.Template,
+		FromDirs:     dirs,
+		ProcessorIDs: processorIDs,
+		ToDir:        mergePath,
+		Template:     m.Template,
 	}
 
 	c := DockerContainerReference{
@@ -352,7 +359,7 @@ func (m Merger) merge(dirs []string, mergePath string, mergerId string) error {
 
 // MergeFiles used by merger container
 // Detects conflicts and calls resolvers to intelligently merge conflicting files
-func (m Merger) MergeFiles(fromDirs []string, mergeDir string) error {
+func (m Merger) MergeFiles(fromDirs []string, processorIDs []string, mergeDir string) error {
 	// Step 1: Collect all files from all processor outputs
 	fileMap := make(map[string][]processorFile) // path -> list of versions
 
@@ -374,9 +381,13 @@ func (m Merger) MergeFiles(fromDirs []string, mergeDir string) error {
 			}
 
 			// Add file to the map
+			templateID := ""
+			if layer < len(processorIDs) {
+				templateID = processorIDs[layer]
+			}
 			fileMap[relPath] = append(fileMap[relPath], processorFile{
 				Path:     fullPath,
-				Template: m.Template.Processors[layer].ID,
+				Template: templateID,
 				Layer:    layer,
 				RelPath:  relPath,
 			})
@@ -388,7 +399,7 @@ func (m Merger) MergeFiles(fromDirs []string, mergeDir string) error {
 		}
 	}
 
-	// Step 2: Identify conflicts and non-conflicts
+	// Step 2: Identify conflicts without calling resolvers
 	var conflicts []string
 	var nonConflicts []string
 	for path, versions := range fileMap {
@@ -404,7 +415,10 @@ func (m Merger) MergeFiles(fromDirs []string, mergeDir string) error {
 		versions := fileMap[conflictPath]
 
 		// Match resolvers using doublestar.Match()
-		matchingResolvers := findMatchingResolver(conflictPath, m.Template.Resolvers)
+		matchingResolvers, err := findMatchingResolver(conflictPath, m.Template.Resolvers)
+		if err != nil {
+			return err
+		}
 
 		if len(matchingResolvers) == 0 {
 			// LWW: use last version
@@ -441,12 +455,20 @@ func (m Merger) MergeFiles(fromDirs []string, mergeDir string) error {
 				return fmt.Errorf("Resolver returned invalid path: expected '%s', got '%s'", conflictPath, response.Path)
 			}
 
+			// Determine file permissions from source files
+			perm := os.FileMode(0644) // default fallback
+			if len(versions) > 0 {
+				if info, err := os.Stat(versions[0].Path); err == nil {
+					perm = info.Mode().Perm()
+				}
+			}
+
 			// Write resolved content to merge directory
 			destPath := filepath.Join(mergeDir, response.Path)
 			if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
 				return fmt.Errorf("failed to create directory for '%s': %w", response.Path, err)
 			}
-			if err := os.WriteFile(destPath, []byte(response.Content), 0644); err != nil {
+			if err := os.WriteFile(destPath, []byte(response.Content), perm); err != nil {
 				return fmt.Errorf("failed to write resolved file '%s': %w", response.Path, err)
 			}
 			fmt.Printf("Successfully resolved conflict '%s' using resolver '%s'\n", conflictPath, resolver.ID)
@@ -476,9 +498,9 @@ func (m Merger) Merge(req BuildReq) (string, []error) {
 
 	// exec all processors
 	fmt.Println("⚙️ Executing processors...")
-	dirs, errs := m.execProcessors(req.Cyan.Processors)
+	dirs, procIDs, errs := m.execProcessors(req.Cyan.Processors)
 	if len(errs) > 0 {
-		fmt.Println("🚨 Error executing processors: ", errs)
+		fmt.Println("🚚 Error executing processors: ", errs)
 		return "", errs
 	}
 	fmt.Println("🎉 Processors completed.")
@@ -490,9 +512,9 @@ func (m Merger) Merge(req BuildReq) (string, []error) {
 		return "", []error{err}
 	}
 	mergePath := "/workspace/area/" + mergeDir.String()
-	err = m.merge(dirs, mergePath, req.MergerId)
+	err = m.merge(dirs, procIDs, mergePath, req.MergerId)
 	if err != nil {
-		fmt.Println("🚨 Error merging processor outputs: ", err)
+		fmt.Println("🚚 Error merging processor outputs: ", err)
 		return "", []error{err}
 	}
 	fmt.Println("🎉 Processor outputs merged.")
@@ -501,7 +523,7 @@ func (m Merger) Merge(req BuildReq) (string, []error) {
 	fmt.Println("⚙️ Executing plugins...")
 	errs = m.execPlugins(mergePath, req.Cyan.Plugins)
 	if len(errs) > 0 {
-		fmt.Println("🚨 Error executing plugins: ", errs)
+		fmt.Println("🚚 Error executing plugins: ", errs)
 		return "", errs
 	}
 	fmt.Println("🎉 Plugins completed.")

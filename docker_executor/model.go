@@ -43,9 +43,10 @@ type CyanReq struct {
 }
 
 type MergeReq struct {
-	FromDirs []string
-	ToDir    string
-	Template TemplateVersionRes `json:"template"`
+	FromDirs     []string
+	ProcessorIDs []string `json:"processorIDs"`
+	ToDir        string
+	Template     TemplateVersionRes `json:"template"`
 }
 
 type ZipReq struct {

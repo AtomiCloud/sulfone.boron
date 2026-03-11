@@ -20,7 +20,7 @@
 
 **In `go.mod`:**
 
-```
+```go
 require github.com/bmatcuk/doublestar/v4
 ```
 
