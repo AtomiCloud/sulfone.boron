@@ -153,12 +153,12 @@ func (e *TryExecutor) populateBlobFromImage(blobVol DockerVolumeReference) error
 		_ = e.Docker.RemoveContainer(cc) // best effort cleanup
 	}()
 
-	// Wait for the unzip container to complete
+	// Wait for the template container to be ready (health check)
+	// The template container runs as a server, so we wait for it to respond, not to stop
 	fmt.Println("⚙️ Waiting for blob extraction to complete...")
-	if exitCode, err := e.Docker.WaitContainer(cc); err != nil {
-		return fmt.Errorf("failed to extract blob from image: %w", err)
-	} else if exitCode != 0 {
-		return fmt.Errorf("unzip container failed with exit code %d", exitCode)
+	ep := fmt.Sprintf("http://%s:5550/", DockerContainerToString(cc))
+	if err := e.statusCheck(ep, 60); err != nil {
+		return fmt.Errorf("blob extraction health check failed: %w", err)
 	}
 	fmt.Println("✅ Blob extraction completed")
 
