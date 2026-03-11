@@ -191,7 +191,7 @@ func TestValidatePathSymlinkAttacks(t *testing.T) {
 	// Test that accessing the symlink is blocked
 	_, err = validatePath(symlinkPath)
 	if err == nil {
-		t.Errorf("validatePath(%q) should reject symlink pointing outside DEV_ROOT", symlinkPath)
+		t.Fatalf("validatePath(%q) should reject symlink pointing outside DEV_ROOT", symlinkPath)
 	}
 	if !strings.Contains(err.Error(), "outside allowed DEV_ROOT") {
 		t.Errorf("validatePath(%q) error = %v, want error containing 'outside allowed DEV_ROOT'", symlinkPath, err)
