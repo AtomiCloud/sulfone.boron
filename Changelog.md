@@ -1,3 +1,24 @@
+## [2.8.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.7.0...v2.8.0) (2026-03-12)
+
+
+### ✨ Features ✨
+
+* **executor:** add POST /executor/try endpoint for local testing ([10a00c2](https://github.com/AtomiCloud/sulfone.boron/commit/10a00c21c40f3d8045d414190bd01d7067719767))
+
+
+### 🐛 Bug Fixes 🐛
+
+* address coderabbit local review findings ([39e016f](https://github.com/AtomiCloud/sulfone.boron/commit/39e016f1edfddc400fc2f5da60fd11cac286a06e))
+* **executor:** address CodeRabbit review comments ([2506063](https://github.com/AtomiCloud/sulfone.boron/commit/25060639a9c2bf19266f90a53f387f358885d825))
+* **executor:** fix try endpoint and cleanup bugs ([5fc5719](https://github.com/AtomiCloud/sulfone.boron/commit/5fc5719acda703b59b16ff45ffcf8db88e66ee98))
+* **executor:** health check already-running resolver containers ([b1fb574](https://github.com/AtomiCloud/sulfone.boron/commit/b1fb574ae559e5a007bc7a9e98472c8aeacde6bf))
+* **server:** persist default source value to request struct ([8ea3b43](https://github.com/AtomiCloud/sulfone.boron/commit/8ea3b43b3cf721e0564095caa196c3956ee2c6ac))
+* **executor:** preserve positional error slices, fix Clean() nil filter ([4329fea](https://github.com/AtomiCloud/sulfone.boron/commit/4329fea2895e4989bc0cddd2b713828ed4ffdda3))
+* **server:** return realPath for consistency in validatePath ([e2cddd7](https://github.com/AtomiCloud/sulfone.boron/commit/e2cddd7ff497c5610dfd048038b0b6a9f5c5d83e))
+* **executor:** use defer for unzip container cleanup ([6cb7d8d](https://github.com/AtomiCloud/sulfone.boron/commit/6cb7d8dc0517444e0d2d8e8e3bfddf704ab55e75))
+* **executor:** use health check for blob extraction ([c553790](https://github.com/AtomiCloud/sulfone.boron/commit/c5537901249619bd2f4fc0f1c0a18b8f21d3e2c9))
+* **test:** use t.Fatalf to prevent nil dereference in symlink test ([a886baf](https://github.com/AtomiCloud/sulfone.boron/commit/a886baf2ed28cdfb58c16e7cf5dd61904478db90))
+
 ## [2.7.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.6.0...v2.7.0) (2026-03-11)
 
 
