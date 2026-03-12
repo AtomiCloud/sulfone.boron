@@ -314,15 +314,24 @@ func (e Executor) Clean(session string) []error {
 		}
 	}
 
-	errs := e.Docker.RemoveAllContainers(sessionContainer)
-	if len(errs) > 0 {
+	if errs := filterNilErrors(e.Docker.RemoveAllContainers(sessionContainer)); len(errs) > 0 {
 		return errs
 	}
-	errs = e.Docker.RemoveAllVolumes(sessionVolume)
-	if len(errs) > 0 {
+	if errs := filterNilErrors(e.Docker.RemoveAllVolumes(sessionVolume)); len(errs) > 0 {
 		return errs
 	}
 	return nil
+}
+
+// filterNilErrors removes nil entries from a positional error slice
+func filterNilErrors(errs []error) []error {
+	var filtered []error
+	for _, err := range errs {
+		if err != nil {
+			filtered = append(filtered, err)
+		}
+	}
+	return filtered
 }
 
 func (e Executor) Start(session string, readVolRef, writeVolRef DockerVolumeReference, req MergerReq) []error {

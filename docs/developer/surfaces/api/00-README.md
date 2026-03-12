@@ -16,6 +16,7 @@ http://localhost:9000
 | ------ | ----------------------------------------------- | ---------------------------------------------- | --------------- |
 | GET    | `/`                                             | Health check                                   | `server.go:30`  |
 | POST   | `/executor`                                     | Start a new execution session                  | `server.go:183` |
+| POST   | `/executor/try`                                 | Setup try/test session for local testing       | `server.go`     |
 | POST   | `/executor/:sessionId`                          | Execute merge and get results                  | `server.go:68`  |
 | DELETE | `/executor/:sessionId`                          | Clean up session resources                     | `server.go:34`  |
 | POST   | `/executor/:sessionId/warm`                     | Warm session with images and volumes           | `server.go:248` |

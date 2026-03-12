@@ -225,10 +225,13 @@ func (de TemplateExecutor) startVolume(volRef DockerVolumeReference) error {
 	} else {
 		fmt.Println("⚙️ Still unzipping...", volRef.CyanId)
 	}
-	err = d.WaitContainer(unzipContainer)
+	exitCode, err := d.WaitContainer(unzipContainer)
 	if err != nil {
 		fmt.Println("🚨 Failed to unzip volume", volRef.CyanId)
 		return err
+	} else if exitCode != 0 {
+		fmt.Println("🚨 Unzip container failed with exit code", exitCode, volRef.CyanId)
+		return fmt.Errorf("unzip container failed with exit code %d", exitCode)
 	} else {
 		fmt.Println("✅ Volume unzipped", volRef.CyanId)
 	}
