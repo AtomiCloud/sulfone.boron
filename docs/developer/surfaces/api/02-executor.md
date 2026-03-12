@@ -195,7 +195,7 @@ Warm a session by pulling images and creating the session volume.
 
 ## POST /executor/try
 
-Setup a try/test session for local testing. Creates blob volume from local image or path, session volume, pulls missing images, warms resolvers, and starts merger.
+Setup a try/test session for local testing. Creates blob volume from local image or path, session volume, pulls missing images, and warms resolvers. The merger is started later via `POST /executor/:sessionId`.
 
 **Key File**: `server.go` (try_executor.go for implementation)
 

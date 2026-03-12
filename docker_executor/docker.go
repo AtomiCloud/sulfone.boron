@@ -340,13 +340,11 @@ func (d *DockerClient) RemoveAllContainers(containerRefs []DockerContainerRefere
 		}(i, containerRef)
 	}
 
-	var allErr []error
+	allErr := make([]error, len(containerRefs))
 
 	for i := 0; i < len(containerRefs); i++ {
 		ie := <-errChan
-		if ie.err != nil {
-			allErr = append(allErr, ie.err)
-		}
+		allErr[ie.index] = ie.err
 	}
 
 	for i := 0; i < cap(semaphore); i++ {
@@ -387,13 +385,11 @@ func (d *DockerClient) RemoveAllVolumes(volRefs []DockerVolumeReference) []error
 		}(i, volRef)
 	}
 
-	var allErr []error
+	allErr := make([]error, len(volRefs))
 
 	for i := 0; i < len(volRefs); i++ {
 		ie := <-errChan
-		if ie.err != nil {
-			allErr = append(allErr, ie.err)
-		}
+		allErr[ie.index] = ie.err
 	}
 
 	for i := 0; i < cap(semaphore); i++ {
