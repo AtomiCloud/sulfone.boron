@@ -3,7 +3,6 @@ package docker_executor
 import (
 	"fmt"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -11,9 +10,6 @@ import (
 var httpClient = &http.Client{
 	Timeout: 5 * time.Second,
 }
-
-// sessionMutex protects session volume creation from race conditions
-var sessionMutex sync.Mutex
 
 type TryExecutor struct {
 	Docker  DockerClient
@@ -37,30 +33,20 @@ func (e *TryExecutor) TrySetup() (TryExecutorRes, []error) {
 		return TryExecutorRes{}, errs
 	}
 
-	// 2. Create session volume (fail if exists)
-	// Note: Session volume is intentionally not cleaned up on partial failure
-	// to allow users to retry or inspect the state for debugging purposes.
-	sessionVol, errs := e.createSessionVolume()
-	if len(errs) > 0 {
-		return TryExecutorRes{}, errs
-	}
-
-	// 3. Pull missing images
+	// 2. Pull missing images
 	errs = e.pullMissingImages()
 	if len(errs) > 0 {
 		return TryExecutorRes{}, errs
 	}
 
-	// 4. Warm resolvers
+	// 3. Warm resolvers
 	errs = e.warmResolvers()
 	if len(errs) > 0 {
 		return TryExecutorRes{}, errs
 	}
 
 	return TryExecutorRes{
-		SessionId:     e.Request.SessionId,
-		BlobVolume:    blobVol,
-		SessionVolume: sessionVol,
+		BlobVolume: blobVol,
 	}, nil
 }
 
@@ -115,7 +101,7 @@ func (e *TryExecutor) populateBlobFromPath(blobVol DockerVolumeReference) error 
 	cc := DockerContainerReference{
 		CyanId:    e.Request.LocalTemplateId,
 		CyanType:  "copy-helper",
-		SessionId: e.Request.SessionId,
+		SessionId: "",
 	}
 	fmt.Println("📂 Copying files from path:", e.Request.Path)
 	return e.Docker.CreateContainerWithCopyMount(cc, e.Request.Path, blobVol)
@@ -163,36 +149,6 @@ func (e *TryExecutor) populateBlobFromImage(blobVol DockerVolumeReference) error
 	fmt.Println("✅ Blob extraction completed")
 
 	return nil
-}
-
-func (e *TryExecutor) createSessionVolume() (DockerVolumeReference, []error) {
-	sessionVol := DockerVolumeReference{
-		CyanId:    e.Request.LocalTemplateId,
-		SessionId: e.Request.SessionId,
-	}
-
-	// Use mutex to ensure atomic check-and-create for session collision detection
-	sessionMutex.Lock()
-	defer sessionMutex.Unlock()
-
-	// Check if exists (collision detection)
-	volumes, err := e.Docker.ListVolumes()
-	if err != nil {
-		return sessionVol, []error{err}
-	}
-
-	for _, v := range volumes {
-		if v.CyanId == e.Request.LocalTemplateId && v.SessionId == e.Request.SessionId {
-			return sessionVol, []error{fmt.Errorf("session volume already exists: session collision")}
-		}
-	}
-
-	fmt.Println("📦 Creating session volume:", DockerVolumeToString(sessionVol))
-	if err := e.Docker.CreateVolume(sessionVol); err != nil {
-		return sessionVol, []error{err}
-	}
-
-	return sessionVol, nil
 }
 
 func (e *TryExecutor) pullMissingImages() []error {
