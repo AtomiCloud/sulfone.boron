@@ -82,6 +82,9 @@ func (d *DockerClient) PullImages(images []DockerImageReference) []error {
 			})
 			if err != nil {
 				fmt.Println("🚨Failed to pull image [Docker.ImagePull]:", ref)
+				errChan <- err
+				<-semaphore
+				return
 			}
 			defer func(reader io.ReadCloser) {
 				_ = reader.Close()
