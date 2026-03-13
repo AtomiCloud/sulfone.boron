@@ -1,3 +1,10 @@
+## [2.8.1](https://github.com/AtomiCloud/sulfone.boron/compare/v2.8.0...v2.8.1) (2026-03-13)
+
+
+### 🐛 Bug Fixes 🐛
+
+* **executor:** prevent nil dereference in PullImages ([2eff2c2](https://github.com/AtomiCloud/sulfone.boron/commit/2eff2c2d0e8d260f11ad017aa9b3a7d521f7bb9c))
+
 ## [2.8.0](https://github.com/AtomiCloud/sulfone.boron/compare/v2.7.0...v2.8.0) (2026-03-12)
 
 
