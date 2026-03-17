@@ -67,7 +67,7 @@ type TemplatePrincipalRes struct {
 
 // TryExecutorReq is the request body for POST /executor/try
 type TryExecutorReq struct {
-	SessionId       string                `json:"session_id" binding:"required"`
+	SessionId       string                `json:"sessionId" binding:"required"`
 	LocalTemplateId string                `json:"localTemplateId" binding:"required"`
 	Source          string                `json:"source"` // "image" (default) or "path"
 	ImageRef        *DockerImageReference `json:"imageRef"`
