@@ -121,7 +121,7 @@ func (e *TryExecutor) populateBlobFromImage(blobVol DockerVolumeReference) error
 	cc := DockerContainerReference{
 		CyanId:    e.Request.LocalTemplateId,
 		CyanType:  "unzip",
-		SessionId: "",
+		SessionId: e.Request.SessionId,
 	}
 
 	fmt.Println("📦 Extracting blob from image:", DockerImageToString(blobImage))
