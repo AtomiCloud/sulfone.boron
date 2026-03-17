@@ -1,3 +1,11 @@
+## [2.8.2](https://github.com/AtomiCloud/sulfone.boron/compare/v2.8.1...v2.8.2) (2026-03-17)
+
+
+### 🐛 Bug Fixes 🐛
+
+* **executor:** unzip container name collision in parallel sessions ([#30](https://github.com/AtomiCloud/sulfone.boron/issues/30)) ([7659981](https://github.com/AtomiCloud/sulfone.boron/commit/765998112c0fa4d2a5229295c7622bbe72313ebb))
+* **executor:** unzip container name collision in parallel sessions ([6ec8f37](https://github.com/AtomiCloud/sulfone.boron/commit/6ec8f37adfa8c465c01f2fb160019dc67b178af7))
+
 ## [2.8.1](https://github.com/AtomiCloud/sulfone.boron/compare/v2.8.0...v2.8.1) (2026-03-13)
 
 
