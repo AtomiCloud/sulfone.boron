@@ -1,3 +1,11 @@
+## [2.8.3](https://github.com/AtomiCloud/sulfone.boron/compare/v2.8.2...v2.8.3) (2026-03-17)
+
+
+### 🐛 Bug Fixes 🐛
+
+* **executor:** use camelCase JSON tag for SessionId in TryExecutorReq ([#31](https://github.com/AtomiCloud/sulfone.boron/issues/31)) ([ce5085c](https://github.com/AtomiCloud/sulfone.boron/commit/ce5085ced8b165cd3e2fc4df56fe23c78265a8f9)), closes [#30](https://github.com/AtomiCloud/sulfone.boron/issues/30)
+* **executor:** use camelCase JSON tag for SessionId in TryExecutorReq ([5ab865c](https://github.com/AtomiCloud/sulfone.boron/commit/5ab865caad2bfda1aabc5c528664582a08ee69d2))
+
 ## [2.8.2](https://github.com/AtomiCloud/sulfone.boron/compare/v2.8.1...v2.8.2) (2026-03-17)
 
 
